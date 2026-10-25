@@ -1,0 +1,481 @@
+[
+  {
+    "id": 1,
+    "product_name": "Re- DB Plus",
+    "dls_license_no": "126-18-(07)-005",
+    "pricing": [
+      {
+        "size_or_weight": "1 kg",
+        "trade_price_tp": "280 TK",
+        "maximum_retail_price_mrp": "360 TK"
+      }
+    ]
+  },
+  {
+    "id": 2,
+    "product_name": "RE- MILK PLUS",
+    "dls_license_no": "126-18-(07)-004",
+    "pricing": [
+      {
+        "size_or_weight": "1 kg",
+        "trade_price_tp": "360 TK",
+        "maximum_retail_price_mrp": "480 TK"
+      }
+    ]
+  },
+  {
+    "id": 3,
+    "product_name": "RE - FAT PLUS",
+    "dls_license_no": "126-18-(07)-",
+    "pricing": [
+      {
+        "size_or_weight": "1 kg",
+        "trade_price_tp": "375 TK",
+        "maximum_retail_price_mrp": "480 TK"
+      }
+    ]
+  },
+  {
+    "id": 4,
+    "product_name": "RE - DCP PLUS",
+    "dls_license_no": "126-18-(07)-",
+    "pricing": [
+      {
+        "size_or_weight": "1 kg",
+        "trade_price_tp": "145 TK",
+        "maximum_retail_price_mrp": "210 TK"
+      }
+    ]
+  },
+  {
+    "id": 5,
+    "product_name": "RE - ZYME VET",
+    "dls_license_no": "126-18-(05)-009",
+    "pricing": [
+      {
+        "size_or_weight": "25 gm",
+        "trade_price_tp": "15 TK",
+        "maximum_retail_price_mrp": "25 TK",
+        "packaging_info": "1 box = 20 Pis"
+      }
+    ]
+  },
+  {
+    "id": 6,
+    "product_name": "RE - MINAL VET",
+    "dls_license_no": "126-18-(05)-012",
+    "pricing": [
+      {
+        "size_or_weight": "20 gm",
+        "trade_price_tp": "17 TK",
+        "maximum_retail_price_mrp": "25 TK",
+        "packaging_info": "1 Box = 20 Pis"
+      }
+    ]
+  },
+  {
+    "id": 7,
+    "product_name": "RE - SALAINE",
+    "dls_license_no": "126-18-(05)-010",
+    "pricing": [
+      {
+        "size_or_weight": "25 gm",
+        "trade_price_tp": "10 TK",
+        "maximum_retail_price_mrp": "15 TK",
+        "packaging_info": "1 Box = 20 Pis"
+      }
+    ]
+  },
+  {
+    "id": 8,
+    "product_name": "RE - DIAVET",
+    "dls_license_no": "126-18-(05)-008",
+    "pricing": [
+      {
+        "size_or_weight": "160 gm",
+        "trade_price_tp": "35 TK",
+        "maximum_retail_price_mrp": "60 TK"
+      }
+    ]
+  },
+  {
+    "id": 9,
+    "product_name": "REFERON VET",
+    "dls_license_no": "126-18-(05)-",
+    "pricing": [
+      {
+        "size_or_weight": "Not specified",
+        "trade_price_tp": "52 TK",
+        "maximum_retail_price_mrp": "80 TK"
+      }
+    ]
+  },
+  {
+    "id": 10,
+    "product_name": "RE-KALOMEGH VET",
+    "bangladesh_patent_no": "1005414",
+    "pricing": [
+      {
+        "size_or_weight": "120 gm",
+        "trade_price_tp": "160 TK",
+        "maximum_retail_price_mrp": "210 TK"
+      },
+      {
+        "size_or_weight": "250 gm",
+        "trade_price_tp": "285 TK",
+        "maximum_retail_price_mrp": "345 TK"
+      }
+    ]
+  },
+  {
+    "id": 11,
+    "product_name": "Re-MASTICARE",
+    "bangladesh_patent_no": "1005415",
+    "pricing": [
+      {
+        "size_or_weight": "100 gm",
+        "trade_price_tp": "160 TK",
+        "maximum_retail_price_mrp": "260 TK"
+      }
+    ]
+  },
+  {
+    "id": 12,
+    "product_name": "Re - B.V SAFE",
+    "dls_license_no": "126-25-",
+    "pricing": [
+      {
+        "size_or_weight": "100 gm",
+        "trade_price_tp": "310 TK",
+        "maximum_retail_price_mrp": "495 TK"
+      },
+      {
+        "size_or_weight": "50 gm",
+        "trade_price_tp": "165 TK",
+        "maximum_retail_price_mrp": "225 TK"
+      }
+    ]
+  },
+  {
+    "id": 13,
+    "product_name": "Re- Uto Plus",
+    "dls_license_no": "126-18-(05)-015",
+    "pricing": [
+      {
+        "size_or_weight": "350 gm",
+        "trade_price_tp": "290 TK",
+        "maximum_retail_price_mrp": "360 TK"
+      }
+    ]
+  },
+  {
+    "id": 14,
+    "product_name": "Re-Thia Vet",
+    "dls_license_no": "126-18-(05)-017",
+    "pricing": [
+      {
+        "size_or_weight": "20 gm",
+        "trade_price_tp": "22 TK",
+        "maximum_retail_price_mrp": "42 TK",
+        "packaging_info": "20 Sachet = 1 Box = 840 T.P"
+      }
+    ]
+  },
+  {
+    "id": 15,
+    "product_name": "Re- Cof Vet",
+    "dls_license_no": "126-25-",
+    "pricing": [
+      {
+        "size_or_weight": "20 gm",
+        "trade_price_tp": "20 TK",
+        "maximum_retail_price_mrp": "30 TK"
+      }
+    ]
+  },
+  {
+    "id": 16,
+    "product_name": "Re-Lebens Baum",
+    "dls_license_no": "126-25",
+    "pricing": [
+      {
+        "size_or_weight": "450 gm",
+        "trade_price_tp": "280 TK",
+        "maximum_retail_price_mrp": "350 TK"
+      }
+    ]
+  },
+  {
+    "id": 17,
+    "product_name": "P.P",
+    "pricing": [
+      {
+        "size_or_weight": "10 gm",
+        "trade_price_tp": "16 TK",
+        "maximum_retail_price_mrp": "25 TK",
+        "packaging_info": "1 Box = 25 Pis"
+      }
+    ]
+  },
+  {
+    "id": 18,
+    "product_name": "M.S",
+    "pricing": [
+      {
+        "size_or_weight": "15 gm",
+        "trade_price_tp": "12 TK",
+        "maximum_retail_price_mrp": "20 TK",
+        "packaging_info": "1 Box = 25 Pis"
+      }
+    ]
+  },
+  {
+    "id": 19,
+    "product_name": "Re - Bovi Plus",
+    "dls_license_no": "126-18-(05)-014",
+    "pricing": [
+      {
+        "size_or_weight": "125 gm",
+        "trade_price_tp": "160 TK",
+        "maximum_retail_price_mrp": "270 TK"
+      }
+    ]
+  },
+  {
+    "id": 20,
+    "product_name": "Re-Euforana",
+    "dls_license_no": "126-25",
+    "pricing": [
+      {
+        "size_or_weight": "100 gm",
+        "trade_price_tp": "235 TK",
+        "maximum_retail_price_mrp": "310 TK"
+      }
+    ]
+  },
+  {
+    "id": 21,
+    "product_name": "Re- L D Min",
+    "dls_license_no": "126-18-(05)-011",
+    "pricing": [
+      {
+        "size_or_weight": "1 kg",
+        "trade_price_tp": "380 TK",
+        "maximum_retail_price_mrp": "495 TK"
+      }
+    ]
+  },
+  {
+    "id": 22,
+    "product_name": "Re - Euramia",
+    "dls_license_no": "126-25",
+    "pricing": [
+      {
+        "size_or_weight": "50 gm",
+        "trade_price_tp": "240 TK",
+        "maximum_retail_price_mrp": "360 TK",
+        "packaging_info": "1 Box = 12 Pis"
+      }
+    ]
+  },
+  {
+    "id": 23,
+    "product_name": "Placenta Nill",
+    "dls_license_no": "126-25-",
+    "pricing": [
+      {
+        "size_or_weight": "500 ml",
+        "trade_price_tp": "275 TK",
+        "maximum_retail_price_mrp": "375 TK"
+      }
+    ]
+  },
+  {
+    "id": 24,
+    "product_name": "Re - Zinc Plus",
+    "dls_license_no": "126-18-(07)-006",
+    "pricing": [
+      {
+        "size_or_weight": "100 ml",
+        "trade_price_tp": "30 TK",
+        "maximum_retail_price_mrp": "55 TK"
+      },
+      {
+        "size_or_weight": "500 ml",
+        "trade_price_tp": "110 TK",
+        "maximum_retail_price_mrp": "195 TK"
+      },
+      {
+        "size_or_weight": "1 Lt",
+        "trade_price_tp": "180 TK",
+        "maximum_retail_price_mrp": "295 TK"
+      },
+      {
+        "size_or_weight": "3 Lt",
+        "trade_price_tp": "460 TK",
+        "maximum_retail_price_mrp": "750 TK"
+      },
+      {
+        "size_or_weight": "5 Lt",
+        "trade_price_tp": "720 TK",
+        "maximum_retail_price_mrp": "1220 TK"
+      }
+    ]
+  },
+  {
+    "id": 25,
+    "product_name": "Re-Violet Plus",
+    "dls_license_no": "126-25-",
+    "pricing": [
+      {
+        "size_or_weight": "60 ml",
+        "trade_price_tp": "120 TK",
+        "maximum_retail_price_mrp": "175 TK",
+        "packaging_info": "1 Box = 12 Pis"
+      },
+      {
+        "size_or_weight": "120 ml",
+        "trade_price_tp": "180 TK",
+        "maximum_retail_price_mrp": "285 TK",
+        "packaging_info": "1 Box = 12 Pis"
+      }
+    ]
+  },
+  {
+    "id": 26,
+    "product_name": "Re- Vita AD3E",
+    "dls_license_no": "126-18-(07)-007",
+    "pricing": [
+      {
+        "size_or_weight": "100 ml",
+        "trade_price_tp": "110 TK",
+        "maximum_retail_price_mrp": "180 TK"
+      },
+      {
+        "size_or_weight": "500 ml",
+        "trade_price_tp": "480 TK",
+        "maximum_retail_price_mrp": "780 TK"
+      }
+    ]
+  },
+  {
+    "id": 27,
+    "product_name": "Re-Sel E",
+    "dls_license_no": "126-18-(07)-001",
+    "pricing": [
+      {
+        "size_or_weight": "100 ml",
+        "trade_price_tp": "90 TK",
+        "maximum_retail_price_mrp": "160 TK",
+        "packaging_info": "1 Box = 12 pis"
+      }
+    ]
+  },
+  {
+    "id": 28,
+    "product_name": "Re-Live Vet",
+    "dls_license_no": "126-25-",
+    "pricing": [
+      {
+        "size_or_weight": "100 ml",
+        "trade_price_tp": "35 TK",
+        "maximum_retail_price_mrp": "65 TK",
+        "packaging_info": "1 box = 12 pis"
+      },
+      {
+        "size_or_weight": "500 ml",
+        "trade_price_tp": "175 TK",
+        "maximum_retail_price_mrp": "275 TK"
+      },
+      {
+        "size_or_weight": "1 Lt",
+        "trade_price_tp": "330 TK",
+        "maximum_retail_price_mrp": "480 TK"
+      }
+    ]
+  },
+  {
+    "id": 29,
+    "product_name": "Re Zinc Plus B",
+    "dls_license_no": "126-18-(05)-013",
+    "pricing": [
+      {
+        "size_or_weight": "1 Lt",
+        "trade_price_tp": "265 TK",
+        "maximum_retail_price_mrp": "335 TK"
+      }
+    ]
+  },
+  {
+    "id": 30,
+    "product_name": "Re-Better Al",
+    "dls_license_no": "126-25-",
+    "pricing": [
+      {
+        "size_or_weight": "250 ml",
+        "trade_price_tp": "185 TK",
+        "maximum_retail_price_mrp": "260 TK"
+      }
+    ]
+  },
+  {
+    "id": 31,
+    "product_name": "Re - Amino 3",
+    "dls_license_no": "126-24-(05)-016",
+    "pricing": [
+      {
+        "size_or_weight": "120 ml",
+        "trade_price_tp": "150 TK",
+        "maximum_retail_price_mrp": "260 TK"
+      },
+      {
+        "size_or_weight": "500 ml",
+        "trade_price_tp": "480 TK",
+        "maximum_retail_price_mrp": "780 TK"
+      },
+      {
+        "size_or_weight": "1 Lt",
+        "trade_price_tp": "760 TK",
+        "maximum_retail_price_mrp": "1260 TK"
+      }
+    ]
+  },
+  {
+    "id": 32,
+    "product_name": "Re - Cal Plus (AD3E)",
+    "dls_license_no": "126-18-(07)-002",
+    "pricing": [
+      {
+        "size_or_weight": "100 ml",
+        "trade_price_tp": "32 TK",
+        "maximum_retail_price_mrp": "55 TK"
+      },
+      {
+        "size_or_weight": "1 Lt",
+        "trade_price_tp": "235 TK",
+        "maximum_retail_price_mrp": "325 TK"
+      },
+      {
+        "size_or_weight": "3 Lt",
+        "trade_price_tp": "490 TK",
+        "maximum_retail_price_mrp": "720 TK"
+      },
+      {
+        "size_or_weight": "5 Lt",
+        "trade_price_tp": "780 TK",
+        "maximum_retail_price_mrp": "1250 TK"
+      }
+    ]
+  },
+  {
+    "id": 33,
+    "product_name": "Paraffin",
+    "pricing": [
+      {
+        "size_or_weight": "250 ml & 500 ml",
+        "trade_price_tp": "Not clearly visible",
+        "maximum_retail_price_mrp": "Not clearly visible"
+      }
+    ]
+  }
+]

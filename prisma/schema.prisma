@@ -1,0 +1,536 @@
+// prisma/schema.prisma
+// Master Forward-Compatible PostgreSQL Schema for Agro-Vet E-Commerce Platform
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// =========================================================
+// ENUMS
+// =========================================================
+
+enum AdminRole {
+  SUPER_ADMIN
+  ADMIN
+  STAFF
+}
+
+enum ProductStatus {
+  ACTIVE
+  DRAFT
+  ARCHIVED
+}
+
+enum ProductFormFactor {
+  POWDER
+  LIQUID
+  SACHET
+  BOLUS
+  SOLUTION
+  OINTMENT
+  INJECTION
+  OTHER
+}
+
+enum BuyerTier {
+  RETAIL      // Uses sellingPrice (defaults to mrpPrice)
+  WHOLESALE   // Uses tradePrice (TP) when qualified
+}
+
+enum WholesaleRuleMode {
+  GLOBAL_ONLY       // Uses only SiteSettings globalMinWholesaleAmount / globalMinWholesaleQty
+  PER_PRODUCT_ONLY  // Uses each ProductVariant's minWholesaleQty / minWholesaleAmount
+  HYBRID_EITHER     // Grants TP if EITHER per-product MOQ OR global cart minimum is met
+}
+
+enum DiscountType {
+  PERCENTAGE
+  FIXED
+}
+
+enum DiscountSource {
+  CLIENT_CUSTOM       // Priority 1: From CustomerProfile (by Phone Number)
+  GENERAL_STOREWIDE   // Priority 2: From SiteSettings (General Discount for All)
+  COUPON              // Priority 3: Promo Code entered at checkout
+  ADMIN_MANUAL        // Manual rebate applied by Admin on invoice
+}
+
+enum PaymentMethod {
+  SSLCOMMERZ
+  COD
+  PARTIAL_ADVANCE
+}
+
+enum PaymentStatus {
+  UNPAID
+  PAID
+  PARTIAL
+  FAILED
+  CANCELLED
+  REFUNDED
+}
+
+enum OrderStatus {
+  PENDING
+  CONFIRMED
+  PACKED
+  SHIPPED
+  DELIVERED
+  CANCELLED
+  RETURNED
+}
+
+enum CourierProvider {
+  STEADFAST
+  PATHAO
+  REDX
+  SUNDARBAN
+  MANUAL
+}
+
+enum LeadStatus {
+  NEW
+  CALLED
+  CONVERTED
+  IGNORED
+}
+
+// =========================================================
+// 1. ADMIN USER TABLE (Role-Based CMS Protection)
+// =========================================================
+
+model AdminUser {
+  id           String    @id @default(cuid())
+  name         String
+  email        String    @unique
+  phone        String?   @unique
+  passwordHash String
+  role         AdminRole @default(ADMIN)
+  isActive     Boolean   @default(true)
+  lastLoginAt  DateTime?
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+}
+
+// =========================================================
+// 2. CATEGORY TABLE
+// =========================================================
+
+model Category {
+  id              String    @id @default(cuid())
+  nameEn          String
+  nameBn          String?
+  slug            String    @unique
+  description     String?
+  image           String?
+  sortOrder       Int       @default(0)
+  isActive        Boolean   @default(true)
+
+  // SEO Metadata
+  metaTitle       String?
+  metaDescription String?
+
+  products        Product[]
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+
+  @@index([slug])
+  @@index([isActive, sortOrder])
+}
+
+// =========================================================
+// 3. PRODUCT TABLE (Core Info + Regulatory + Clinical/AI Data)
+// =========================================================
+
+model Product {
+  id                      String            @id @default(cuid())
+  legacyCatalogId         Int?              @unique // Maps 1..33 from product-price.json
+  nameEn                  String
+  nameBn                  String?
+  slug                    String            @unique
+  formFactor              ProductFormFactor @default(POWDER)
+  speciesTags             String[]          // e.g., ["CATTLE_BUFFALO", "POULTRY", "GOAT_SHEEP", "AQUA"]
+
+  // Veterinary Regulatory & Trust Signals
+  dlsLicenseNo            String?           // e.g., "126-18-(07)-005"
+  bangladeshPatentNo      String?           // e.g., "1005414" (Kalomegh & Masticare)
+  manufacturer            String?
+
+  // Storefront Media & Copy
+  thumbnail               String            @default("/images/placeholder-medicine.webp")
+  images                  String[]
+  shortDescription        String?
+
+  // 1-to-1 Clinical & AI Chatbot Knowledge Base Columns
+  composition             String?           @db.Text
+  indication              String?           @db.Text
+  dosageAndAdministration String?           @db.Text
+  withdrawalPeriod        String?
+  contraindications       String?
+  storageInstructions     String?           @default("আলো থেকে দূরে, ঠান্ডা ও শুষ্ক স্থানে সংরক্ষণ করুন।")
+  searchKeywords          String[]          // Bangla & English symptom/generic keywords for search & RAG
+
+  // Merchandising & Visibility
+  isFeatured              Boolean           @default(false)
+  isBestSeller            Boolean           @default(false)
+  status                  ProductStatus     @default(ACTIVE)
+
+  // Dynamic SEO Overrides
+  metaTitle               String?
+  metaDescription         String?
+
+  // Relations
+  categoryId              String?
+  category                Category?         @relation(fields: [categoryId], references: [id], onDelete: SetNull)
+  variants                ProductVariant[]
+  orderItems              OrderItem[]
+
+  createdAt               DateTime          @default(now())
+  updatedAt               DateTime          @updatedAt
+
+  @@index([slug])
+  @@index([status, isFeatured])
+  @@index([categoryId])
+}
+
+// =========================================================
+// 4. PRODUCT VARIANT TABLE (Pack Sizes, TP/MRP & Per-Product MOQ)
+// =========================================================
+
+model ProductVariant {
+  id                 String      @id @default(cuid())
+  productId          String
+  product            Product     @relation(fields: [productId], references: [id], onDelete: Cascade)
+
+  sku                String      @unique
+  packSize           String      // e.g., "100 ml", "1 kg", "25 gm", "5 Lt"
+  weightGrams        Int         @default(100) // Used for courier weight calculations
+  packagingInfo      String?     // e.g., "1 Box = 20 Pis", "1 Box = 12 Pis"
+  unitsPerBox        Int?        // e.g., 20, 12, 25
+
+  // Dual Pricing Structure (in BDT)
+  tradePrice         Decimal     @db.Decimal(10, 2) // Wholesale Price (TP)
+  mrpPrice           Decimal     @db.Decimal(10, 2) // Printed Maximum Retail Price (MRP)
+  sellingPrice       Decimal     @db.Decimal(10, 2) // Default Online Retail Price (= mrpPrice by default)
+
+  // Per-Product Wholesale Qualification Rules (Nullable = falls back to SiteSettings global rule)
+  minWholesaleQty    Int?        // e.g., 20 for 25g sachets, 12 for 100ml vials, 3 for 5L jars
+  minWholesaleAmount Decimal?    @db.Decimal(10, 2) // Optional minimum BDT spend on this variant for TP
+
+  // Inventory (Supports 1-Click Quick Inline Edit in Admin Table)
+  stockQuantity      Int         @default(100)
+  inStock            Boolean     @default(true)
+  isDefault          Boolean     @default(false)
+  sortOrder          Int         @default(0)
+
+  orderItems         OrderItem[]
+  createdAt          DateTime    @default(now())
+  updatedAt          DateTime    @updatedAt
+
+  @@index([productId])
+  @@index([inStock])
+}
+
+// =========================================================
+// 5. CUSTOMER PROFILE TABLE (Per-Client Custom Discounts & VIP Tier)
+// =========================================================
+
+model CustomerProfile {
+  id                      String       @id @default(cuid())
+  phone                   String       @unique // Strict 11-digit BD Mobile: "017XXXXXXXX"
+  name                    String
+  businessOrFarmName      String?      // e.g., "Bismillah Agro Vet Pharmacy"
+  email                   String?
+  district                String?
+  upazila                 String?
+  address                 String?      @db.Text
+
+  // Buyer Tier & Wholesale Privileges
+  defaultPriceTier        BuyerTier    @default(RETAIL)
+  bypassWholesaleMinimum  Boolean      @default(false) // If true, VIP dealer gets TP even on 1 unit
+
+  // Priority 1: Per-Client Custom Discount (Overrides General Storewide Discount when enabled)
+  hasCustomDiscount       Boolean      @default(false)
+  discountType            DiscountType @default(PERCENTAGE)
+  discountValue           Decimal      @default(0) @db.Decimal(10, 2) // e.g., 8.00 for 8% off
+  minOrderForDiscount     Decimal      @default(0) @db.Decimal(10, 2)
+
+  // Internal Order & Fraud Tracking Metrics
+  totalOrdersCount        Int          @default(0)
+  deliveredOrdersCount    Int          @default(0)
+  cancelledOrReturnedCnt  Int          @default(0)
+  adminNotes              String?      @db.Text
+  isActive                Boolean      @default(true)
+
+  orders                  Order[]
+  createdAt               DateTime     @default(now())
+  updatedAt               DateTime     @updatedAt
+
+  @@index([phone])
+  @@index([defaultPriceTier])
+}
+
+// =========================================================
+// 6. ORDER & ORDER ITEM TABLES (SSLCommerz + Courier + CAPI Ready)
+// =========================================================
+
+model Order {
+  id                    String           @id @default(cuid())
+  orderNumber           String           @unique // e.g., "AV-2610-0001"
+  orderType             BuyerTier        @default(RETAIL) // "RETAIL" (MRP) | "WHOLESALE" (TP)
+
+  // Optional Link to CustomerProfile + Immutable Customer Snapshot
+  customerProfileId     String?
+  customerProfile       CustomerProfile? @relation(fields: [customerProfileId], references: [id], onDelete: SetNull)
+  customerName          String
+  customerPhone         String           // Validated: ^01[3-9]\d{8}$
+  customerAltPhone      String?
+  customerEmail         String?
+  district              String
+  upazila               String
+  address               String           @db.Text
+  orderNote             String?
+
+  // Server-Calculated Financials (Zero Client-Side Price Trust)
+  subtotal              Decimal          @db.Decimal(10, 2)
+  discountAmount        Decimal          @default(0) @db.Decimal(10, 2)
+  appliedDiscountSource DiscountSource?  // "CLIENT_CUSTOM" | "GENERAL_STOREWIDE" | "COUPON" | "ADMIN_MANUAL"
+  appliedDiscountLabel  String?          // e.g., "Special Client Discount (8%)"
+  couponCode            String?
+  shippingFee           Decimal          @db.Decimal(10, 2)
+  grandTotal            Decimal          @db.Decimal(10, 2)
+  paidAmount            Decimal          @default(0) @db.Decimal(10, 2)
+  dueAmount             Decimal          @db.Decimal(10, 2) // Amount courier collects on delivery
+
+  // Payment & Fulfillment State Machine
+  paymentMethod         PaymentMethod    @default(COD)
+  paymentStatus         PaymentStatus    @default(UNPAID)
+  orderStatus           OrderStatus      @default(PENDING)
+  agreedToPolicies      Boolean          @default(true) // Mandatory SSLCommerz compliance proof
+
+  // Forward-Compatible Courier Block (Tier 1 Manual + Tier 2 API/Webhook Ready)
+  courierProvider       CourierProvider?
+  consignmentId         String?
+  trackingCode          String?
+  trackingUrl           String?
+  courierStatus         String?          // e.g., "in_transit", "delivered", "returned"
+  codCollectableAmount  Decimal?         @db.Decimal(10, 2)
+  dispatchedAt          DateTime?
+  deliveredAt           DateTime?
+  courierWebhookLogs    Json?            // Array of webhook payloads in Tier 2
+
+  // Forward-Compatible Marketing Block (Browser DataLayer + Meta CAPI Deduplication)
+  analyticsEventId      String           @unique @default(cuid()) // Shared event_id for Pixel + CAPI
+  clientIp              String?
+  userAgent             String?
+  fbc                   String?          // Meta _fbc cookie
+  fbp                   String?          // Meta _fbp cookie
+  utmSource             String?
+  utmMedium             String?
+  utmCampaign           String?
+  capiPurchaseSent      Boolean          @default(false)
+
+  // Communication & Admin Logs
+  notificationsSent     Json?            // Array of { channel: "SMS" | "WHATSAPP", status, timestamp }
+  adminNotes            String?          @db.Text
+
+  items                 OrderItem[]
+  transactions          Transaction[]
+
+  createdAt             DateTime         @default(now())
+  updatedAt             DateTime         @updatedAt
+
+  @@index([orderNumber])
+  @@index([customerPhone])
+  @@index([orderStatus, paymentStatus])
+  @@index([createdAt])
+}
+
+model OrderItem {
+  id                String         @id @default(cuid())
+  orderId           String
+  order             Order          @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  productId         String
+  product           Product        @relation(fields: [productId], references: [id], onDelete: Restrict)
+  variantId         String
+  variant           ProductVariant @relation(fields: [variantId], references: [id], onDelete: Restrict)
+
+  // Immutable Snapshot at Time of Purchase
+  nameEn            String
+  nameBn            String?
+  packSize          String
+  sku               String
+  priceTierApplied  BuyerTier      @default(RETAIL) // Records whether item was billed at MRP or TP
+  unitTradePrice    Decimal        @db.Decimal(10, 2)
+  unitMrpPrice      Decimal        @db.Decimal(10, 2)
+  unitSellingPrice  Decimal        @db.Decimal(10, 2) // Actual unit price charged before order-level discount
+  quantity          Int
+  lineTotal         Decimal        @db.Decimal(10, 2) // unitSellingPrice * quantity
+
+  @@index([orderId])
+  @@index([productId])
+}
+
+// =========================================================
+// 7. SSLCOMMERZ TRANSACTION AUDIT TABLE
+// =========================================================
+
+model Transaction {
+  id            String   @id @default(cuid())
+  orderId       String
+  order         Order    @relation(fields: [orderId], references: [id], onDelete: Cascade)
+
+  tranId        String   @unique // Unique transaction ID generated per payment attempt
+  valId         String?          // SSLCommerz validation ID
+  bankTranId    String?
+  amount        Decimal  @db.Decimal(10, 2)
+  storeAmount   Decimal? @db.Decimal(10, 2)
+  currency      String   @default("BDT")
+  cardType      String?          // e.g., "BKASH-bKash", "NAGAD", "VISA"
+  cardBrand     String?
+  cardIssuer    String?
+  status        String           // "INITIATED" | "VALID" | "VALIDATED" | "FAILED" | "CANCELLED"
+  riskLevel     Int      @default(0) // 0 = Safe, 1 = Flagged for manual verification
+  rawIpnPayload Json?
+  refundHistory Json?            // Array of { refundRefId, refundedAmount, reason, timestamp }
+  validatedAt   DateTime?
+
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  @@index([orderId])
+  @@index([tranId])
+}
+
+// =========================================================
+// 8. COUPON TABLE (Marketing Promo Codes)
+// =========================================================
+
+model Coupon {
+  id                  String       @id @default(cuid())
+  code                String       @unique // Stored uppercase, e.g., "VET10"
+  description         String?
+  discountType        DiscountType @default(PERCENTAGE)
+  discountValue       Decimal      @db.Decimal(10, 2)
+  minOrderAmount      Decimal      @default(0) @db.Decimal(10, 2)
+  maxDiscountCap      Decimal?     @db.Decimal(10, 2)
+  applicableOrderType BuyerTier?   // Null = valid for both Retail & Wholesale
+  usageLimit          Int?
+  usedCount           Int          @default(0)
+  startsAt            DateTime     @default(now())
+  expiresAt           DateTime?
+  isActive            Boolean      @default(true)
+  createdAt           DateTime     @default(now())
+  updatedAt           DateTime     @updatedAt
+
+  @@index([code, isActive])
+}
+
+// =========================================================
+// 9. INCOMPLETE LEAD TABLE (Abandoned Checkout Recovery)
+// =========================================================
+
+model IncompleteLead {
+  id               String     @id @default(cuid())
+  phone            String     // 11-digit BD phone captured on checkout blur
+  name             String?
+  district         String?
+  upazila          String?
+  address          String?
+  orderType        BuyerTier  @default(RETAIL)
+  cartItems        Json       // Snapshot of cart items
+  cartTotal        Decimal    @db.Decimal(10, 2)
+  status           LeadStatus @default(NEW)
+  adminNotes       String?
+  convertedOrderId String?
+  createdAt        DateTime   @default(now())
+  updatedAt        DateTime   @updatedAt
+
+  @@index([phone])
+  @@index([status, updatedAt])
+}
+
+// =========================================================
+// 10. HERO BANNER TABLE (Storefront CMS)
+// =========================================================
+
+model HeroBanner {
+  id        String   @id @default(cuid())
+  title     String
+  subtitle  String?
+  badgeText String?
+  imageUrl  String
+  mobileUrl String?
+  ctaText   String   @default("এখনই কিনুন")
+  ctaLink   String   @default("/products")
+  sortOrder Int      @default(0)
+  isActive  Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([isActive, sortOrder])
+}
+
+// =========================================================
+// 11. SITE SETTINGS TABLE (Global Rules, Discounts & Marketing Hooks)
+// =========================================================
+
+model SiteSettings {
+  id                           String            @id @default("default")
+  storeName                    String            @default("Agro-Vet Medicine Store")
+  storeTagline                 String?           @default("Licensed Veterinary Medicine & Nutritional Supplements Dealer")
+  supportPhone                 String            @default("01700000000")
+  whatsappNumber               String            @default("8801700000000")
+  supportEmail                 String            @default("info@example.com")
+  physicalAddress              String            @default("Bangladesh")
+
+  // Mandatory SSLCommerz Legal & Vet Regulatory Compliance
+  tradeLicenseNo               String?
+  dlsDealerLicenseNo           String?
+  dbidNumber                   String?
+  refundTimelineText           String            @default("7 to 10 working days")
+  insideDeliveryTimelineText   String            @default("2 to 3 working days")
+  outsideDeliveryTimelineText  String            @default("3 to 5 working days")
+
+  // Shipping & Delivery Charge Configuration
+  insideDistrictName           String            @default("Dhaka")
+  insideDistrictFee            Decimal           @default(70) @db.Decimal(10, 2)
+  outsideDistrictFee           Decimal           @default(130) @db.Decimal(10, 2)
+  freeShippingThreshold        Decimal?          @db.Decimal(10, 2)
+
+  // Global Wholesale Qualification Rules (TP vs MRP)
+  wholesaleRuleMode            WholesaleRuleMode @default(HYBRID_EITHER)
+  globalMinWholesaleAmount     Decimal           @default(3000) @db.Decimal(10, 2)
+  globalMinWholesaleQty        Int               @default(5)
+
+  // Priority 2: General Storewide Discounts (Fallback when client has no CustomerProfile discount)
+  enableGeneralDiscount        Boolean           @default(false)
+  generalRetailDiscountPercent Decimal           @default(0) @db.Decimal(5, 2)
+  generalWholesaleDiscountPct  Decimal           @default(0) @db.Decimal(5, 2)
+
+  // Self-Service Marketing Agency Hooks (Tier 1 & Tier 2)
+  gtmContainerId               String?
+  metaPixelId                  String?
+  metaConversionApiToken       String?
+  metaTestEventCode            String?
+  googleAdsId                  String?
+  tiktokPixelId                String?
+
+  // Future Tier 2 Courier & SMS Gateway Credentials
+  steadfastApiKey              String?
+  steadfastSecretKey           String?
+  pathaoClientId               String?
+  pathaoClientSecret           String?
+  redxAccessToken              String?
+  smsGatewayUrl                String?
+  smsApiKey                    String?
+  smsSenderId                  String?
+  enableAutoOrderSms           Boolean           @default(false)
+
+  updatedAt                    DateTime          @updatedAt
+}

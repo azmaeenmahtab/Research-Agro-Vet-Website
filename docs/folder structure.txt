@@ -1,0 +1,49 @@
+agro-vet-ecommerce/
+├── prisma/
+│   ├── schema.prisma                 # Locked 12-table PostgreSQL schema
+│   ├── seed-products.json            # Merged 33 products + 20 clinical profiles
+│   └── seed.ts                       # Database seeder
+├── public/
+│   ├── sounds/
+│   │   └── new-order-chime.mp3       # Audio alert for Manager Live Order Dashboard
+│   └── images/
+├── src/
+│   ├── app/
+│   │   ├── (storefront)/             # Customer-facing SSR routes
+│   │   │   ├── page.tsx              # Home, Species filter, Featured, Wholesale Contact CTA
+│   │   │   ├── products/
+│   │   │   │   ├── page.tsx          # Bilingual Catalog & Filter page
+│   │   │   │   └── [slug]/page.tsx   # Product Details Page (PDP) + Pack-Size Selector
+│   │   │   ├── checkout/page.tsx     # 1-Step Phone-First Order Submission
+│   │   │   ├── order-success/[orderNumber]/page.tsx
+│   │   │   ├── track-order/page.tsx  # Public Phone + Order ID status tracker
+│   │   │   └── (legal)/              # Terms, Privacy & Refund policy pages
+│   │   ├── admin/                    # Protected Unified Admin CMS & Operations Portal
+│   │   │   ├── login/page.tsx
+│   │   │   ├── orders/
+│   │   │   │   ├── page.tsx          # Live Order Stream & Tele-Confirmation Board
+│   │   │   │   └── [id]/invoice/page.tsx # Printable A4 & Thermal Invoice View
+│   │   │   ├── products/
+│   │   │   │   ├── page.tsx          # Product Table with Quick Inline Price/Stock Editor
+│   │   │   │   ├── new/page.tsx      # Multi-Variant + Clinical Tab Builder
+│   │   │   │   └── [id]/edit/page.tsx
+│   │   │   ├── discounts/page.tsx    # Universal Discount + Per-Client Phone Discounts
+│   │   │   ├── categories/page.tsx
+│   │   │   └── settings/page.tsx     # Shipping fees, Licenses, Marketing Pixel IDs
+│   │   └── api/                      # REST Route Handlers (see Section 2 below)
+│   ├── components/
+│   │   ├── storefront/               # Navbar, ProductCard, VariantSelector, CartDrawer, WholesaleBanner
+│   │   ├── admin/                    # LiveOrderNotifier, InlineVariantRow, OrderManageModal, InvoiceTemplate
+│   │   └── ui/                       # shadcn/ui primitives
+│   ├── services/                     # Pure Server-Side Business Logic (Prisma Transactions)
+│   │   ├── pricing.service.ts        # Universal vs. Per-Client vs. Manager Custom Discount engine
+│   │   ├── order.service.ts          # Order creation, tele-confirmation, manual payment & courier updates
+│   │   ├── product.service.ts        # Bilingual search, catalog filters, inline price/stock updates
+│   │   └── marketing.service.ts      # Meta XML feed generator & CAPI placeholder hook
+│   ├── store/
+│   │   └── useCartStore.ts           # Zustand persistent Cart & Checkout draft store
+│   └── lib/
+│       ├── prisma.ts                 # Singleton Prisma Client
+│       ├── auth.ts                   # Admin JWT / NextAuth session guard
+│       ├── analytics.ts              # Centralized window.dataLayer dispatcher
+│       └── validators/               # Shared Zod schemas for API & Forms
