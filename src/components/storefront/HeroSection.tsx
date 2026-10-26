@@ -81,10 +81,10 @@ export default function HeroSection() {
             </div>
 
             {/* Cold Chain Badge overlay */}
-            <div className="absolute bottom-6 left-6 inline-flex items-center gap-1.5 px-3 py-1 bg-slate-900/85 backdrop-blur-xs text-white rounded-lg text-[11px] font-semibold">
+            {/* <div className="absolute bottom-6 left-6 inline-flex items-center gap-1.5 px-3 py-1 bg-slate-900/85 backdrop-blur-xs text-white rounded-lg text-[11px] font-semibold">
               <Snowflake className="w-3.5 h-3.5 text-emerald-400" />
               <span>কোল্ড-চেইন নিয়ন্ত্রিত ওয়্যারহাউস (২°C - ৮°C)</span>
-            </div>
+            </div> */}
           </div>
 
           {/* Quick Metrics Trio */}

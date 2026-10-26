@@ -34,7 +34,7 @@ export default function FeaturedProducts({ initialProducts = [] }: FeaturedProdu
             (p.thumbnail.startsWith('http') || p.thumbnail.includes('re-milk-plus') || p.thumbnail.includes('re-db-plus'))
               ? p.thumbnail
               : STITCH_FALLBACK_PRODUCTS[idx % (STITCH_FALLBACK_PRODUCTS.length || 1)]?.thumbnail,
-          speciesTags: p.speciesTags || ['🐄 গরু', '🐓 পোল্ট্রি'],
+          speciesTags: p.speciesTags || ['CATTLE_BUFFALO', 'POULTRY'],
           indication: p.indication || 'উন্নত স্বাস্থ্য ও উৎপাদন বৃদ্ধি সহায়ক',
           variants:
             p.variants && p.variants.length > 0

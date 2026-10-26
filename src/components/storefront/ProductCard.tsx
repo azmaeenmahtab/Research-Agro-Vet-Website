@@ -41,20 +41,27 @@ export function toBengaliNumber(val: number | string | undefined | null): string
 }
 
 function formatSpecies(tag: string) {
-  if (tag.startsWith('🐄') || tag.startsWith('🐓') || tag.startsWith('🐐') || tag.startsWith('🐟')) {
-    return tag;
-  }
-  switch (tag) {
+  // Strip any emoji characters if present
+  const clean = tag.replace(/[\u{1F300}-\u{1F9FF}\u{2600}-\u{26FF}\u{2700}-\u{27BF}]/gu, '').trim();
+  switch (clean) {
     case 'CATTLE_BUFFALO':
-      return '🐄 গরু ও মহিষ';
+    case 'গরু ও মহিষ':
+    case 'গরু':
+      return 'গরু ও মহিষ';
     case 'POULTRY':
-      return '🐓 পোল্ট্রি';
+    case 'পোল্ট্রি ও হাঁস':
+    case 'পোল্ট্রি':
+      return 'পোল্ট্রি';
     case 'GOAT_SHEEP':
-      return '🐐 ছাগল';
+    case 'ছাগল ও ভেড়া':
+    case 'ছাগল':
+      return 'ছাগল';
     case 'AQUA':
-      return '🐟 মৎস্য';
+    case 'মৎস্য ও চিংড়ি':
+    case 'মৎস্য':
+      return 'মৎস্য';
     default:
-      return tag;
+      return clean;
   }
 }
 

@@ -15,7 +15,7 @@ export default function Footer() {
           </p>
           <div className="inline-flex items-center gap-1.5 px-2.5 py-1 bg-slate-800 text-emerald-400 rounded border border-slate-700 text-[11px] font-semibold">
             <ShieldCheck className="w-3.5 h-3.5 shrink-0" />
-            <span>DLS Reg: 126-18-(07)-006</span>
+            <span>DLS Reg: 126</span>
           </div>
         </div>
 
@@ -48,11 +48,11 @@ export default function Footer() {
           <div className="space-y-2 text-slate-400">
             <p className="flex items-center gap-2">
               <Phone className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
-              <span>01711-234567 (সকাল ৮টা - রাত ১০টা)</span>
+              <span>01716019731 (সকাল ৮টা - রাত ১০টা)</span>
             </p>
             <p className="flex items-center gap-2">
               <Mail className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
-              <span>support@researchagrovet.com</span>
+              <span>researchagrovet9@gmail.com</span>
             </p>
             <p className="flex items-start gap-2">
               <MapPin className="w-3.5 h-3.5 text-emerald-400 shrink-0 mt-0.5" />
