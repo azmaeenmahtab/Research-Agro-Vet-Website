@@ -5,19 +5,19 @@ const TickerItem = () => (
     {/* 1. Discount */}
     <div className="flex items-center gap-2">
       <BadgePercent className="w-3.5 h-3.5 text-amber-300 shrink-0" />
-      <span>Special Offer: <strong>Universal 5% OFF</strong> on all veterinary medicines!</span>
+      <span>🎉 বিশেষ অফার: সকল ভেটেরিনারি ঔষধে চলছে <strong>৫% সার্বজনীন ছাড়!</strong></span>
     </div>
 
     {/* 2. Helpline */}
     <a href="tel:01711234567" className="flex items-center gap-1.5 hover:text-white transition-colors">
       <Phone className="w-3.5 h-3.5 text-emerald-300 shrink-0" />
-      <span>Helpline: <strong>01711-234567</strong> (8:00 AM - 10:00 PM)</span>
+      <span>হেল্পলাইন: <strong>01711-234567</strong> (সকাল ৮টা - রাত ১০টা)</span>
     </a>
 
     {/* 3. Licensed Dealer */}
     <div className="flex items-center gap-1.5 bg-emerald-900/60 text-emerald-200 px-2.5 py-0.5 rounded text-[11px]">
       <ShieldCheck className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
-      <span>DLS Licensed Dealer: Reg. 126-18-(07)-006</span>
+      <span>DLS অনুমোদিত ডিলার: Reg. 126-18-(07)-006</span>
     </div>
   </div>
 );

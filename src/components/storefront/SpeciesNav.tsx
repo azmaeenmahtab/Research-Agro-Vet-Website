@@ -4,12 +4,12 @@ import Link from 'next/link';
 import { usePathname, useSearchParams } from 'next/navigation';
 
 const speciesList = [
-  { label: 'All Medicines', href: '/products', tag: null },
-  { label: '🐄 Cattle & Buffalo', href: '/products?species=CATTLE_BUFFALO', tag: 'CATTLE_BUFFALO' },
-  { label: '🐓 Poultry & Birds', href: '/products?species=POULTRY', tag: 'POULTRY' },
-  { label: '🐐 Goat & Sheep', href: '/products?species=GOAT_SHEEP', tag: 'GOAT_SHEEP' },
-  { label: '🐟 Fisheries & Aqua', href: '/products?species=AQUA', tag: 'AQUA' },
-  { label: '🤝 Wholesale & Dealership', href: '/#dealer-contact', tag: 'WHOLESALE' },
+  { label: 'সকল ঔষধ', href: '/products', tag: null },
+  { label: '🐄 গরু ও মহিষ', href: '/products?species=CATTLE_BUFFALO', tag: 'CATTLE_BUFFALO' },
+  { label: '🐓 পোল্ট্রি ও হাঁস', href: '/products?species=POULTRY', tag: 'POULTRY' },
+  { label: '🐐 ছাগল ও ভেড়া', href: '/products?species=GOAT_SHEEP', tag: 'GOAT_SHEEP' },
+  { label: '🐟 মৎস্য ও একুয়া', href: '/products?species=AQUA', tag: 'AQUA' },
+  { label: '🤝 পাইকারি ও ডিলার যোগাযোগ', href: '/#dealer-contact', tag: 'WHOLESALE' },
 ];
 
 export default function SpeciesNav() {

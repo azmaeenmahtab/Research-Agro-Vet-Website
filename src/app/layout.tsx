@@ -13,14 +13,14 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Research Agro Vet — Licensed Veterinary Medicine & Pharmaceuticals",
-  description: "Government-approved veterinary prescription medicines, nutritional supplements, and clinical healthcare products for livestock, poultry, and aquaculture farming.",
+  title: "Research Agro Vet — অনুমোদিত ভেটেরিনারি ঔষধ ও ফার্মাসিউটিক্যালস",
+  description: "গবাদিপশু, পোল্ট্রি ও মৎস্য খামারীদের জন্য অনুমোদিত ভেটেরিনারি প্রেসক্রিপশন ড্রাগ, মিল্ক বুস্টার ও পুষ্টি সম্পূরক।",
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
     <html
-      lang="en"
+      lang="bn"
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col">{children}</body>

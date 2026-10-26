@@ -107,6 +107,7 @@ async function main() {
           indication: item.indication || null,
           dosageAndAdministration: item.dosageAndAdministration || null,
           status: ProductStatus.ACTIVE,
+          isFeatured: (item.legacyCatalogId || 0) <= 8,
         },
         create: {
           legacyCatalogId: item.legacyCatalogId,
@@ -120,6 +121,7 @@ async function main() {
           indication: item.indication || null,
           dosageAndAdministration: item.dosageAndAdministration || null,
           status: ProductStatus.ACTIVE,
+          isFeatured: (item.legacyCatalogId || 0) <= 8,
         },
       });
 

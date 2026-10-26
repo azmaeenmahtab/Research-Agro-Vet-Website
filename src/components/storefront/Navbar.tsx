@@ -37,7 +37,7 @@ export default function Navbar() {
           </div>
           <div className="flex flex-col">
             <span className="font-extrabold text-lg text-emerald-800 leading-tight">Research Agro Vet</span>
-            <span className="text-[10px] text-slate-500 font-medium">Pharmaceuticals & Livestock Care</span>
+            <span className="text-[10px] text-slate-500 font-medium">ফার্মাসিউটিক্যালস ও লাইভস্টক কেয়ার</span>
           </div>
         </Link>
 
@@ -48,28 +48,28 @@ export default function Navbar() {
             type="search"
             value={query}
             onChange={(e) => setQuery(e.target.value)}
-            placeholder="Search medicine, generics, or brand (e.g. Zinc, Calcium, Vitamins)..."
+            placeholder="ঔষধের নাম বা উপাদান দিয়ে খুঁজুন (e.g. Zinc, ক্যালসিয়াম, ভিটামিন)..."
             className="w-full pl-9 pr-20 py-2 bg-slate-50 border border-slate-200 rounded-lg text-sm focus:bg-white focus:border-emerald-600 focus:outline-none transition-all"
           />
           <button type="submit" className="absolute right-1 top-1 bottom-1 px-3 bg-emerald-700 hover:bg-emerald-800 text-white rounded text-xs font-semibold transition-colors">
-            Search
+            অনুসন্ধান
           </button>
         </form>
 
         {/* Actions */}
         <div className="flex items-center gap-2 shrink-0">
           <Link href="/track-order" className="hidden lg:flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium text-slate-700 hover:bg-slate-100 transition-colors">
-            <span>Track Order</span>
+            <span>অর্ডার ট্র্যাক</span>
           </Link>
 
           <a
-            href="https://wa.me/8801711234567?text=Hello,%20I%20am%20contacting%20for%20veterinary%20consultation%20and%20inquiry."
+            href="https://wa.me/8801711234567?text=আসসালামু%20আলাইকুম,%20ঔষধ%20ও%20খামার%20পরামর্শের%20জন্য%20যোগাযোগ%20করছি।"
             target="_blank"
             rel="noopener noreferrer"
             className="hidden sm:flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium text-emerald-800 bg-emerald-50 hover:bg-emerald-100 transition-colors"
           >
             <MessageCircle className="w-4 h-4 text-emerald-600" />
-            <span>Consultation</span>
+            <span>পরামর্শ</span>
           </a>
 
           {/* Cart Button */}
@@ -78,8 +78,8 @@ export default function Navbar() {
             className="flex items-center gap-2 px-3 py-1.5 bg-amber-600 hover:bg-amber-700 text-white rounded-lg text-xs font-bold shadow-xs transition-colors"
           >
             <ShoppingBag className="w-4 h-4" />
-            <span>Cart ({count})</span>
-            <span className="hidden xs:inline border-l border-amber-500 pl-1.5">৳{subtotal.toLocaleString('en-US')}</span>
+            <span>কার্ট ({count})</span>
+            <span className="hidden xs:inline border-l border-amber-500 pl-1.5">৳{subtotal.toLocaleString('bn-BD')}</span>
           </button>
         </div>
       </div>
