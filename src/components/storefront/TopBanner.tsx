@@ -17,7 +17,7 @@ const TickerItem = () => (
     {/* 3. Licensed Dealer */}
     <div className="flex items-center gap-1.5 bg-emerald-900/60 text-emerald-200 px-2.5 py-0.5 rounded text-[11px]">
       <ShieldCheck className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
-      <span>DLS অনুমোদিত ডিলার: Reg. 126-18-(07)-006</span>
+      <span>DLS অনুমোদিত ডিলার: Reg. No. - 126</span>
     </div>
   </div>
 );

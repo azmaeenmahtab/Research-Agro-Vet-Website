@@ -7,19 +7,21 @@ export default function HeroSection() {
       <div className="max-w-7xl mx-auto px-4 grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-center">
         {/* Left Column: Value Proposition & CTAs */}
         <div className="lg:col-span-7 space-y-5">
-          {/* Compliance Pill */}
-          <div className="inline-flex items-center gap-2 px-3 py-1 bg-emerald-100/80 text-emerald-900 rounded-full text-xs font-semibold">
-            <ShieldCheck className="w-4 h-4 text-emerald-700" />
-            <span>গণপ্রজাতন্ত্রী বাংলাদেশ সরকার অনুমোদিত ডিলার</span>
-          </div>
 
           {/* Headline */}
           <h1 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold text-slate-900 tracking-tight leading-[1.25]">
             গবাদিপশু ও পোল্ট্রির শতভাগ আসল ও অনুমোদিত{' '}
-            <span className="text-emerald-700 underline decoration-emerald-300 decoration-4 underline-offset-4">
+            <span className="text-emerald-700  decoration-emerald-300 decoration-4 underline-offset-4">
               ঔষধিযুক্ত খাদ্য প্রি-মিক্স
             </span>
           </h1>
+
+          {/* Government Approval Banner */}
+          <div className="inline-flex items-center gap-3 bg-emerald-900 text-white px-5 py-2.5 rounded-lg shadow-sm">
+            <ShieldCheck className="w-5 h-5 text-emerald-300 shrink-0" />
+            <span className=" font-semibold">গণপ্রজাতন্ত্রী বাংলাদেশ সরকার অনুমোদিত ডিলার</span>
+            <span className="text-sm text-amber-300 font-bold border-l border-emerald-700 pl-3">DLS Reg. 126</span>
+          </div>
 
           {/* Description */}
           <p className="text-sm sm:text-base text-slate-600 max-w-xl leading-relaxed">
@@ -27,10 +29,10 @@ export default function HeroSection() {
           </p>
 
           {/* Trust Badges */}
-          <div className="flex flex-wrap gap-2.5 pt-1 text-xs text-slate-700">
+          {/* <div className="flex flex-wrap gap-2.5 pt-1 text-xs text-slate-700">
             <span className="flex items-center gap-1.5 px-3 py-1.5 bg-white rounded-lg border border-slate-200 shadow-2xs font-medium">
               <CheckCircle2 className="w-4 h-4 text-emerald-600" />
-              DLS লাইসেন্সকৃত ডিলার: 126-18-(07)-006
+              DLS লাইসেন্সকৃত ডিলার: 126
             </span>
             <span className="flex items-center gap-1.5 px-3 py-1.5 bg-white rounded-lg border border-slate-200 shadow-2xs font-medium">
               <Truck className="w-4 h-4 text-emerald-600" />
@@ -40,7 +42,7 @@ export default function HeroSection() {
               <Snowflake className="w-4 h-4 text-emerald-600" />
               কোল্ড-চেইন (২°C - ৮°C) সংরক্ষিত
             </span>
-          </div>
+          </div> */}
 
           {/* Action CTAs */}
           <div className="flex flex-wrap items-center gap-3 pt-2">

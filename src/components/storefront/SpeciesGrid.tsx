@@ -62,9 +62,7 @@ export default function SpeciesGrid() {
               প্রাণী ভিত্তিক ফিড প্রিমিক্স বাছাই করুন
             </h2>
           </div>
-          <p className="text-xs sm:text-sm text-slate-500 max-w-md">
-            আপনার খামারের নির্দিষ্ট প্রাণীর ধরন অনুযায়ী অনুমোদিত ফর্মুলেশন ও সঠিক ডোজ চার্ট দেখুন।
-          </p>
+          
         </div>
 
         {/* 4-Card Animal Species Grid */}
@@ -94,25 +92,25 @@ export default function SpeciesGrid() {
                   )}
 
                   {/* Animal Tag Badge */}
-                  <span className="absolute top-2 left-2 bg-emerald-800 text-white text-[11px] font-bold px-2.5 py-0.5 rounded shadow-xs z-10">
+                  {/* <span className="absolute top-2 left-2 bg-emerald-800 text-white text-[11px] font-bold px-2.5 py-0.5 rounded shadow-xs z-10">
                     {item.tag}
-                  </span>
+                  </span> */}
                 </div>
 
                 {/* Titles & Description */}
-                <h3 className="font-bold text-sm text-slate-900 group-hover:text-emerald-700 transition-colors">
+                {/* <h3 className="font-bold text-sm text-slate-900 group-hover:text-emerald-700 transition-colors">
                   {item.titleEn}
-                </h3>
-                <p className="text-xs font-semibold text-emerald-800 mt-0.5">
+                </h3> */}
+                <p className="texr-[20px] font-semibold text-emerald-800 mt-0.5">
                   {item.titleBn}
                 </p>
-                <p className="text-xs text-slate-500 mt-1.5 leading-relaxed line-clamp-2">
+                <p className="text-sm text-slate-500 mt-1.5 leading-relaxed line-clamp-2">
                   {item.description}
                 </p>
               </div>
 
               {/* Action Link Footer */}
-              <div className="mt-4 pt-3 border-t border-slate-100 flex items-center justify-between text-xs font-bold text-emerald-700 group-hover:text-emerald-800">
+              <div className="mt-4 pt-3 border-t border-slate-100 flex items-center justify-between text-sm font-bold text-emerald-700 group-hover:text-emerald-800">
                 <span>পণ্য তালিকা দেখুন</span>
                 <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
               </div>
