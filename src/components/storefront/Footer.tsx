@@ -11,7 +11,7 @@ export default function Footer() {
             <span className="font-extrabold text-base text-white">Research Agro Vet</span>
           </div>
           <p className="text-slate-400 text-xs leading-relaxed">
-            লাইভস্টক, ডেইরি, পোল্ট্রি ও মৎস্য খামারীদের জন্য অনুমোদিত ভেটেরিনারি ঔষধ ও পুষ্টি সম্পূরক সরবরাহকারী।
+            লাইভস্টক, ডেইরি, পোল্ট্রি ও মৎস্য খামারীদের জন্য অনুমোদিত Medicated Veterinary Feed Premix ও পুষ্টি সম্পূরক সরবরাহকারী।
           </p>
           <div className="inline-flex items-center gap-1.5 px-2.5 py-1 bg-slate-800 text-emerald-400 rounded border border-slate-700 text-[11px] font-semibold">
             <ShieldCheck className="w-3.5 h-3.5 shrink-0" />

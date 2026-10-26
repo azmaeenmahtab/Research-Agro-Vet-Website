@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
@@ -10,15 +10,19 @@ import { useCartStore } from '@/store/useCartStore';
 export default function Navbar() {
   const router = useRouter();
   const [query, setQuery] = useState('');
+  const [mounted, setMounted] = useState(false);
   const { getItemCount, getCartSubtotal, openCartDrawer } = useCartStore();
+
+  useEffect(() => setMounted(true), []);
 
   const handleSearch = (e: React.SyntheticEvent) => {
     e.preventDefault();
     if (query.trim()) router.push(`/products?q=${encodeURIComponent(query.trim())}`);
   };
 
-  const count = getItemCount();
-  const subtotal = getCartSubtotal();
+  // Use 0 on server & first render to avoid hydration mismatch
+  const count = mounted ? getItemCount() : 0;
+  const subtotal = mounted ? getCartSubtotal() : 0;
 
   return (
     <nav className="bg-white/95 backdrop-blur-md border-b border-slate-200 sticky top-0 z-40">
@@ -37,7 +41,7 @@ export default function Navbar() {
           </div>
           <div className="flex flex-col">
             <span className="font-extrabold text-lg text-emerald-800 leading-tight">Research Agro Vet</span>
-            <span className="text-[10px] text-slate-500 font-medium">ফার্মাসিউটিক্যালস ও লাইভস্টক কেয়ার</span>
+            <span className="text-[10px] text-slate-500 font-medium tracking-tight">Medicated Veterinary Feed Premix</span>
           </div>
         </Link>
 
@@ -48,7 +52,7 @@ export default function Navbar() {
             type="search"
             value={query}
             onChange={(e) => setQuery(e.target.value)}
-            placeholder="ঔষধের নাম বা উপাদান দিয়ে খুঁজুন (e.g. Zinc, ক্যালসিয়াম, ভিটামিন)..."
+            placeholder="পণ্যের নাম বা উপাদান দিয়ে খুঁজুন (e.g. Zinc, ক্যালসিয়াম, ভিটামিন)..."
             className="w-full pl-9 pr-20 py-2 bg-slate-50 border border-slate-200 rounded-lg text-sm focus:bg-white focus:border-emerald-600 focus:outline-none transition-all"
           />
           <button type="submit" className="absolute right-1 top-1 bottom-1 px-3 bg-emerald-700 hover:bg-emerald-800 text-white rounded text-xs font-semibold transition-colors">
@@ -63,7 +67,7 @@ export default function Navbar() {
           </Link>
 
           <a
-            href="https://wa.me/8801711234567?text=আসসালামু%20আলাইকুম,%20ঔষধ%20ও%20খামার%20পরামর্শের%20জন্য%20যোগাযোগ%20করছি।"
+            href="https://wa.me/8801711234567?text=আসসালামু%20আলাইকুম,%20ফিড%20প্রিমিক্স%20ও%20খামার%20পরামর্শের%20জন্য%20যোগাযোগ%20করছি।"
             target="_blank"
             rel="noopener noreferrer"
             className="hidden sm:flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium text-emerald-800 bg-emerald-50 hover:bg-emerald-100 transition-colors"

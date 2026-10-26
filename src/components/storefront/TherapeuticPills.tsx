@@ -5,7 +5,7 @@ import Link from 'next/link';
 import { Layers, ChevronLeft, ChevronRight } from 'lucide-react';
 
 const categories = [
-  { label: 'সকল রোগ ও উপসর্গ', href: '/products' },
+  { label: 'সকল ক্যাটাগরি', href: '/products' },
   { label: 'ক্ষুধা ও বদহজম / Bloat', href: '/products?category=digestive-appetite-care' },
   { label: 'ক্যালসিয়াম ও দুধ বৃদ্ধি / Milk Booster', href: '/products?category=calcium-milk-bone' },
   { label: 'লিভার টনিক / Liver Tonic', href: '/products?category=liver-tonic-digestive' },
@@ -27,7 +27,7 @@ export default function TherapeuticPills() {
         {/* Label */}
         <div className="flex items-center gap-1.5 text-xs font-bold text-slate-700 shrink-0 mr-1">
           <Layers className="w-3.5 h-3.5 text-emerald-700" />
-          <span className="hidden sm:inline">রোগ ও উপসর্গ:</span>
+          <span className="hidden sm:inline">ক্যাটাগরি:</span>
         </div>
 
         {/* Left Arrow Button */}

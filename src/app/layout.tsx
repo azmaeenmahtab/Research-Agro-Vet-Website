@@ -13,8 +13,8 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Research Agro Vet — অনুমোদিত ভেটেরিনারি ঔষধ ও ফার্মাসিউটিক্যালস",
-  description: "গবাদিপশু, পোল্ট্রি ও মৎস্য খামারীদের জন্য অনুমোদিত ভেটেরিনারি প্রেসক্রিপশন ড্রাগ, মিল্ক বুস্টার ও পুষ্টি সম্পূরক।",
+  title: "Research Agro Vet — Medicated Veterinary Feed Premix & Livestock Nutrition",
+  description: "গবাদিপশু, পোল্ট্রি ও মৎস্য খামারীদের জন্য অনুমোদিত Medicated Veterinary Feed Premix, মিল্ক বুস্টার ও পুষ্টি সম্পূরক।",
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {

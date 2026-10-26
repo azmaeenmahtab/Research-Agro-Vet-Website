@@ -56,7 +56,7 @@ export default function CartDrawer() {
                   onClick={closeCartDrawer}
                   className="mt-3 text-xs text-emerald-700 font-bold hover:underline"
                 >
-                  ঔষধ দেখতে ক্লিক করুন
+                  পণ্য দেখতে ক্লিক করুন
                 </button>
               </div>
             ) : (

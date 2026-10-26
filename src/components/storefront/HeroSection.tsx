@@ -17,13 +17,13 @@ export default function HeroSection() {
           <h1 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold text-slate-900 tracking-tight leading-[1.25]">
             গবাদিপশু ও পোল্ট্রির শতভাগ আসল ও অনুমোদিত{' '}
             <span className="text-emerald-700 underline decoration-emerald-300 decoration-4 underline-offset-4">
-              ভেটেরিনারি ঔষধ
+              ঔষধিযুক্ত খাদ্য প্রি-মিক্স
             </span>
           </h1>
 
           {/* Description */}
           <p className="text-sm sm:text-base text-slate-600 max-w-xl leading-relaxed">
-            সরাসরি এগ্রো-ফার্মাসিউটিক্যালস ম্যানুফ্যাকচারার থেকে নিয়ন্ত্রিত কোল্ড-চেইনে সংরক্ষিত খাঁটি প্রেসক্রিপশন ড্রাগ, মিল্ক বুস্টার, গ্রোথ সাপ্লিমেন্ট ও মিনারেল প্রিমিক্স।
+            সরাসরি অনুমোদিত প্রস্তুতকারক থেকে নিয়ন্ত্রিত কোল্ড-চেইনে সংরক্ষিত প্রিমিয়াম কোয়ালিটি ফিড প্রিমিক্স, মিল্ক বুস্টার, গ্রোথ সাপ্লিমেন্ট ও মিনারেল।
           </p>
 
           {/* Trust Badges */}
@@ -48,12 +48,12 @@ export default function HeroSection() {
               href="/products"
               className="inline-flex items-center gap-2 px-5 py-3 bg-emerald-700 hover:bg-emerald-800 text-white rounded-lg text-sm font-bold transition-all shadow-xs"
             >
-              <span>সকল ঔষধ দেখুন</span>
+              <span>সকল প্রিমিক্স দেখুন</span>
               <ArrowRight className="w-4 h-4" />
             </Link>
 
             <a
-              href="https://wa.me/8801711234567?text=আসসালামু%20আলাইকুম,%20ঔষধ%20ও%20খামার%20পরামর্শের%20জন্য%20যোগাযোগ%20করছি।"
+              href="https://wa.me/8801711234567?text=আসসালামু%20আলাইকুম,%20ফিড%20প্রিমিক্স%20ও%20খামার%20পরামর্শের%20জন্য%20যোগাযোগ%20করছি।"
               target="_blank"
               rel="noopener noreferrer"
               className="inline-flex items-center gap-2 px-5 py-3 bg-green-600 hover:bg-green-700 text-white rounded-lg text-sm font-bold transition-all shadow-xs"
@@ -89,7 +89,7 @@ export default function HeroSection() {
           <div className="grid grid-cols-3 gap-2.5 text-center">
             <div className="p-2.5 bg-white rounded-xl border border-slate-200 shadow-2xs">
               <span className="block text-base font-extrabold text-emerald-700">১০০%</span>
-              <span className="text-[11px] text-slate-500 font-medium">জেনুইন ড্রাগ</span>
+              <span className="text-[11px] text-slate-500 font-medium">জেনুইন প্রিমিক্স</span>
             </div>
             <div className="p-2.5 bg-white rounded-xl border border-slate-200 shadow-2xs">
               <span className="block text-base font-extrabold text-emerald-700">৬৪ জেলা</span>

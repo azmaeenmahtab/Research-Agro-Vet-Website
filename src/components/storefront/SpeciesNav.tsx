@@ -4,7 +4,7 @@ import Link from 'next/link';
 import { usePathname, useSearchParams } from 'next/navigation';
 
 const speciesList = [
-  { label: 'সকল ঔষধ', href: '/products', tag: null },
+  { label: 'সকল পণ্য', href: '/products', tag: null },
   { label: '🐄 গরু ও মহিষ', href: '/products?species=CATTLE_BUFFALO', tag: 'CATTLE_BUFFALO' },
   { label: '🐓 পোল্ট্রি ও হাঁস', href: '/products?species=POULTRY', tag: 'POULTRY' },
   { label: '🐐 ছাগল ও ভেড়া', href: '/products?species=GOAT_SHEEP', tag: 'GOAT_SHEEP' },

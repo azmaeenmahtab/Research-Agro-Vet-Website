@@ -59,7 +59,7 @@ export default function SpeciesGrid() {
         <div className="flex flex-col md:flex-row md:items-end justify-between mb-8 gap-3">
           <div>
             <h2 className="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight">
-              প্রাণী ভিত্তিক ঔষধ বাছাই করুন
+              প্রাণী ভিত্তিক ফিড প্রিমিক্স বাছাই করুন
             </h2>
           </div>
           <p className="text-xs sm:text-sm text-slate-500 max-w-md">
@@ -113,7 +113,7 @@ export default function SpeciesGrid() {
 
               {/* Action Link Footer */}
               <div className="mt-4 pt-3 border-t border-slate-100 flex items-center justify-between text-xs font-bold text-emerald-700 group-hover:text-emerald-800">
-                <span>ঔষধ তালিকা দেখুন</span>
+                <span>পণ্য তালিকা দেখুন</span>
                 <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
               </div>
             </Link>

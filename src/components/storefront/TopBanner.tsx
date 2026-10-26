@@ -5,7 +5,7 @@ const TickerItem = () => (
     {/* 1. Discount */}
     <div className="flex items-center gap-2">
       <BadgePercent className="w-3.5 h-3.5 text-amber-300 shrink-0" />
-      <span>🎉 বিশেষ অফার: সকল ভেটেরিনারি ঔষধে চলছে <strong>৫% সার্বজনীন ছাড়!</strong></span>
+      <span>বিশেষ অফার: সকল ফিড প্রিমিক্স ও পণ্যে চলছে <strong>৫% সার্বজনীন ছাড়!</strong></span>
     </div>
 
     {/* 2. Helpline */}
