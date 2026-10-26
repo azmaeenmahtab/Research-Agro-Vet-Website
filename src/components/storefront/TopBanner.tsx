@@ -11,7 +11,7 @@ const TickerItem = () => (
     {/* 2. Helpline */}
     <a href="tel:01711234567" className="flex items-center gap-1.5 hover:text-white transition-colors">
       <Phone className="w-3.5 h-3.5 text-emerald-300 shrink-0" />
-      <span>হেল্পলাইন: <strong>01711-234567</strong> (সকাল ৮টা - রাত ১০টা)</span>
+      <span>হেল্পলাইন: <strong>01716-019731</strong> (সকাল ৮টা - রাত ১০টা)</span>
     </a>
 
     {/* 3. Licensed Dealer */}

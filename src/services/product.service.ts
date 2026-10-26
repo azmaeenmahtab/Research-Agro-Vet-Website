@@ -64,9 +64,15 @@ export async function getProducts(params: ProductFilterParams = {}) {
   return { products, total, page, totalPages: Math.ceil(total / limit) };
 }
 
-export async function getProductBySlug(slug: string) {
+export async function getProductBySlug(slugOrId: string) {
+  const bySlug = await prisma.product.findUnique({
+    where: { slug: slugOrId },
+    include: { variants: { orderBy: { sellingPrice: 'asc' } }, category: true },
+  });
+  if (bySlug) return bySlug;
+
   return prisma.product.findUnique({
-    where: { slug },
+    where: { id: slugOrId },
     include: { variants: { orderBy: { sellingPrice: 'asc' } }, category: true },
   });
 }

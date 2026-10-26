@@ -1,7 +1,7 @@
 'use client';
 
 import React from 'react';
-import { Percent } from 'lucide-react';
+import { BadgePercent } from 'lucide-react';
 import ProductCard from './ProductCard';
 import type { ProductCardData } from './ProductCard';
 
@@ -72,12 +72,7 @@ export default function FeaturedProducts({ initialProducts = [] }: FeaturedProdu
       {/* Section Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 mb-8">
         <div>
-          <div className="inline-flex items-center gap-1.5 text-[#a05600] text-xs font-bold mb-1">
-            <span className="w-4 h-4 rounded-full bg-amber-100 flex items-center justify-center text-[10px]">
-              ⊞
-            </span>
-            <span>খামারীদের সর্বাধিক ব্যবহৃত প্রেসক্রিপশন ড্রাগ</span>
-          </div>
+          
           <h2 className="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight">
             জনপ্রিয় ভেটেরিনারি ঔষধসমূহ
           </h2>
@@ -85,7 +80,7 @@ export default function FeaturedProducts({ initialProducts = [] }: FeaturedProdu
 
         <div className="flex items-center gap-2">
           <span className="px-3 py-1 bg-[#ffdcc3] text-[#2f1500] rounded-md text-xs font-bold flex items-center gap-1.5 shadow-2xs border border-amber-200/80">
-            <Percent className="w-3.5 h-3.5 stroke-[2.5]" />
+            <BadgePercent className="w-3.5 h-3.5 stroke-[2.5]" />
             <span>৫% ডিসকাউন্ট এক্টিভ</span>
           </span>
         </div>

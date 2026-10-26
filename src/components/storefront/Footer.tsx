@@ -56,7 +56,7 @@ export default function Footer() {
             </p>
             <p className="flex items-start gap-2">
               <MapPin className="w-3.5 h-3.5 text-emerald-400 shrink-0 mt-0.5" />
-              <span>ঢাকা, বাংলাদেশ • ৬৪ জেলায় ক্যাশ অন ডেলিভারি</span>
+              <span>হাতিগাড়া, বেড়া, পাবনা, বাংলাদেশ • ৬৪ জেলায় ক্যাশ অন ডেলিভারি</span>
             </p>
           </div>
         </div>

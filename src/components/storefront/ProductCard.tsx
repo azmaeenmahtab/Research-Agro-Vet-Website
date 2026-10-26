@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
+import Link from 'next/link';
 import { ShoppingCart, Check } from 'lucide-react';
 import { useCartStore } from '@/store/useCartStore';
 
@@ -154,7 +155,10 @@ export default function ProductCard({ product }: ProductCardProps) {
         </div>
 
         {/* Product Image */}
-        <div className="relative h-44 w-full bg-slate-50/80 rounded-lg p-2.5 flex items-center justify-center overflow-hidden mb-3 border border-slate-100">
+        <Link
+          href={`/products/${product.slug || product.id}`}
+          className="relative h-44 w-full bg-slate-50/80 rounded-lg p-2.5 flex items-center justify-center overflow-hidden mb-3 border border-slate-100 block group/img"
+        >
           {(product.thumbnail || product.imageUrl) && (
             <img
               src={(product.thumbnail || product.imageUrl)!}
@@ -163,7 +167,7 @@ export default function ProductCard({ product }: ProductCardProps) {
                 e.currentTarget.onerror = null;
                 e.currentTarget.style.display = 'none';
               }}
-              className="h-full w-auto object-contain mix-blend-multiply group-hover:scale-105 transition-transform duration-300"
+              className="h-full w-auto object-contain mix-blend-multiply group-hover/img:scale-105 transition-transform duration-300"
               loading="lazy"
             />
           )}
@@ -181,20 +185,20 @@ export default function ProductCard({ product }: ProductCardProps) {
               ))}
             </div>
           )}
-        </div>
+        </Link>
 
         {/* Title Block */}
-        <div>
-          <h3 className="font-bold text-base text-slate-900 leading-snug group-hover:text-emerald-800 transition-colors">
+        <Link href={`/products/${product.slug || product.id}`} className="block group/title">
+          <h3 className="font-bold text-base text-slate-900 leading-snug group-hover/title:text-emerald-800 transition-colors">
             {product.nameEn}
           </h3>
-          {product.nameBn && (
+          {/* {product.nameBn && (
             <p className="text-xs text-slate-600 font-medium mt-0.5">{product.nameBn}</p>
-          )}
-          {product.indication && (
+          )} */}
+          {/* {product.indication && (
             <p className="text-[11px] text-slate-500 mt-1 line-clamp-1">{product.indication}</p>
-          )}
-        </div>
+          )} */}
+        </Link>
 
         {/* Pack Size Selector */}
         <div className="mt-3">
