@@ -194,9 +194,9 @@ export default function ProductCatalogContainer({
   const endItem = Math.min(currentPage * pageSize, totalCount);
 
   return (
-    <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
-      {/* Left Column: Filter Sidebar (col-span-3, sticky) */}
-      <aside className="lg:col-span-3 w-full lg:sticky lg:top-[120px] self-start z-20">
+    <div className="grid grid-cols-1 lg:grid-cols-12 gap-5 items-start">
+      {/* Left Column: Filter Sidebar (col-span-4, sticky) */}
+      <aside className="lg:col-span-3 w-full lg:sticky lg:top-[85px] self-start z-20">
         <ProductFilters
           currentSpecies={species}
           currentCategory={category}
@@ -207,7 +207,7 @@ export default function ProductCatalogContainer({
         />
       </aside>
 
-      {/* Right Column: Catalog Grid & Pagination (col-span-9) */}
+      {/* Right Column: Catalog Grid & Pagination (col-span-8) */}
       <div className="lg:col-span-9 space-y-5" id="catalog-content-top">
         {/* Catalog Header Bar */}
         <div className="bg-white p-4 rounded-xl border border-slate-200 shadow-2xs flex flex-col sm:flex-row sm:items-center justify-between gap-4">
@@ -223,9 +223,9 @@ export default function ProductCatalogContainer({
                 <Loader2 className="w-4 h-4 text-emerald-700 animate-spin" />
               )}
             </div>
-            <p className="text-xs text-slate-500 mt-0.5">
+            {/* <p className="text-xs text-slate-500 mt-0.5">
               উন্নত ফর্মুলেশন ও নিশ্চিত কার্যকারিতা।
-            </p>
+            </p> */}
           </div>
 
           {/* Active Filter Chips */}

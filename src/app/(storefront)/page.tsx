@@ -1,4 +1,5 @@
 import { Suspense } from 'react';
+import SpeciesNav from '@/components/storefront/SpeciesNav';
 import HeroSection from '@/components/storefront/HeroSection';
 import SpeciesGrid from '@/components/storefront/SpeciesGrid';
 import TherapeuticPills from '@/components/storefront/TherapeuticPills';
@@ -21,6 +22,9 @@ async function FeaturedProductsLoader() {
 export default function HomePage() {
   return (
     <div>
+      <Suspense fallback={<div className="h-8 bg-slate-50 border-b border-slate-200" />}>
+        <SpeciesNav />
+      </Suspense>
       <HeroSection />
       <SpeciesGrid />
       <TherapeuticPills />

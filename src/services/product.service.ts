@@ -65,15 +65,24 @@ export async function getProducts(params: ProductFilterParams = {}) {
 }
 
 export async function getProductBySlug(slugOrId: string) {
+  const include = {
+    variants: { orderBy: { sellingPrice: 'asc' as const } },
+    category: true,
+    reviews: {
+      where: { status: 'APPROVED' as const },
+      orderBy: { createdAt: 'desc' as const },
+    },
+  };
+
   const bySlug = await prisma.product.findUnique({
     where: { slug: slugOrId },
-    include: { variants: { orderBy: { sellingPrice: 'asc' } }, category: true },
+    include,
   });
   if (bySlug) return bySlug;
 
   return prisma.product.findUnique({
     where: { id: slugOrId },
-    include: { variants: { orderBy: { sellingPrice: 'asc' } }, category: true },
+    include,
   });
 }
 

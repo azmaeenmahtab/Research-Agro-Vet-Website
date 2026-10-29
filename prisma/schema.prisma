@@ -100,6 +100,12 @@ enum LeadStatus {
   IGNORED
 }
 
+enum ReviewStatus {
+  PENDING
+  APPROVED
+  REJECTED
+}
+
 // =========================================================
 // 1. ADMIN USER TABLE (Role-Based CMS Protection)
 // =========================================================
@@ -189,6 +195,7 @@ model Product {
   category                Category?         @relation(fields: [categoryId], references: [id], onDelete: SetNull)
   variants                ProductVariant[]
   orderItems              OrderItem[]
+  reviews                 ProductReview[]
 
   createdAt               DateTime          @default(now())
   updatedAt               DateTime          @updatedAt
@@ -234,6 +241,31 @@ model ProductVariant {
 
   @@index([productId])
   @@index([inStock])
+}
+
+// =========================================================
+// 4B. PRODUCT REVIEW TABLE (Ratings, Verified Farmers, Moderation)
+// =========================================================
+
+model ProductReview {
+  id              String        @id @default(cuid())
+  productId       String
+  product         Product       @relation(fields: [productId], references: [id], onDelete: Cascade)
+
+  userName        String
+  userPhone       String?
+  farmerType      String?       // e.g. "ডেইরি খামারি", "পোল্ট্রি খামারি", "মৎস্য চাষী", "ফার্মাসিস্ট/ডিলার"
+  rating          Int           @default(5) // 1 to 5 stars
+  title           String?
+  comment         String        @db.Text
+  isVerified      Boolean       @default(false)
+  status          ReviewStatus  @default(APPROVED) // Auto-approved by default for instant feedback, admin can moderate
+
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
+
+  @@index([productId, status])
+  @@index([createdAt])
 }
 
 // =========================================================

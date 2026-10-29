@@ -3,8 +3,7 @@ import Link from 'next/link';
 import { getProducts } from '@/services/product.service';
 import { ProductCardData } from '@/components/storefront/ProductCard';
 import ProductCatalogContainer from '@/components/storefront/ProductCatalogContainer';
-import { toBengaliNumber } from '@/lib/formatters';
-import { Home, ShieldCheck } from 'lucide-react';
+
 
 interface ProductsPageProps {
   searchParams: Promise<{
@@ -97,55 +96,50 @@ async function ProductsCatalog({ searchParams }: ProductsPageProps) {
 
   return (
     <div className="bg-slate-50 min-h-screen">
-      {/* Breadcrumb & Regulatory Ribbon */}
-      <div className="bg-white border-b border-slate-200 py-2.5 px-4">
-        <div className="max-w-7xl mx-auto flex flex-col sm:flex-row sm:items-center justify-between gap-2 text-xs">
-          <nav aria-label="Breadcrumb" className="flex items-center gap-1.5 text-slate-600 flex-wrap">
-            <Link href="/" className="hover:text-emerald-700 flex items-center gap-1">
-              <Home className="w-3.5 h-3.5" />
-              <span>হোম</span>
-            </Link>
-            <span className="text-slate-300">/</span>
-            <Link href="/products" className="font-semibold text-slate-900 hover:text-emerald-700">
-              সকল পণ্য
-            </Link>
-            {species && (
-              <>
-                <span className="text-slate-300">/</span>
-                <span className="px-2 py-0.5 rounded bg-emerald-50 text-emerald-800 font-bold border border-emerald-200">
-                  {SPECIES_NAMES[species] || species}
-                </span>
-              </>
-            )}
-            {category && (
-              <>
-                <span className="text-slate-300">/</span>
-                <span className="px-2 py-0.5 rounded bg-slate-100 text-slate-700 font-medium">
-                  {category}
-                </span>
-              </>
-            )}
-            {search && (
-              <>
-                <span className="text-slate-300">/</span>
-                <span className="text-amber-800 italic">“{search}”</span>
-              </>
-            )}
-          </nav>
-
-          <div className="flex items-center gap-2 text-slate-500 font-medium">
-            <span className="inline-flex items-center gap-1 text-emerald-800 font-semibold">
-              <ShieldCheck className="w-4 h-4 text-emerald-600" />
-              প্রাণিসম্পদ অধিদপ্তর নিবন্ধিত
-            </span>
-            <span>•</span>
-            <span>সর্বমোট {toBengaliNumber(totalCount)} টি পণ্য তালিকাভুক্ত</span>
-          </div>
-        </div>
+      {/* Breadcrumb */}
+      <div className="max-w-7xl mx-auto px-4 pt-4 sm:pt-6">
+        <nav aria-label="Breadcrumb" className="flex items-center gap-2 text-sm text-slate-500 flex-wrap">
+          <Link href="/" className="hover:text-emerald-700 transition-colors">
+            হোম
+          </Link>
+          <span className="text-slate-400">/</span>
+          <Link
+            href="/products"
+            className={
+              species || category || search
+                ? 'hover:text-emerald-700 transition-colors'
+                : 'font-semibold text-slate-800'
+            }
+          >
+            সকল পণ্য
+          </Link>
+          {species && (
+            <>
+              <span className="text-slate-400">/</span>
+              <span className="font-semibold text-slate-800">
+                {SPECIES_NAMES[species] || species}
+              </span>
+            </>
+          )}
+          {category && (
+            <>
+              <span className="text-slate-400">/</span>
+              <span className="font-semibold text-slate-800">
+                {category}
+              </span>
+            </>
+          )}
+          {search && (
+            <>
+              <span className="text-slate-400">/</span>
+              <span className="text-slate-700 italic">“{search}”</span>
+            </>
+          )}
+        </nav>
       </div>
 
       {/* Main Catalog & Isolated Grid Section */}
-      <main className="max-w-7xl mx-auto px-4 py-8">
+      <main className="max-w-7xl mx-auto px-4 py-6 sm:py-8">
         <ProductCatalogContainer
           initialProducts={initialProducts}
           initialTotal={totalCount}

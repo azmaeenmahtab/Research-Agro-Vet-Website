@@ -99,7 +99,7 @@ export default function ProductFilters({
         <h3 className="text-xs font-bold text-slate-700 uppercase tracking-wider mb-2">
           প্রাণী অনুযায়ী (Species)
         </h3>
-        <div className="space-y-1">
+        <div className="space-y-1.5">
           {SPECIES_OPTIONS.map((spec) => {
             const isSelected = (!currentSpecies && spec.value === undefined) || currentSpecies === spec.value;
             return (
@@ -107,7 +107,7 @@ export default function ProductFilters({
                 key={spec.id}
                 type="button"
                 onClick={() => updateFilter('species', spec.value)}
-                className={`w-full flex items-center justify-between px-3 py-2 rounded-lg text-xs font-medium transition-all text-left ${
+                className={`w-full flex items-center justify-between px-3.5 py-2.5 rounded-lg text-xs font-medium transition-all text-left ${
                   isSelected
                     ? 'bg-emerald-50 text-emerald-800 font-bold border border-emerald-200 shadow-2xs'
                     : 'text-slate-600 hover:bg-slate-100 hover:text-slate-900'
@@ -126,7 +126,7 @@ export default function ProductFilters({
         <h3 className="text-xs font-bold text-slate-700 uppercase tracking-wider mb-2">
           ক্যাটাগরি (Indication)
         </h3>
-        <div className="space-y-1">
+        <div className="space-y-1.5">
           {CATEGORY_OPTIONS.map((cat) => {
             const isSelected = (!currentCategory && cat.value === undefined) || currentCategory === cat.value;
             return (
@@ -134,7 +134,7 @@ export default function ProductFilters({
                 key={cat.slug}
                 type="button"
                 onClick={() => updateFilter('category', cat.value)}
-                className={`w-full flex items-center justify-between px-3 py-2 rounded-lg text-xs font-medium transition-all text-left ${
+                className={`w-full flex items-center justify-between px-3.5 py-2.5 rounded-lg text-xs font-medium transition-all text-left ${
                   isSelected
                     ? 'bg-emerald-50 text-emerald-800 font-bold border border-emerald-200 shadow-2xs'
                     : 'text-slate-600 hover:bg-slate-100 hover:text-slate-900'
@@ -149,7 +149,7 @@ export default function ProductFilters({
       </div>
 
       {/* Wholesale / Dealer Support Banner */}
-      <div className="bg-slate-900 text-white rounded-xl p-4 shadow-sm space-y-2.5">
+      {/* <div className="bg-slate-900 text-white rounded-xl p-4 shadow-sm space-y-2.5">
         <div className="flex items-center gap-2">
           <div className="w-7 h-7 rounded-lg bg-amber-500/20 text-amber-400 flex items-center justify-center font-bold text-sm">
             🤝
@@ -180,7 +180,7 @@ export default function ProductFilters({
             <span>হোয়াটসঅ্যাপ</span>
           </a>
         </div>
-      </div>
+      </div> */}
     </div>
   );
 
@@ -211,7 +211,7 @@ export default function ProductFilters({
       </div>
 
       {/* Desktop Panel */}
-      <div className="hidden lg:block bg-white rounded-xl border border-slate-200 p-4 shadow-2xs max-h-[calc(100vh-140px)] overflow-y-auto [scrollbar-width:thin]">
+      <div className="hidden lg:block bg-white rounded-xl border border-slate-200 p-5 shadow-2xs max-h-[calc(100vh-100px)] overflow-y-auto [scrollbar-width:thin]">
         {filterContent}
       </div>
     </div>

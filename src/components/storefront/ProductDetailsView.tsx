@@ -5,6 +5,7 @@ import Image from 'next/image';
 import { useCartStore } from '@/store/useCartStore';
 import { toBengaliNumber } from '@/lib/formatters';
 import ProductCard, { ProductCardData } from './ProductCard';
+import ProductReviewsSection, { ProductReviewItem } from './ProductReviewsSection';
 import {
   Check,
   ShoppingCart,
@@ -20,6 +21,7 @@ import {
   FileText,
   AlertCircle,
   Pill,
+  Star,
 } from 'lucide-react';
 
 interface ProductDetailsViewProps {
@@ -57,6 +59,7 @@ interface ProductDetailsViewProps {
       packagingInfo?: string | null;
       unitsPerBox?: number | null;
     }>;
+    reviews?: ProductReviewItem[];
   };
   relatedProducts?: ProductCardData[];
 }
@@ -90,6 +93,13 @@ export default function ProductDetailsView({
   const savingsPerUnit = mrp > sellingPrice ? mrp - sellingPrice : 0;
   const subtotal = sellingPrice * quantity;
 
+  const reviews = product.reviews || [];
+  const totalReviews = reviews.length;
+  const avgRating =
+    totalReviews > 0
+      ? Number((reviews.reduce((acc, r) => acc + (r.rating || 5), 0) / totalReviews).toFixed(1))
+      : 0;
+
   // Add to cart handler
   const handleAddToCart = () => {
     if (!currentVariant) return;
@@ -122,12 +132,13 @@ export default function ProductDetailsView({
   const whatsappMsg = encodeURIComponent(
     `আসসালামু আলাইকুম, আমি Research Agro Vet থেকে ${product.nameEn} (${currentVariant?.packSize || ''}, পরিমাণ: ${quantity} টি, সর্বমোট: ৳${subtotal}) অর্ডার করতে চাই।`
   );
-  const whatsappUrl = `https://wa.me/8801711234567?text=${whatsappMsg}`;
+  const whatsappUrl = `https://wa.me/8801716019731?text=${whatsappMsg}`;
 
   // Quick Carton setter
   const handleSetFullBox = () => {
-    const boxQty = currentVariant?.unitsPerBox || 12;
-    setQuantity(boxQty);
+    if (currentVariant?.unitsPerBox) {
+      setQuantity(currentVariant.unitsPerBox);
+    }
   };
 
   // Dose calculation logic
@@ -160,11 +171,9 @@ export default function ProductDetailsView({
             <div className="absolute top-4 left-4 z-10 flex flex-col gap-1.5">
               <span className="px-2.5 py-1 rounded-md bg-emerald-50 text-emerald-800 font-bold text-xs border border-emerald-200 flex items-center gap-1 shadow-2xs">
                 <ShieldCheck className="w-3.5 h-3.5 text-emerald-600" />
-                ১০০% আসল ফর্মুলেশন
+                DLS অনুমোদিত
               </span>
-              <span className="px-2.5 py-0.5 rounded-md bg-[#ffdcc3] text-[#7d4200] font-bold text-[11px] shadow-2xs">
-                ৫% সার্বজনীন ছাড়
-              </span>
+              
             </div>
 
             {/* Product Image */}
@@ -177,7 +186,7 @@ export default function ProductDetailsView({
             </div>
 
             {/* Bottom Security Seal */}
-            <div className="absolute bottom-3 inset-x-3 bg-slate-50/90 backdrop-blur-xs rounded-lg py-1.5 px-3 flex items-center justify-between text-slate-600 text-[11px] font-medium border border-slate-200/60">
+            {/* <div className="absolute bottom-3 inset-x-3 bg-slate-50/90 backdrop-blur-xs rounded-lg py-1.5 px-3 flex items-center justify-between text-slate-600 text-[11px] font-medium border border-slate-200/60">
               <span className="flex items-center gap-1">
                 <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
                 ডিএলএস নিয়ন্ত্রিত ব্যাচ
@@ -185,7 +194,7 @@ export default function ProductDetailsView({
               <span className="font-mono font-bold text-emerald-800">
                 {product.dlsLicenseNo || 'DLS Verified'}
               </span>
-            </div>
+            </div> */}
           </div>
 
           {/* Gallery Thumbnails (if multiple exist) */}
@@ -208,48 +217,63 @@ export default function ProductDetailsView({
             </div>
           )}
 
-          {/* Clinical Support Hotline Box */}
-          <div className="bg-emerald-50/60 border border-emerald-200/80 rounded-xl p-4 flex items-center justify-between gap-3 shadow-2xs">
-            <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-full bg-emerald-700 text-white flex items-center justify-center shrink-0">
-                <Phone className="w-4 h-4" />
-              </div>
-              <div>
-                <p className="text-xs font-bold text-slate-900">ভেটেরিনারি সার্জন হটলাইন</p>
-                <p className="text-[11px] text-slate-600">ডোজ ও খামার ব্যবস্থাপনায় ফ্রি পরামর্শ</p>
-              </div>
-            </div>
-            <a
-              href="tel:01711234567"
-              className="px-3 py-1.5 bg-emerald-700 hover:bg-emerald-800 text-white text-xs font-bold rounded-lg transition-colors shadow-2xs shrink-0"
-            >
-              ০১৭১১-২৩৪৫৬৭
-            </a>
-          </div>
+          
         </div>
 
         {/* Right Column: Taxonomy, Pricing, Pack Sizes & CTAs (7 cols) */}
         <div className="lg:col-span-7 space-y-5">
           {/* Main Title & Taxonomy Block */}
           <div className="bg-white p-6 rounded-2xl border border-slate-200 shadow-2xs space-y-3">
-            <div className="flex flex-wrap items-center justify-between gap-2">
+            {/* <div className="flex flex-wrap items-center justify-between">
               <span className="text-xs font-bold text-emerald-800 uppercase tracking-wider bg-emerald-50 px-2.5 py-0.5 rounded-md border border-emerald-100">
                 {product.category?.nameBn || product.category?.nameEn || 'ভেটেরিনারি ফিড প্রিমিক্স'}
               </span>
-              <span className="text-[11px] font-mono text-slate-500 font-semibold bg-slate-100 px-2 py-0.5 rounded">
-                SKU: {currentVariant?.sku || 'AV-PROD'}
-              </span>
-            </div>
+              
+            </div> */}
 
             <div>
-              <h1 className="text-2xl sm:text-3xl font-black text-slate-900 tracking-tight leading-snug">
-                {product.nameEn}
-                {product.nameBn && (
-                  <span className="text-emerald-800 ml-2 font-bold text-xl sm:text-2xl">
-                    ({product.nameBn})
-                  </span>
-                )}
-              </h1>
+              <div className='flex justify-between items-center'>
+                <h1 className="text-2xl sm:text-3xl font-black text-slate-900 tracking-tight leading-snug">
+                  {product.nameEn}
+                </h1>
+              </div>
+
+              {/* Star Rating & Reviews anchor link */}
+              <div className="flex items-center gap-2 pt-1.5 pb-0.5">
+                <a
+                  href="#reviews-section"
+                  className="inline-flex items-center gap-2 text-xs font-semibold text-slate-700 hover:text-emerald-800 transition-colors group cursor-pointer"
+                >
+                  <div className="flex items-center gap-0.5 text-amber-400">
+                    {[1, 2, 3, 4, 5].map((s) => (
+                      <Star
+                        key={s}
+                        className={`w-3.5 h-3.5 ${
+                          totalReviews > 0 && s <= Math.round(avgRating)
+                            ? 'fill-amber-400 text-amber-400'
+                            : 'text-slate-300'
+                        }`}
+                      />
+                    ))}
+                  </div>
+                  {totalReviews > 0 ? (
+                    <>
+                      <span className="font-bold text-slate-900 text-xs sm:text-sm">
+                        {toBengaliNumber(avgRating)}
+                      </span>
+                      <span className="text-slate-300">•</span>
+                      <span className="underline decoration-slate-300 group-hover:decoration-emerald-700 text-slate-600">
+                        {toBengaliNumber(totalReviews)} টি খামারি রিভিউ
+                      </span>
+                    </>
+                  ) : (
+                    <span className="text-slate-500 hover:underline">
+                      এখনো রিভিউ নেই • প্রথম রিভিউ দিন
+                    </span>
+                  )}
+                </a>
+              </div>
+              
               {product.shortDescription && (
                 <p className="text-sm text-slate-600 mt-2 leading-relaxed">{product.shortDescription}</p>
               )}
@@ -294,11 +318,11 @@ export default function ProductDetailsView({
                     ৫% সার্বজনীন ছাড়
                   </span>
                 </div>
-                {savingsPerUnit > 0 && (
+                {/* {savingsPerUnit > 0 && (
                   <p className="text-xs font-bold text-emerald-800 mt-1">
                     🎉 প্রতিটি ফাইলে সাশ্রয়: ৳{toBengaliNumber(savingsPerUnit)}
                   </p>
-                )}
+                )} */}
               </div>
 
               <div className="text-right sm:border-l sm:border-slate-200 sm:pl-4">
@@ -360,23 +384,27 @@ export default function ProductDetailsView({
               </div>
             </div>
 
-            {/* Carton Master Info */}
-            <div className="bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 flex flex-wrap items-center justify-between gap-2 text-xs">
-              <span className="text-slate-700 flex items-center gap-1.5">
-                <Layers className="w-4 h-4 text-slate-500" />
-                <span>
-                  {currentVariant?.packagingInfo ||
-                    `১ কার্টনে ${toBengaliNumber(currentVariant?.unitsPerBox || 12)} টি ফাইল থাকে`}
+            {/* Carton Master Info - Only show when packaging info or unitsPerBox actually exists */}
+            {Boolean(currentVariant?.packagingInfo || currentVariant?.unitsPerBox) && (
+              <div className="bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 flex flex-wrap items-center justify-between gap-2 text-xs">
+                <span className="text-slate-700 flex items-center gap-1.5">
+                  <Layers className="w-4 h-4 text-slate-500" />
+                  <span>
+                    {currentVariant?.packagingInfo ||
+                      `১ কার্টনে ${toBengaliNumber(currentVariant?.unitsPerBox || 0)} টি থাকে`}
+                  </span>
                 </span>
-              </span>
-              <button
-                type="button"
-                onClick={handleSetFullBox}
-                className="font-bold text-emerald-800 hover:text-emerald-900 underline cursor-pointer"
-              >
-                সম্পূর্ণ কার্টন যোগ করুন ({toBengaliNumber(currentVariant?.unitsPerBox || 12)} ফাইল)
-              </button>
-            </div>
+                {Boolean(currentVariant?.unitsPerBox) && (
+                  <button
+                    type="button"
+                    onClick={handleSetFullBox}
+                    className="font-bold text-emerald-800 hover:text-emerald-900 underline cursor-pointer"
+                  >
+                    সম্পূর্ণ কার্টন যোগ করুন ({toBengaliNumber(currentVariant?.unitsPerBox || 0)} টি)
+                  </button>
+                )}
+              </div>
+            )}
 
             {/* Quantity Stepper & Running Subtotal */}
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pt-1">
@@ -443,7 +471,7 @@ export default function ProductDetailsView({
                 className="py-3 px-3 rounded-xl font-bold text-xs bg-[#d97706] hover:bg-[#b45309] text-white flex items-center justify-center gap-1.5 transition-colors shadow-xs cursor-pointer"
               >
                 <Zap className="w-4 h-4" />
-                <span>⚡ এখনই অর্ডার</span>
+                <span>অর্ডার করুন</span>
               </button>
 
               {/* Button 3: WhatsApp Order */}
@@ -477,54 +505,7 @@ export default function ProductDetailsView({
         </div>
       </div>
 
-      {/* Smart Veterinary Dosage Calculator Module */}
-      <div className="bg-white rounded-2xl border border-slate-200 p-6 shadow-2xs">
-        <div className="max-w-4xl mx-auto flex flex-col md:flex-row items-center justify-between gap-6">
-          <div className="space-y-1 text-center md:text-left">
-            <div className="flex items-center justify-center md:justify-start gap-1.5 text-emerald-800 text-xs font-bold">
-              <Calculator className="w-4 h-4" />
-              <span>স্মার্ট ভেটেরিনারি ডোজ ক্যালকুলেটর</span>
-            </div>
-            <h3 className="text-lg font-bold text-slate-900">
-              প্রাণীর ওজন অনুযায়ী সঠিক প্রয়োগমাত্রা নির্ধারণ
-            </h3>
-            <p className="text-xs text-slate-500">
-              সঠিক মাত্রায় প্রয়োগ নিশ্চিত করলে ঔষধের কার্যকারিতা বজায় থাকে এবং অপচয় রোধ হয়।
-            </p>
-          </div>
-
-          <div className="flex flex-wrap items-center justify-center gap-3 w-full md:w-auto">
-            <select
-              value={calcAnimal}
-              onChange={(e) => setCalcAnimal(e.target.value as any)}
-              className="h-10 px-3 bg-slate-50 border border-slate-200 rounded-lg text-xs font-bold text-slate-800 outline-none focus:border-emerald-600"
-            >
-              <option value="cattle">গরু ও মহিষ (বড়)</option>
-              <option value="goat">ছাগল ও ভেড়া (ছোট)</option>
-              <option value="poultry">পোল্ট্রি ও লেয়ার</option>
-            </select>
-
-            {calcAnimal !== 'poultry' && (
-              <div className="flex items-center gap-1 bg-slate-50 border border-slate-200 rounded-lg px-2 h-10">
-                <input
-                  type="number"
-                  min="10"
-                  max="800"
-                  value={calcWeight}
-                  onChange={(e) => setCalcWeight(Number(e.target.value) || 0)}
-                  className="w-16 bg-transparent text-xs font-mono font-bold text-slate-900 outline-none text-center"
-                />
-                <span className="text-xs text-slate-500 font-bold">কেজি</span>
-              </div>
-            )}
-
-            <div className="bg-emerald-50 border border-emerald-200 px-4 py-2 rounded-lg text-center min-w-[150px]">
-              <span className="text-[10px] text-emerald-800 font-bold block">প্রয়োজনীয় ডোজ</span>
-              <span className="text-xs font-bold text-[#047857]">{calculateDose()}</span>
-            </div>
-          </div>
-        </div>
-      </div>
+      
 
       {/* Clinical Reference Tabs */}
       <div className="bg-white rounded-2xl border border-slate-200 p-6 shadow-2xs space-y-6">
@@ -632,6 +613,64 @@ export default function ProductDetailsView({
           )}
         </div>
       </div>
+
+
+      {/* Smart Veterinary Dosage Calculator Module */}
+      
+      {/* <div className="bg-white rounded-2xl border border-slate-200 p-6 shadow-2xs">
+        <div className="max-w-4xl mx-auto flex flex-col md:flex-row items-center justify-between gap-6">
+          <div className="space-y-1 text-center md:text-left">
+            <div className="flex items-center justify-center md:justify-start gap-1.5 text-emerald-800 text-xs font-bold">
+              <Calculator className="w-4 h-4" />
+              <span>স্মার্ট ভেটেরিনারি ডোজ ক্যালকুলেটর</span>
+            </div>
+            <h3 className="text-lg font-bold text-slate-900">
+              প্রাণীর ওজন অনুযায়ী সঠিক প্রয়োগমাত্রা নির্ধারণ
+            </h3>
+            <p className="text-xs text-slate-500">
+              সঠিক মাত্রায় প্রয়োগ নিশ্চিত করলে ঔষধের কার্যকারিতা বজায় থাকে এবং অপচয় রোধ হয়।
+            </p>
+          </div>
+
+          <div className="flex flex-wrap items-center justify-center gap-3 w-full md:w-auto">
+            <select
+              value={calcAnimal}
+              onChange={(e) => setCalcAnimal(e.target.value as any)}
+              className="h-10 px-3 bg-slate-50 border border-slate-200 rounded-lg text-xs font-bold text-slate-800 outline-none focus:border-emerald-600"
+            >
+              <option value="cattle">গরু ও মহিষ (বড়)</option>
+              <option value="goat">ছাগল ও ভেড়া (ছোট)</option>
+              <option value="poultry">পোল্ট্রি ও লেয়ার</option>
+            </select>
+
+            {calcAnimal !== 'poultry' && (
+              <div className="flex items-center gap-1 bg-slate-50 border border-slate-200 rounded-lg px-2 h-10">
+                <input
+                  type="number"
+                  min="10"
+                  max="800"
+                  value={calcWeight}
+                  onChange={(e) => setCalcWeight(Number(e.target.value) || 0)}
+                  className="w-16 bg-transparent text-xs font-mono font-bold text-slate-900 outline-none text-center"
+                />
+                <span className="text-xs text-slate-500 font-bold">কেজি</span>
+              </div>
+            )}
+
+            <div className="bg-emerald-50 border border-emerald-200 px-4 py-2 rounded-lg text-center min-w-[150px]">
+              <span className="text-[10px] text-emerald-800 font-bold block">প্রয়োজনীয় ডোজ</span>
+              <span className="text-xs font-bold text-[#047857]">{calculateDose()}</span>
+            </div>
+          </div>
+        </div>
+      </div> */}
+
+      {/* Product Reviews Section */}
+      <ProductReviewsSection
+        productId={product.id}
+        productName={product.nameEn}
+        initialReviews={reviews}
+      />
 
       {/* Related Products Grid */}
       {relatedProducts && relatedProducts.length > 0 && (

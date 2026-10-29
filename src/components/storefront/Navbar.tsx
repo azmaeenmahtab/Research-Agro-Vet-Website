@@ -25,11 +25,11 @@ export default function Navbar() {
   const subtotal = mounted ? getCartSubtotal() : 0;
 
   return (
-    <nav className="bg-white/95 backdrop-blur-md border-b border-slate-200 sticky top-0 z-40">
+    <nav className="bg-white/95 backdrop-blur-md border-b border-slate-200 sticky top-0 z-40 ">
       <div className="max-w-7xl mx-auto px-4 py-2.5 flex items-center justify-between gap-4">
         {/* Brand */}
         <Link href="/" className="flex items-center gap-2.5 shrink-0">
-          <div className="relative w-15 h-9 shrink-0 flex items-center justify-center">
+          <div className="relative w-20 h-12 shrink-0 flex items-center justify-center">
             <Image
               src="/images/logo.png?v=3"
               alt="Research Agro Vet"
@@ -52,11 +52,11 @@ export default function Navbar() {
             type="search"
             value={query}
             onChange={(e) => setQuery(e.target.value)}
-            placeholder="পণ্যের নাম বা উপাদান দিয়ে খুঁজুন (e.g. Zinc, ক্যালসিয়াম, ভিটামিন)..."
+            placeholder="পণ্যের নাম (e.g. Re-Cal)"
             className="w-full pl-9 pr-20 py-2 bg-slate-50 border border-slate-200 rounded-lg text-sm focus:bg-white focus:border-emerald-600 focus:outline-none transition-all"
           />
-          <button type="submit" className="absolute right-1 top-1 bottom-1 px-3 bg-emerald-700 hover:bg-emerald-800 text-white rounded text-xs font-semibold transition-colors">
-            অনুসন্ধান
+          <button type="submit" className="absolute right-0 top-0 bottom-0 px-3 bg-emerald-700 hover:bg-emerald-800 text-white rounded text-xs font-semibold transition-colors">
+            SEARCH
           </button>
         </form>
 

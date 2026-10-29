@@ -4,7 +4,6 @@ import { notFound } from 'next/navigation';
 import { getProductBySlug, getProducts } from '@/services/product.service';
 import ProductDetailsView from '@/components/storefront/ProductDetailsView';
 import { ProductCardData } from '@/components/storefront/ProductCard';
-import { Home, ShieldCheck } from 'lucide-react';
 
 interface ProductDetailPageProps {
   params: Promise<{
@@ -94,46 +93,36 @@ async function ProductDetailContent({ params }: ProductDetailPageProps) {
 
   return (
     <div className="bg-slate-50 min-h-screen">
-      {/* Breadcrumb & Regulatory Strip */}
-      <div className="bg-white border-b border-slate-200 py-2.5 px-4">
-        <div className="max-w-7xl mx-auto flex flex-col sm:flex-row sm:items-center justify-between gap-2 text-xs">
-          <nav aria-label="Breadcrumb" className="flex items-center gap-1.5 text-slate-600 flex-wrap">
-            <Link href="/" className="hover:text-emerald-700 flex items-center gap-1">
-              <Home className="w-3.5 h-3.5" />
-              <span>হোম</span>
-            </Link>
-            <span className="text-slate-300">/</span>
-            <Link href="/products" className="hover:text-emerald-700">
-              সকল পণ্য
-            </Link>
-            {product.category && (
-              <>
-                <span className="text-slate-300">/</span>
-                <Link
-                  href={`/products?category=${product.category.slug}`}
-                  className="hover:text-emerald-700"
-                >
-                  {product.category.nameBn || product.category.nameEn}
-                </Link>
-              </>
-            )}
-            <span className="text-slate-300">/</span>
-            <span className="font-bold text-slate-900 truncate max-w-xs">{product.nameEn}</span>
-          </nav>
-
-          <div className="flex items-center gap-2 text-slate-500 font-medium">
-            <span className="inline-flex items-center gap-1 text-emerald-800 font-semibold">
-              <ShieldCheck className="w-4 h-4 text-emerald-600" />
-              {product.dlsLicenseNo ? `DLS Lic: ${product.dlsLicenseNo}` : 'প্রাণিসম্পদ অধিদপ্তর অনুমোদিত'}
-            </span>
-            <span>•</span>
-            <span className="text-emerald-700 font-bold">ইন-স্টক ও ডেলিভারি যোগ্য</span>
-          </div>
-        </div>
+      {/* Breadcrumb */}
+      <div className="max-w-7xl mx-auto px-4 pt-4 sm:pt-6">
+        <nav aria-label="Breadcrumb" className="flex items-center gap-2 text-sm text-slate-500 flex-wrap">
+          <Link href="/" className="hover:text-emerald-700 transition-colors">
+            হোম
+          </Link>
+          <span className="text-slate-400">/</span>
+          <Link href="/products" className="hover:text-emerald-700 transition-colors">
+            সকল পণ্য
+          </Link>
+          {product.category && (
+            <>
+              <span className="text-slate-400">/</span>
+              <Link
+                href={`/products?category=${product.category.slug}`}
+                className="hover:text-emerald-700 transition-colors"
+              >
+                {product.category.nameBn || product.category.nameEn}
+              </Link>
+            </>
+          )}
+          <span className="text-slate-400">/</span>
+          <span className="font-semibold text-slate-800 truncate max-w-xs sm:max-w-md">
+            {product.nameEn}
+          </span>
+        </nav>
       </div>
 
       {/* Main Content Area */}
-      <main className="max-w-7xl mx-auto px-4 py-8">
+      <main className="max-w-7xl mx-auto px-4 py-6 sm:py-8">
         <ProductDetailsView product={product} relatedProducts={relatedProducts} />
       </main>
     </div>

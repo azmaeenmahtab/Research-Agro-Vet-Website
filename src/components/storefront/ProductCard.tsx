@@ -145,14 +145,12 @@ export default function ProductCard({ product }: ProductCardProps) {
     <article className="group flex flex-col justify-between bg-white rounded-xl border border-slate-200/90 hover:border-emerald-500/40 p-4 shadow-2xs hover:shadow-md transition-all duration-200">
       <div>
         {/* Badges & Status */}
-        <div className="flex items-center justify-between gap-2 mb-3">
+        {/* <div className="flex items-center justify-between gap-2 mb-3">
           <span className="px-2 py-0.5 rounded bg-[#ECFDF5] text-[#047857] text-[11px] font-bold border border-emerald-100">
             {tagBadgeText}
           </span>
-          <span className="px-2 py-0.5 rounded bg-[#DCFCE7] text-[#166534] text-[11px] font-bold">
-            {product.inStock !== false ? 'ইন-স্টক' : 'স্টক শেষ'}
-          </span>
-        </div>
+          
+        </div> */}
 
         {/* Product Image */}
         <Link
@@ -173,7 +171,7 @@ export default function ProductCard({ product }: ProductCardProps) {
           )}
 
           {/* Species Badges */}
-          {product.speciesTags && product.speciesTags.length > 0 && (
+          {/* {product.speciesTags && product.speciesTags.length > 0 && (
             <div className="absolute bottom-1.5 right-1.5 flex flex-wrap gap-1 z-10">
               {product.speciesTags.slice(0, 2).map((species, i) => (
                 <span
@@ -184,20 +182,22 @@ export default function ProductCard({ product }: ProductCardProps) {
                 </span>
               ))}
             </div>
-          )}
+          )} */}
         </Link>
 
         {/* Title Block */}
         <Link href={`/products/${product.slug || product.id}`} className="block group/title">
-          <h3 className="font-bold text-base text-slate-900 leading-snug group-hover/title:text-emerald-800 transition-colors">
+        <div className='flex justify-between items-center'>
+<h3 className="font-bold text-base text-slate-900 leading-snug group-hover/title:text-emerald-800 transition-colors">
             {product.nameEn}
           </h3>
-          {/* {product.nameBn && (
-            <p className="text-xs text-slate-600 font-medium mt-0.5">{product.nameBn}</p>
-          )} */}
-          {/* {product.indication && (
-            <p className="text-[11px] text-slate-500 mt-1 line-clamp-1">{product.indication}</p>
-          )} */}
+
+            <span className="px-2 py-0.5 rounded bg-[#DCFCE7] text-[#166534] text-[11px] font-bold">
+            {product.inStock !== false ? 'ইন-স্টক' : 'স্টক শেষ'}
+          </span>
+        </div>
+          
+        
         </Link>
 
         {/* Pack Size Selector */}

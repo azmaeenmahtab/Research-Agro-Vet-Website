@@ -1,7 +1,7 @@
 import { BadgePercent, Phone, ShieldCheck } from 'lucide-react';
 
 const TickerItem = () => (
-  <div className="flex items-center gap-12 sm:gap-20 px-8 shrink-0">
+  <div className="flex items-center py-2 text-[14px] gap-12 sm:gap-20 px-8 shrink-0">
     {/* 1. Discount */}
     <div className="flex items-center gap-2">
       <BadgePercent className="w-3.5 h-3.5 text-amber-300 shrink-0" />
@@ -15,7 +15,7 @@ const TickerItem = () => (
     </a>
 
     {/* 3. Licensed Dealer */}
-    <div className="flex items-center gap-1.5 bg-emerald-900/60 text-emerald-200 px-2.5 py-0.5 rounded text-[11px]">
+    <div className="flex items-center gap-1.5 bg-emerald-900/60 text-emerald-200 px-2.5 py-0.5 rounded">
       <ShieldCheck className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
       <span>DLS অনুমোদিত ডিলার: Reg. No. - 126</span>
     </div>
