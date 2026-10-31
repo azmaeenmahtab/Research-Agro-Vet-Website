@@ -262,13 +262,9 @@ export default function ProductManagementDashboard() {
       {/* Page Title & Context Header */}
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-2 border-b border-slate-200">
         <div>
-          <div className="flex items-center gap-2 text-xs font-semibold text-slate-500 mb-3">
-            <span>Admin Portal</span>
-            <span>/</span>
-            <span className="text-[#005d42]">Inventory & Price Control</span>
-          </div>
+          
           <div className="flex items-center gap-3">
-            <h1 className="text-2xl font-bold text-slate-900 tracking-tight">
+            <h1 className="text-3xl  font-bold pb-3 text-slate-900 tracking-tight">
               Product & Packaging Management
             </h1>
            

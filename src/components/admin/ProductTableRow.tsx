@@ -168,7 +168,7 @@ export default function ProductTableRow({
 
             {/* 3. TRADE PRICE (TP) */}
             <td className="py-3.5 px-3 align-middle text-right whitespace-nowrap">
-              <span className="text-sm sm:text-[15px] font-bold text-slate-700 tabular-nums">
+              <span className="inline-block px-3 py-1 rounded-lg text-sm sm:text-[15px] font-extrabold text-orange-800 bg-orange-50 border border-orange-200/90 tabular-nums shadow-2xs">
                 ৳{Number(variant.tradePrice).toLocaleString()}
               </span>
             </td>
