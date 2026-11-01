@@ -141,6 +141,7 @@ async function ProductsCatalog({ searchParams }: ProductsPageProps) {
       {/* Main Catalog & Isolated Grid Section */}
       <main className="max-w-7xl mx-auto px-4 py-6 sm:py-8">
         <ProductCatalogContainer
+          key={`${species || ''}-${category || ''}-${search || ''}-${page}`}
           initialProducts={initialProducts}
           initialTotal={totalCount}
           initialPage={page}

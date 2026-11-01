@@ -85,13 +85,19 @@ export interface AdminOrder {
 
 export interface OrderStatsSummary {
   totalOrders: number;
+  totalRevenue?: number;
+  averageOrderValue?: number;
   pendingCount: number;
   confirmedCount: number;
   shippedCount: number;
   deliveredCount: number;
   cancelledCount: number;
+  codOrdersCount?: number;
+  paidOrdersCount?: number;
   todayCount: number;
   todayRevenue: number;
+  lifetimeTotalOrders?: number;
+  lifetimeRevenue?: number;
 }
 
 export interface UpdateOrderPayload {
@@ -111,3 +117,4 @@ export interface UpdateOrderPayload {
   upazila?: string;
   address?: string;
 }
+

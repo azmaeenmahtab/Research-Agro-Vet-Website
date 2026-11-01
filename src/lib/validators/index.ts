@@ -39,6 +39,7 @@ export const adminProductSchema = z.object({
   nameEn: z.string().min(2, 'English name is required'),
   nameBn: z.string().optional(),
   categoryId: z.string().optional(),
+  categoryIds: z.array(z.string()).optional(),
   formFactor: z.string().default('POWDER'),
   speciesTags: z.array(z.string()).default([]),
   dlsLicenseNo: z.string().optional(),

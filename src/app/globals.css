@@ -1,1 +1,10 @@
 @import "tailwindcss";
+@import "@heroui/styles";
+
+/* Research Agro Vet Theme for HeroUI RangeCalendar */
+:root {
+  --accent: #005d42;
+  --accent-foreground: #ffffff;
+  --accent-soft: rgba(0, 93, 66, 0.15);
+  --accent-soft-foreground: #005d42;
+}

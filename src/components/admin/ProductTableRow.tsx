@@ -107,16 +107,25 @@ export default function ProductTableRow({
                       )}
                     </div>
 
-                    {/* Metadata: Category, Form factor, Regulatory */}
-                    <div className="flex items-center gap-2 text-xs text-slate-500 flex-wrap">
-                      {product.category && (
-                        <span className="bg-slate-200/70 text-slate-700 px-2 py-0.5 rounded text-[11px] font-medium">
-                          {product.category.nameEn}
-                        </span>
-                      )}
+                      {/* Metadata: Categories, Form factor, Regulatory */}
+                      <div className="flex items-center gap-1.5 text-xs text-slate-500 flex-wrap">
+                        {product.categories && product.categories.length > 0 ? (
+                          product.categories.map((cat) => (
+                            <span
+                              key={cat.id}
+                              className="bg-emerald-50 text-emerald-800 border border-emerald-200/70 px-2 py-0.5 rounded text-[10.5px] font-medium"
+                            >
+                              {cat.nameEn}
+                            </span>
+                          ))
+                        ) : product.category ? (
+                          <span className="bg-slate-200/70 text-slate-700 px-2 py-0.5 rounded text-[11px] font-medium">
+                            {product.category.nameEn}
+                          </span>
+                        ) : null}
                       <span className="text-slate-300">•</span>
                       <span className="text-[11px] font-medium text-slate-600">
-                        {product.formFactor}
+                        {product.formFactor === 'BOLUS' ? 'BOLUS / TABLET' : product.formFactor}
                       </span>
                       {product.dlsLicenseNo && (
                         <>
@@ -157,12 +166,12 @@ export default function ProductTableRow({
             <td className="py-3 px-3.5 align-middle text-xs">
               <div className="flex flex-col">
                 <span className="font-bold text-slate-800 text-sm">{variant.packSize}</span>
-                <span className="text-[11px] text-slate-400 font-mono tracking-tight">
+                {/* <span className="text-[11px] text-slate-400 font-mono tracking-tight">
                   {variant.sku}
-                </span>
-                {variant.packagingInfo && (
+                </span> */}
+                {/* {variant.packagingInfo && (
                   <span className="text-[10px] text-slate-500">{variant.packagingInfo}</span>
-                )}
+                )} */}
               </div>
             </td>
 

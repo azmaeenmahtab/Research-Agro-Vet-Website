@@ -7,6 +7,7 @@ import { ProductStatus } from '@/types/admin-product';
 interface CategoryOption {
   id: string;
   nameEn: string;
+  nameBn?: string | null;
   slug: string;
 }
 
@@ -45,7 +46,7 @@ export default function ProductFilters({
         <input
           type="text"
           className="w-full pl-10 pr-4 py-2 bg-slate-50 text-slate-900 text-sm rounded-lg border border-slate-200 focus:bg-white focus:ring-2 focus:ring-[#005d42] focus:border-transparent outline-none transition-all placeholder:text-slate-400"
-          placeholder="Search by medicine name, composition, SKU, or DLS license..."
+          placeholder="Search by premix name, composition, SKU, or DLS license..."
           value={searchQuery}
           onChange={(e) => onSearchChange(e.target.value)}
         />
@@ -116,7 +117,7 @@ export default function ProductFilters({
           className="px-4 py-2 bg-[#005d42] hover:bg-[#004e37] text-white rounded-lg text-xs font-bold flex items-center gap-1.5 shadow-xs transition-colors"
         >
           <Plus className="w-4 h-4" />
-          <span>Add Medicine</span>
+          <span>Add Product</span>
         </button>
       </div>
     </div>

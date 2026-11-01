@@ -15,6 +15,7 @@ import {
 interface CategoryOption {
   id: string;
   nameEn: string;
+  nameBn?: string | null;
   slug: string;
 }
 
@@ -48,17 +49,26 @@ export default function ProductManagementDashboard() {
 
   // Toast
   const [toast, setToast] = useState<ToastState | null>(null);
+  const [debouncedSearch, setDebouncedSearch] = useState(searchQuery);
+
+  // Debounce search query to prevent typing stutter and race conditions
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setDebouncedSearch(searchQuery);
+    }, 250);
+    return () => clearTimeout(timer);
+  }, [searchQuery]);
 
   const showToast = (message: string, type: 'success' | 'error' | 'info' = 'success') => {
     setToast({ message, type });
   };
 
   // Fetch Products & Stats from API
-  const fetchProducts = async () => {
+  const fetchProducts = async (currentSearch = debouncedSearch) => {
     setIsLoading(true);
     try {
       const params = new URLSearchParams();
-      if (searchQuery) params.set('q', searchQuery);
+      if (currentSearch) params.set('q', currentSearch);
       if (selectedCategory !== 'ALL') params.set('category', selectedCategory);
       if (selectedStatus !== 'ALL') params.set('status', selectedStatus);
 
@@ -88,8 +98,8 @@ export default function ProductManagementDashboard() {
   };
 
   useEffect(() => {
-    fetchProducts();
-  }, [searchQuery, selectedCategory, selectedStatus]);
+    fetchProducts(debouncedSearch);
+  }, [debouncedSearch, selectedCategory, selectedStatus]);
 
   // Expand / Collapse all toggle
   const isAllExpanded = useMemo(() => {

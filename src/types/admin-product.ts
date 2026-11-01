@@ -63,8 +63,16 @@ export interface AdminProduct {
   category?: {
     id: string;
     nameEn: string;
+    nameBn?: string | null;
     slug: string;
   } | null;
+  categories?: {
+    id: string;
+    nameEn: string;
+    nameBn?: string | null;
+    slug: string;
+  }[];
+  categoryIds?: string[];
 
   variants: AdminVariant[];
   createdAt: string | Date;

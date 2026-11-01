@@ -71,7 +71,7 @@ export default function AdminSidebar({ isOpen, onClose }: AdminSidebarProps) {
   const sidebarContent = (
     <div className="flex flex-col h-full bg-white text-slate-800">
       {/* Brand & Header */}
-      <div className="px-5 py-3 border-b border-slate-150 flex items-center justify-between">
+      <div className="px-5 py-3 flex items-center justify-between">
         <Link
           href="/admin/products"
           onClick={onClose}
@@ -110,7 +110,7 @@ export default function AdminSidebar({ isOpen, onClose }: AdminSidebarProps) {
       </div>
 
       {/* Navigation Sections */}
-      <div className="flex-1 overflow-y-auto px-4 py-5 space-y-6">
+      <div className="flex-1 overflow-y-auto px-4 py-3 space-y-6">
         {navigationSections.map((section, sIdx) => (
           <div key={sIdx} className="space-y-1.5">
             <p className="px-3 text-[11px] font-bold text-slate-400 uppercase tracking-wider">

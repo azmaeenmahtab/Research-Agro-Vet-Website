@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { ProductFormFactor, ProductStatus } from '@prisma/client';
+import { generateStandardSku } from '@/lib/sku-generator';
 
 function slugify(text: string): string {
   return text
@@ -72,8 +73,21 @@ export async function PUT(
       metaTitle,
       metaDescription,
       categoryId,
+      categoryIds,
       variants,
     } = body;
+
+    const rawCategoryIds: string[] | undefined = Array.isArray(categoryIds)
+      ? categoryIds.filter(Boolean)
+      : categoryId !== undefined
+      ? (categoryId ? [categoryId] : [])
+      : undefined;
+    const primaryCategoryId =
+      rawCategoryIds !== undefined
+        ? (rawCategoryIds[0] || null)
+        : categoryId !== undefined
+        ? (categoryId || null)
+        : undefined;
 
     // Verify product exists
     const existing = await prisma.product.findUnique({
@@ -97,12 +111,24 @@ export async function PUT(
       }
     }
 
+    // Ensure product has a valid 3-digit sequential legacyCatalogId
+    let effectiveCatalogId = existing.legacyCatalogId;
+    if (!effectiveCatalogId) {
+      const maxProduct = await prisma.product.findFirst({
+        where: { legacyCatalogId: { not: null } },
+        orderBy: { legacyCatalogId: 'desc' },
+        select: { legacyCatalogId: true },
+      });
+      effectiveCatalogId = (maxProduct?.legacyCatalogId ?? 33) + 1;
+    }
+
     // Run database transaction to safely update product and variants
     const updated = await prisma.$transaction(async (tx) => {
       // 1. Update Product Details
       const prod = await tx.product.update({
         where: { id },
         data: {
+          legacyCatalogId: effectiveCatalogId,
           ...(nameEn !== undefined && { nameEn: nameEn.trim() }),
           ...(nameBn !== undefined && { nameBn: nameBn?.trim() || null }),
           ...(finalSlug && { slug: finalSlug }),
@@ -138,7 +164,12 @@ export async function PUT(
           ...(status !== undefined && { status: status as ProductStatus }),
           ...(metaTitle !== undefined && { metaTitle: metaTitle?.trim() || null }),
           ...(metaDescription !== undefined && { metaDescription: metaDescription?.trim() || null }),
-          ...(categoryId !== undefined && { categoryId: categoryId || null }),
+          ...(primaryCategoryId !== undefined && { categoryId: primaryCategoryId }),
+          ...(rawCategoryIds !== undefined && {
+            categories: {
+              set: rawCategoryIds.map((cId) => ({ id: cId })),
+            },
+          }),
         },
       });
 
@@ -155,11 +186,35 @@ export async function PUT(
           });
         }
 
-        // Upsert variants
+        // Upsert variants with guaranteed unique SKUs
+        const usedSkusInBatch = new Set<string>();
+
         for (let idx = 0; idx < variants.length; idx++) {
           const v = variants[idx];
+          const targetForm = formFactor || existing.formFactor;
+          const baseSku = generateStandardSku(
+            effectiveCatalogId,
+            targetForm,
+            v.packSize || 'Standard Pack'
+          );
+
+          let finalSku = baseSku;
+          let skuCounter = 2;
+          while (
+            usedSkusInBatch.has(finalSku) ||
+            (await tx.productVariant.findFirst({
+              where: {
+                sku: finalSku,
+                NOT: v.id ? { id: v.id } : undefined,
+              },
+            }))
+          ) {
+            finalSku = `${baseSku}-${skuCounter++}`;
+          }
+          usedSkusInBatch.add(finalSku);
+
           const variantData = {
-            sku: v.sku?.trim() || `${finalSlug.toUpperCase().slice(0, 4)}-${idx + 1}-${Date.now().toString().slice(-3)}`,
+            sku: finalSku,
             packSize: v.packSize?.trim() || 'Standard Pack',
             weightGrams: Number(v.weightGrams) || 100,
             packagingInfo: v.packagingInfo || null,
@@ -196,6 +251,7 @@ export async function PUT(
         include: {
           variants: { orderBy: { sortOrder: 'asc' } },
           category: true,
+          categories: true,
         },
       });
     });

@@ -13,7 +13,12 @@ export default function Navbar() {
   const [mounted, setMounted] = useState(false);
   const { getItemCount, getCartSubtotal, openCartDrawer } = useCartStore();
 
-  useEffect(() => setMounted(true), []);
+  useEffect(() => {
+    setMounted(true);
+    const sp = new URLSearchParams(window.location.search);
+    const q = sp.get('q') || sp.get('search');
+    if (q) setQuery(q);
+  }, []);
 
   const handleSearch = (e: React.SyntheticEvent) => {
     e.preventDefault();

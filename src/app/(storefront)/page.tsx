@@ -9,7 +9,7 @@ import { getFeaturedProducts } from '@/services/product.service';
 async function FeaturedProductsLoader() {
   let products: any[] = [];
   try {
-    const rawProducts = await getFeaturedProducts(4);
+    const rawProducts = await getFeaturedProducts(8);
     // Serialize Prisma Decimals for the Client Component boundary
     products = JSON.parse(JSON.stringify(rawProducts));
   } catch (error) {
