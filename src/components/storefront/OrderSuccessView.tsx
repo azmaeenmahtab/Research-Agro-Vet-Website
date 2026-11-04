@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
+import { getApiUrl } from '@/lib/api-client';
 import {
   CheckCircle2,
   Copy,
@@ -22,7 +23,7 @@ export default function OrderSuccessView({ orderNumber }: { orderNumber: string 
     async function loadOrder() {
       if (!orderNumber) return;
       try {
-        const res = await fetch(`/api/orders/${orderNumber}`);
+        const res = await fetch(getApiUrl(`/api/orders/${orderNumber}`));
         const data = await res.json();
         if (data.success && data.order) {
           setOrder(data.order);

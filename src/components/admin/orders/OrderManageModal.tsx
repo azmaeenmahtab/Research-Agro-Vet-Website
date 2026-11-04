@@ -10,6 +10,8 @@ import {
   PaymentStatus,
   UpdateOrderPayload,
 } from '@/types/admin-order';
+import { toast } from '@heroui/react';
+import { getApiUrl } from '@/lib/api-client';
 import {
   X,
   Phone,
@@ -31,6 +33,7 @@ import {
   MapPin,
   ChevronRight,
   ChevronLeft,
+  RotateCcw,
 } from 'lucide-react';
 
 interface OrderManageModalProps {
@@ -50,8 +53,26 @@ export default function OrderManageModal({
 }: OrderManageModalProps) {
   const [activeTab, setActiveTab] = useState<'items' | 'payment' | 'logistics'>('items');
 
+  // Dynamic Universal Discount
+  const [universalDiscount, setUniversalDiscount] = useState<{
+    enabled: boolean;
+    percent: number;
+    label: string;
+  }>({ enabled: true, percent: 5, label: 'Website 5% Universal Discount' });
+
+  useEffect(() => {
+    fetch(getApiUrl('/api/discounts/universal'))
+      .then((res) => res.json())
+      .then((res) => {
+        if (res?.data) {
+          setUniversalDiscount(res.data);
+        }
+      })
+      .catch(() => {});
+  }, []);
+
   // Form states
-  const [discountType, setDiscountType] = useState<'UNIVERSAL_5' | 'CUSTOM'>('UNIVERSAL_5');
+  const [discountType, setDiscountType] = useState<'NONE' | 'UNIVERSAL_5' | 'CUSTOM' | 'CLIENT_CUSTOM'>('NONE');
   const [customDiscountAmount, setCustomDiscountAmount] = useState<number>(0);
   const [discountLabel, setDiscountLabel] = useState<string>('Manager Special Rebate');
 
@@ -70,16 +91,31 @@ export default function OrderManageModal({
   const [address, setAddress] = useState<string>('');
 
   const [isSaving, setIsSaving] = useState(false);
-  const [toastMessage, setToastMessage] = useState<string | null>(null);
 
   // Sync state whenever order opens/changes
   useEffect(() => {
     if (order) {
-      setDiscountType(
-        order.appliedDiscountSource === 'ADMIN_MANUAL' ? 'CUSTOM' : 'UNIVERSAL_5'
-      );
-      setCustomDiscountAmount(order.discountAmount || 0);
-      setDiscountLabel(order.appliedDiscountLabel || 'Manager Special Rebate');
+      if (!order.discountAmount || order.discountAmount === 0 || !order.appliedDiscountSource) {
+        setDiscountType('NONE');
+        setCustomDiscountAmount(0);
+        setDiscountLabel('No Discount');
+      } else if (order.appliedDiscountSource === 'ADMIN_MANUAL') {
+        setDiscountType('CUSTOM');
+        setCustomDiscountAmount(order.discountAmount);
+        setDiscountLabel(order.appliedDiscountLabel || 'Manager Special Rebate');
+      } else if (order.appliedDiscountSource === 'GENERAL_STOREWIDE') {
+        setDiscountType('UNIVERSAL_5');
+        setCustomDiscountAmount(order.discountAmount);
+        setDiscountLabel(order.appliedDiscountLabel || 'Website 5% Universal Discount');
+      } else if (order.appliedDiscountSource === 'CLIENT_CUSTOM') {
+        setDiscountType('CLIENT_CUSTOM');
+        setCustomDiscountAmount(order.discountAmount);
+        setDiscountLabel(order.appliedDiscountLabel || 'VIP Individual Client Discount');
+      } else {
+        setDiscountType('CUSTOM');
+        setCustomDiscountAmount(order.discountAmount);
+        setDiscountLabel(order.appliedDiscountLabel || 'Custom Rebate');
+      }
 
       setPaymentMethod(order.paymentMethod || 'COD');
       setPaymentStatus(order.paymentStatus || 'UNPAID');
@@ -95,7 +131,6 @@ export default function OrderManageModal({
       setUpazila(order.upazila || '');
       setAddress(order.address || '');
 
-      setToastMessage(null);
       setActiveTab('items');
     }
   }, [order?.id, isOpen]);
@@ -106,21 +141,33 @@ export default function OrderManageModal({
   const subtotal = order.subtotal;
   const shippingFee = order.shippingFee;
 
-  let calculatedDiscount = order.discountAmount;
-  let calculatedDiscountSource: DiscountSource = order.appliedDiscountSource || 'GENERAL_STOREWIDE';
-  let calculatedDiscountLabel = discountLabel;
+  let calculatedDiscount = 0;
+  let calculatedDiscountSource: DiscountSource | null = null;
+  let calculatedDiscountLabel: string | null = null;
 
-  if (discountType === 'UNIVERSAL_5') {
-    calculatedDiscount = Math.round(subtotal * 0.05);
+  if (discountType === 'NONE') {
+    calculatedDiscount = 0;
+    calculatedDiscountSource = null;
+    calculatedDiscountLabel = null;
+  } else if (discountType === 'UNIVERSAL_5') {
+    const universalPct = universalDiscount.enabled ? universalDiscount.percent : 0;
+    calculatedDiscount = Math.round(subtotal * (universalPct / 100));
     calculatedDiscountSource = 'GENERAL_STOREWIDE';
-    calculatedDiscountLabel = 'Website 5% Universal Discount';
+    calculatedDiscountLabel = universalDiscount.label || `Website ${universalDiscount.percent}% Universal Discount`;
   } else if (discountType === 'CUSTOM') {
-    calculatedDiscount = Number(customDiscountAmount) || 0;
+    calculatedDiscount = Math.max(0, Number(customDiscountAmount) || 0);
     calculatedDiscountSource = 'ADMIN_MANUAL';
+    calculatedDiscountLabel = discountLabel || 'Manager Special Rebate';
+  } else if (discountType === 'CLIENT_CUSTOM') {
+    calculatedDiscount = order.discountAmount || 0;
+    calculatedDiscountSource = 'CLIENT_CUSTOM';
+    calculatedDiscountLabel = order.appliedDiscountLabel || 'VIP Individual Client Discount';
   }
 
   const grandTotal = Math.max(0, subtotal - calculatedDiscount + shippingFee);
-  const dueAmount = Math.max(0, grandTotal - paidAmount);
+  const dueAmount = (paymentStatus === 'REFUNDED' || orderStatus === 'RETURNED' || orderStatus === 'CANCELLED')
+    ? 0
+    : Math.max(0, grandTotal - paidAmount);
 
   const cleanPhone = order.customerPhone.replace(/[^0-9]/g, '');
 
@@ -157,10 +204,13 @@ export default function OrderManageModal({
         address: address.trim(),
       });
 
-      setToastMessage('Order updated successfully!');
-      setTimeout(() => setToastMessage(null), 3000);
+      toast.success('Order updated successfully!', {
+        description: `Order #${order.orderNumber} details and fulfillment synced.`,
+      });
     } catch (err: any) {
-      alert(err.message || 'Failed to update order');
+      toast.danger('Failed to update order', {
+        description: err.message || 'An unexpected error occurred.',
+      });
     } finally {
       setIsSaving(false);
     }
@@ -272,13 +322,6 @@ export default function OrderManageModal({
 
         {/* Modal Scrollable Body */}
         <div className="flex-1 overflow-y-auto p-6 space-y-5">
-          {toastMessage && (
-            <div className="p-3 bg-emerald-50 border border-emerald-200 text-emerald-800 rounded-xl text-xs font-semibold flex items-center gap-2">
-              <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
-              <span>{toastMessage}</span>
-            </div>
-          )}
-
           {/* TAB 1: CUSTOMER & MEDICINES */}
           {activeTab === 'items' && (
             <div className="space-y-5">
@@ -488,70 +531,139 @@ export default function OrderManageModal({
                   <span>Discount: <strong className="text-red-600">-৳{calculatedDiscount}</strong></span>
                 </div>
 
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
-                  <label className="flex items-start gap-3 p-3.5 bg-slate-50 rounded-xl border border-slate-200/80 cursor-pointer hover:border-emerald-300 hover:bg-emerald-50/30 transition-all">
-                    <input
-                      type="radio"
-                      name="modalDiscountType"
-                      checked={discountType === 'UNIVERSAL_5'}
-                      onChange={() => setDiscountType('UNIVERSAL_5')}
-                      className="text-[#005d42] focus:ring-0 mt-0.5"
-                    />
-                    <div className="flex flex-col">
-                      <span className="font-bold text-slate-900 text-xs">
-                        Universal 5% Discount Applied (৳{Math.round(subtotal * 0.05)})
-                      </span>
-                      <span className="text-[11px] text-slate-500 mt-0.5">
-                        Default 5% storewide checkout discount
-                      </span>
-                    </div>
-                  </label>
-
-                  <label className="flex items-start gap-3 p-3.5 bg-slate-50 rounded-xl border border-slate-200/80 cursor-pointer hover:border-emerald-300 hover:bg-emerald-50/30 transition-all">
-                    <input
-                      type="radio"
-                      name="modalDiscountType"
-                      checked={discountType === 'CUSTOM'}
-                      onChange={() => setDiscountType('CUSTOM')}
-                      className="text-[#005d42] focus:ring-0 mt-0.5"
-                    />
-                    <div className="flex flex-col">
-                      <span className="font-bold text-[#005d42] text-xs">
-                        Manager Special Rebate (Custom ৳)
-                      </span>
-                      <span className="text-[11px] text-slate-500 mt-0.5">
-                        Set a custom telephone discount or farmer rebate
-                      </span>
-                    </div>
-                  </label>
-                </div>
-
-                {discountType === 'CUSTOM' && (
-                  <div className="grid grid-cols-2 gap-3 p-3 bg-emerald-50/50 rounded-xl border border-emerald-100">
-                    <div>
-                      <label className="block text-[11px] font-semibold text-slate-700 mb-1">
-                        Discount Amount (BDT):
-                      </label>
-                      <input
-                        type="number"
-                        value={customDiscountAmount}
-                        onChange={(e) => setCustomDiscountAmount(Number(e.target.value))}
-                        className="w-full px-3 py-1.5 rounded-lg border border-slate-300 text-xs font-bold font-mono outline-none focus:ring-2 focus:ring-[#005d42]"
-                      />
-                    </div>
-                    <div>
-                      <label className="block text-[11px] font-semibold text-slate-700 mb-1">
-                        Discount Reason / Label:
-                      </label>
-                      <input
-                        type="text"
-                        value={discountLabel}
-                        onChange={(e) => setDiscountLabel(e.target.value)}
-                        placeholder="e.g. VIP Farmer Phone Rebate"
-                        className="w-full px-3 py-1.5 rounded-lg border border-slate-300 text-xs outline-none focus:ring-2 focus:ring-[#005d42]"
-                      />
+                {/* If order is already CONFIRMED, SHIPPED, DELIVERED: Lock discount permanently */}
+                {order.orderStatus !== 'PENDING' ? (
+                  <div className="p-3.5 bg-slate-100 rounded-xl border border-slate-200/90 flex items-center justify-between text-xs">
+                    <div className="flex items-center gap-2.5">
+                      <div className="w-8 h-8 rounded-lg bg-slate-200 flex items-center justify-center text-slate-700 shrink-0 font-bold">
+                        🔒
+                      </div>
+                      <div>
+                        <div className="flex items-center gap-2">
+                          <span className="font-bold text-slate-800">
+                            {order.discountAmount > 0
+                              ? `${order.appliedDiscountLabel || 'Discount Applied'} (-৳${order.discountAmount.toLocaleString()})`
+                              : 'No Discount Applied (৳0)'}
+                          </span>
+                          <span className="text-[10px] font-bold bg-amber-100 text-amber-900 border border-amber-200 px-2 py-0.5 rounded-full">
+                            Locked • Status: {order.orderStatus}
+                          </span>
+                        </div>
+                        <p className="text-[11px] text-slate-500 mt-0.5">
+                          Discount policy locked to prevent discrepancies and maintain audit integrity.
+                        </p>
+                      </div>
                     </div>
                   </div>
+                ) : (
+                  <>
+                    <div className="flex items-center justify-between">
+                      <span className="text-xs font-semibold text-slate-700">Pre-Confirmation Discount Adjustment:</span>
+                      <span className="text-[11px] text-amber-700 font-medium bg-amber-50 px-2 py-0.5 rounded border border-amber-200">
+                        Editable before Confirmation
+                      </span>
+                    </div>
+
+                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 text-xs">
+                      {/* Option 1: No Discount */}
+                      <label className={`flex items-start gap-2.5 p-3 rounded-xl border cursor-pointer transition-all ${
+                        discountType === 'NONE'
+                          ? 'bg-slate-100/80 border-slate-400 ring-1 ring-slate-400'
+                          : 'bg-slate-50 border-slate-200/80 hover:bg-slate-100/60'
+                      }`}>
+                        <input
+                          type="radio"
+                          name="modalDiscountType"
+                          checked={discountType === 'NONE'}
+                          onChange={() => setDiscountType('NONE')}
+                          className="text-[#005d42] focus:ring-0 mt-0.5"
+                        />
+                        <div className="flex flex-col">
+                          <span className="font-bold text-slate-800 text-xs">
+                            🚫 No Discount (৳0)
+                          </span>
+                          <span className="text-[11px] text-slate-500 mt-0.5">
+                            Standard price, 0% rebate
+                          </span>
+                        </div>
+                      </label>
+
+                      {/* Option 2: Order Recorded / Universal Discount */}
+                      <label className={`flex items-start gap-2.5 p-3 rounded-xl border cursor-pointer transition-all ${
+                        discountType === 'UNIVERSAL_5'
+                          ? 'bg-emerald-50/60 border-emerald-500 ring-1 ring-emerald-500'
+                          : 'bg-slate-50 border-slate-200/80 hover:bg-emerald-50/30'
+                      }`}>
+                        <input
+                          type="radio"
+                          name="modalDiscountType"
+                          checked={discountType === 'UNIVERSAL_5'}
+                          onChange={() => setDiscountType('UNIVERSAL_5')}
+                          className="text-[#005d42] focus:ring-0 mt-0.5"
+                        />
+                        <div className="flex flex-col">
+                          <span className="font-bold text-slate-900 text-xs">
+                            🌐 Universal {universalDiscount.percent}% (৳{Math.round(subtotal * ((universalDiscount.enabled ? universalDiscount.percent : 0) / 100))})
+                          </span>
+                          <span className="text-[11px] text-slate-500 mt-0.5">
+                            {universalDiscount.enabled ? `Default website ${universalDiscount.percent}% promotion` : 'Universal discount currently disabled in settings'}
+                          </span>
+                        </div>
+                      </label>
+
+                      {/* Option 3: Manager Custom */}
+                      <label className={`flex items-start gap-2.5 p-3 rounded-xl border cursor-pointer transition-all ${
+                        discountType === 'CUSTOM'
+                          ? 'bg-emerald-50/60 border-emerald-500 ring-1 ring-emerald-500'
+                          : 'bg-slate-50 border-slate-200/80 hover:border-emerald-300 hover:bg-emerald-50/30'
+                      }`}>
+                        <input
+                          type="radio"
+                          name="modalDiscountType"
+                          checked={discountType === 'CUSTOM'}
+                          onChange={() => setDiscountType('CUSTOM')}
+                          className="text-[#005d42] focus:ring-0 mt-0.5"
+                        />
+                        <div className="flex flex-col">
+                          <span className="font-bold text-[#005d42] text-xs">
+                            🏷️ Manager Rebate (৳)
+                          </span>
+                          <span className="text-[11px] text-slate-500 mt-0.5">
+                            Phone call concession
+                          </span>
+                        </div>
+                      </label>
+                    </div>
+
+                    {discountType === 'CUSTOM' && (
+                      <div className="grid grid-cols-2 gap-3 p-3 bg-emerald-50/50 rounded-xl border border-emerald-100">
+                        <div>
+                          <label className="block text-[11px] font-semibold text-slate-700 mb-1">
+                            Discount Amount (BDT):
+                          </label>
+                          <input
+                            type="number"
+                            min={0}
+                            value={customDiscountAmount}
+                            onChange={(e) => setCustomDiscountAmount(Number(e.target.value))}
+                            className="w-full px-3 py-1.5 rounded-lg border border-slate-300 text-xs font-bold font-mono outline-none focus:ring-2 focus:ring-[#005d42] [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                          />
+                        </div>
+                        <div>
+                          <label className="block text-[11px] font-semibold text-slate-700 mb-1">
+                            Discount Reason / Label:
+                          </label>
+                          <input
+                            type="text"
+                            value={discountLabel}
+                            onChange={(e) => setDiscountLabel(e.target.value)}
+                            placeholder="e.g. VIP Farmer Phone Rebate"
+                            className="w-full px-3 py-1.5 rounded-lg border border-slate-300 text-xs outline-none focus:ring-2 focus:ring-[#005d42]"
+                          />
+                        </div>
+                      </div>
+                    )}
+                  </>
                 )}
 
                 <div className="bg-[#005d42] text-white p-3.5 rounded-xl flex items-center justify-between">
@@ -599,7 +711,16 @@ export default function OrderManageModal({
                       <option value="UNPAID">UNPAID</option>
                       <option value="PARTIAL">PARTIAL</option>
                       <option value="PAID">PAID</option>
+                      <option value="REFUNDED">REFUNDED</option>
+                      <option value="FAILED">FAILED</option>
                     </select>
+
+                    {paymentStatus === 'REFUNDED' && (
+                      <div className="mt-2 p-2 rounded-lg bg-purple-50 border border-purple-200 text-purple-900 text-[11px] flex items-center gap-1.5 animate-in fade-in">
+                        <RotateCcw className="w-3.5 h-3.5 text-purple-600 shrink-0" />
+                        <span>Payment refunded back to customer. Due COD set to ৳0.</span>
+                      </div>
+                    )}
                   </div>
                 </div>
 
@@ -612,7 +733,7 @@ export default function OrderManageModal({
                       type="number"
                       value={paidAmount}
                       onChange={(e) => setPaidAmount(Number(e.target.value))}
-                      className="w-full px-3 py-2 rounded-xl border border-slate-300 text-xs bg-white outline-none font-bold tabular-nums focus:ring-2 focus:ring-[#005d42]"
+                      className="w-full px-3 py-2 rounded-xl border border-slate-300 text-xs bg-white outline-none font-bold tabular-nums focus:ring-2 focus:ring-[#005d42] [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
                     />
                   </div>
 
@@ -680,11 +801,24 @@ export default function OrderManageModal({
                     >
                       <option value="PENDING">PENDING</option>
                       <option value="CONFIRMED">CONFIRMED (Tele-verified)</option>
-                      <option value="PACKED">PACKED</option>
-                      <option value="SHIPPED">SHIPPED</option>
-                      <option value="DELIVERED">DELIVERED</option>
+                      <option value="PACKED">PACKED (Ready for courier)</option>
+                      <option value="SHIPPED">SHIPPED (In transit)</option>
+                      <option value="DELIVERED">DELIVERED (Completed)</option>
+                      <option value="RETURNED">RETURNED (Customer Refused / RTO)</option>
                       <option value="CANCELLED">CANCELLED</option>
                     </select>
+
+                    {orderStatus === 'RETURNED' && (
+                      <div className="mt-2 p-2.5 rounded-xl bg-rose-50 border border-rose-200 text-rose-950 text-xs flex items-start gap-2 animate-in fade-in">
+                        <RotateCcw className="w-4 h-4 text-rose-600 shrink-0 mt-0.5" />
+                        <div className="space-y-0.5">
+                          <span className="font-bold text-[11px] block">Order Marked as RETURNED (RTO)</span>
+                          <span className="text-[10px] text-rose-800 leading-tight block">
+                            The customer did not receive the delivery or returned the consignment to the courier. If partial payment was made, ensure you adjust the Payment Status to REFUNDED.
+                          </span>
+                        </div>
+                      </div>
+                    )}
                   </div>
 
                   <div>

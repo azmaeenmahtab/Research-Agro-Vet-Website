@@ -1,13 +1,17 @@
 'use client';
 
 import React, { useState, useEffect, useCallback } from 'react';
+import { PlusCircle } from 'lucide-react';
 import OrderLiveTicker from './OrderLiveTicker';
 import OrderStatsOverview from './OrderStatsOverview';
 import OrderFilterTabs from './OrderFilterTabs';
 import OrderTable from './OrderTable';
 import OrderManageModal from './OrderManageModal';
+import ManualOrderModal from './ManualOrderModal';
 import InvoicePrintModal from './InvoicePrintModal';
 import BatchInvoicePrintModal from './BatchInvoicePrintModal';
+import { toast } from '@heroui/react';
+import { getApiUrl } from '@/lib/api-client';
 import {
   AdminOrder,
   OrderStatsSummary,
@@ -33,6 +37,7 @@ export default function OrderManagementDashboard() {
   });
 
   const [currentStatus, setCurrentStatus] = useState<string>('ALL');
+  const [currentPaymentStatus, setCurrentPaymentStatus] = useState<string>('ALL');
   const [searchQuery, setSearchQuery] = useState<string>('');
   const [dateRange, setDateRange] = useState<string>('LIFETIME');
   const [startDate, setStartDate] = useState<string | undefined>(undefined);
@@ -44,6 +49,9 @@ export default function OrderManagementDashboard() {
   const [invoiceOrderToPrint, setInvoiceOrderToPrint] = useState<AdminOrder | null>(null);
   const [isInvoiceModalOpen, setIsInvoiceModalOpen] = useState<boolean>(false);
   const [isBatchPrintModalOpen, setIsBatchPrintModalOpen] = useState<boolean>(false);
+
+  // Manual Order Modal State
+  const [isManualOrderOpen, setIsManualOrderOpen] = useState<boolean>(false);
 
   // Fetch orders from API
   const fetchOrders = useCallback(
@@ -57,13 +65,16 @@ export default function OrderManagementDashboard() {
       try {
         const params = new URLSearchParams();
         if (currentStatus !== 'ALL') params.append('status', currentStatus);
+        if (currentPaymentStatus !== 'ALL') params.append('paymentStatus', currentPaymentStatus);
         if (searchQuery.trim()) params.append('search', searchQuery.trim());
         if (startDate) params.append('startDate', startDate);
         if (endDate) params.append('endDate', endDate);
         params.append('limit', String(activeSize));
         params.append('page', String(activePage));
 
-        const res = await fetch(`/api/admin/orders?${params.toString()}`);
+        const res = await fetch(getApiUrl(`/api/admin/orders?${params.toString()}`), {
+          credentials: 'include',
+        });
         const data = await res.json();
 
         if (data.success) {
@@ -78,15 +89,18 @@ export default function OrderManagementDashboard() {
             const found = data.orders.find((o: AdminOrder) => o.id === prev.id);
             return found || prev;
           });
+        } else {
+          toast.danger(data.message || 'Failed to load orders');
         }
-      } catch (err) {
+      } catch (err: any) {
         console.error('Failed to load orders:', err);
+        toast.danger(err.message || 'Network error fetching orders');
       } finally {
         setIsLoading(false);
         setIsRefreshing(false);
       }
     },
-    [currentStatus, searchQuery, startDate, endDate, currentPage, pageSize]
+    [currentStatus, currentPaymentStatus, searchQuery, startDate, endDate, currentPage, pageSize]
   );
 
   useEffect(() => {
@@ -95,6 +109,11 @@ export default function OrderManagementDashboard() {
 
   const handleStatusChange = (status: string) => {
     setCurrentStatus(status);
+    setCurrentPage(1);
+  };
+
+  const handlePaymentStatusChange = (paymentStatus: string) => {
+    setCurrentPaymentStatus(paymentStatus);
     setCurrentPage(1);
   };
 
@@ -114,9 +133,10 @@ export default function OrderManagementDashboard() {
 
   // Update order handler
   const handleUpdateOrder = async (id: string, payload: UpdateOrderPayload) => {
-    const res = await fetch(`/api/admin/orders/${id}`, {
+    const res = await fetch(getApiUrl(`/api/admin/orders/${id}`), {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json' },
+      credentials: 'include',
       body: JSON.stringify(payload),
     });
 
@@ -145,7 +165,10 @@ export default function OrderManagementDashboard() {
   };
 
   const handleExportCsv = () => {
-    if (orders.length === 0) return;
+    if (orders.length === 0) {
+      toast.info('No orders available to export in this range.');
+      return;
+    }
 
     const headers = [
       'Order Number',
@@ -206,6 +229,9 @@ export default function OrderManagementDashboard() {
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
+    toast.success('Orders exported to CSV', {
+      description: `Downloaded ${orders.length} order records for ${filename}`,
+    });
   };
 
   const handlePrintInvoice = (order: AdminOrder) => {
@@ -223,6 +249,7 @@ export default function OrderManagementDashboard() {
       />
 
       {/* 2. Order Analytics & Date Range Stat Cards Bento */}
+     
       <OrderStatsOverview
         stats={stats}
         currentRange={dateRange}
@@ -232,16 +259,27 @@ export default function OrderManagementDashboard() {
         onPrintAllInvoices={() => setIsBatchPrintModalOpen(true)}
         onExportCsv={handleExportCsv}
         filteredOrdersCount={totalOrders}
+        onOpenManualOrder={() => setIsManualOrderOpen(true)}
+        currentStatus={currentStatus}
+        onStatusSelect={handleStatusChange}
+        currentPaymentStatus={currentPaymentStatus}
+        onPaymentStatusSelect={handlePaymentStatusChange}
       />
 
-      {/* 3. Top Filter Toolbar & Status Badges */}
-      <OrderFilterTabs
-        currentStatus={currentStatus}
-        onStatusChange={handleStatusChange}
-        searchQuery={searchQuery}
-        onSearchChange={handleSearchChange}
-        stats={stats}
-      />
+      {/* 3. Top Filter Toolbar & Status Badges — with Manual Order Button */}
+      <div className="flex flex-col sm:flex-row sm:items-start gap-3">
+        <div className="flex-1 min-w-0">
+          <OrderFilterTabs
+            currentStatus={currentStatus}
+            onStatusChange={handleStatusChange}
+            currentPaymentStatus={currentPaymentStatus}
+            onPaymentStatusChange={handlePaymentStatusChange}
+            searchQuery={searchQuery}
+            onSearchChange={handleSearchChange}
+            stats={stats}
+          />
+        </div>
+      </div>
 
       {/* 4. Full-Width Orders Table with Enterprise Numbered Pagination */}
       <div className="w-full">
@@ -290,6 +328,19 @@ export default function OrderManagementDashboard() {
             ? `${startDate} → ${endDate}`
             : dateRange
         }
+      />
+
+      {/* 8. Manual Order Creation Modal */}
+      <ManualOrderModal
+        isOpen={isManualOrderOpen}
+        onClose={() => setIsManualOrderOpen(false)}
+        onSuccess={(orderNumber) => {
+          setIsManualOrderOpen(false);
+          fetchOrders(true);
+          toast.success(`Order ${orderNumber} created`, {
+            description: 'The manual order has been placed successfully.',
+          });
+        }}
       />
     </div>
   );

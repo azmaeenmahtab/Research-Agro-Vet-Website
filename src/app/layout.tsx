@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono, Anek_Bangla } from "next/font/google";
+import HeroToastProvider from "@/components/providers/HeroToastProvider";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -29,7 +30,10 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
       lang="bn"
       className={`${anekBangla.variable} ${geistSans.variable} ${geistMono.variable} h-full antialiased`}
     >
-      <body className="min-h-full flex flex-col font-[family-name:var(--font-anek-bangla),family-name:var(--font-geist-sans),sans-serif]">{children}</body>
+      <body className="min-h-full flex flex-col font-[family-name:var(--font-anek-bangla),family-name:var(--font-geist-sans),sans-serif]">
+        <HeroToastProvider />
+        {children}
+      </body>
     </html>
   );
 }

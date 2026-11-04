@@ -156,22 +156,24 @@ export async function getOrderStats(params: OrderStatsParams = {}): Promise<Orde
 
   const [
     totalOrders,
-    pendingCount,
-    confirmedCount,
-    shippedCount,
-    deliveredCount,
-    cancelledCount,
+    orderStatusGroups,
+    paymentStatusGroups,
     rangeOrdersForRevenue,
     todayOrders,
     lifetimeCount,
     lifetimeOrdersRevenue,
   ] = await Promise.all([
     prisma.order.count({ where: rangeWhere }),
-    prisma.order.count({ where: { ...rangeWhere, orderStatus: 'PENDING' } }),
-    prisma.order.count({ where: { ...rangeWhere, orderStatus: 'CONFIRMED' } }),
-    prisma.order.count({ where: { ...rangeWhere, orderStatus: 'SHIPPED' } }),
-    prisma.order.count({ where: { ...rangeWhere, orderStatus: 'DELIVERED' } }),
-    prisma.order.count({ where: { ...rangeWhere, orderStatus: 'CANCELLED' } }),
+    prisma.order.groupBy({
+      by: ['orderStatus'],
+      where: rangeWhere,
+      _count: { id: true },
+    }),
+    prisma.order.groupBy({
+      by: ['paymentStatus'],
+      where: rangeWhere,
+      _count: { id: true },
+    }),
     prisma.order.findMany({
       where: {
         ...rangeWhere,
@@ -193,6 +195,15 @@ export async function getOrderStats(params: OrderStatsParams = {}): Promise<Orde
     }),
   ]);
 
+  const orderStatusMap: Record<string, number> = {};
+  for (const item of orderStatusGroups) {
+    orderStatusMap[item.orderStatus] = item._count.id;
+  }
+  const paymentStatusMap: Record<string, number> = {};
+  for (const item of paymentStatusGroups) {
+    paymentStatusMap[item.paymentStatus] = item._count.id;
+  }
+
   const totalRevenue = rangeOrdersForRevenue.reduce(
     (acc, curr) => acc + Number(curr.grandTotal || 0),
     0
@@ -210,21 +221,28 @@ export async function getOrderStats(params: OrderStatsParams = {}): Promise<Orde
   const codOrdersCount = rangeOrdersForRevenue.filter(
     (o) => o.paymentMethod === 'COD'
   ).length;
-  const paidOrdersCount = rangeOrdersForRevenue.filter(
-    (o) => o.paymentStatus === 'PAID'
-  ).length;
 
   return {
     totalOrders,
     totalRevenue,
     averageOrderValue,
-    pendingCount,
-    confirmedCount,
-    shippedCount,
-    deliveredCount,
-    cancelledCount,
+    // Order Statuses
+    pendingCount: orderStatusMap['PENDING'] || 0,
+    confirmedCount: orderStatusMap['CONFIRMED'] || 0,
+    packedCount: orderStatusMap['PACKED'] || 0,
+    shippedCount: orderStatusMap['SHIPPED'] || 0,
+    deliveredCount: orderStatusMap['DELIVERED'] || 0,
+    returnedCount: orderStatusMap['RETURNED'] || 0,
+    cancelledCount: orderStatusMap['CANCELLED'] || 0,
+    // Payment Statuses
+    paidCount: paymentStatusMap['PAID'] || 0,
+    partialCount: paymentStatusMap['PARTIAL'] || 0,
+    unpaidCount: paymentStatusMap['UNPAID'] || 0,
+    refundedCount: paymentStatusMap['REFUNDED'] || 0,
+    failedCount: paymentStatusMap['FAILED'] || 0,
+    // Legacy / Period
     codOrdersCount,
-    paidOrdersCount,
+    paidOrdersCount: paymentStatusMap['PAID'] || 0,
     todayCount: todayOrders.length,
     todayRevenue,
     lifetimeTotalOrders: lifetimeCount,
@@ -281,9 +299,9 @@ export async function updateAdminOrder(id: string, payload: UpdateOrderPayload):
   const grandTotal = Math.max(0, subtotal - discountAmount + shippingFee);
   const dueAmount = Math.max(0, grandTotal - paidAmount);
 
-  // Automatically adjust payment status if paidAmount changes
+  // Use admin's explicitly chosen paymentStatus if provided; otherwise auto-compute from paidAmount
   let paymentStatus = payload.paymentStatus || current.paymentStatus;
-  if (payload.paidAmount !== undefined) {
+  if (!payload.paymentStatus && payload.paidAmount !== undefined) {
     if (paidAmount >= grandTotal && grandTotal > 0) {
       paymentStatus = 'PAID';
     } else if (paidAmount > 0 && paidAmount < grandTotal) {
@@ -292,6 +310,11 @@ export async function updateAdminOrder(id: string, payload: UpdateOrderPayload):
       paymentStatus = 'UNPAID';
     }
   }
+
+  // If refunded or returned/cancelled, courier should collect 0 on delivery
+  const finalDueAmount = (paymentStatus === 'REFUNDED' || payload.orderStatus === 'RETURNED' || payload.orderStatus === 'CANCELLED')
+    ? 0
+    : dueAmount;
 
   const updated = await prisma.order.update({
     where: { id },
@@ -303,8 +326,8 @@ export async function updateAdminOrder(id: string, payload: UpdateOrderPayload):
       discountAmount: new Prisma.Decimal(discountAmount),
       shippingFee: new Prisma.Decimal(shippingFee),
       grandTotal: new Prisma.Decimal(grandTotal),
-      dueAmount: new Prisma.Decimal(dueAmount),
-      codCollectableAmount: new Prisma.Decimal(dueAmount),
+      dueAmount: new Prisma.Decimal(finalDueAmount),
+      codCollectableAmount: new Prisma.Decimal(finalDueAmount),
       ...(payload.appliedDiscountLabel !== undefined && {
         appliedDiscountLabel: payload.appliedDiscountLabel,
       }),

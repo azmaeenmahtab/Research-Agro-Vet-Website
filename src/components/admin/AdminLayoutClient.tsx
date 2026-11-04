@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
+import { usePathname } from 'next/navigation';
 import AdminSidebar from './AdminSidebar';
 import AdminHeader from './AdminHeader';
 
@@ -10,6 +11,12 @@ interface AdminLayoutClientProps {
 
 export default function AdminLayoutClient({ children }: AdminLayoutClientProps) {
   const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false);
+  const pathname = usePathname();
+
+  // If on admin auth page (e.g. /admin/auth/login), render full screen without dashboard sidebar
+  if (pathname?.startsWith('/admin/auth')) {
+    return <main className="min-h-screen w-full">{children}</main>;
+  }
 
   return (
     <div className="min-h-screen bg-[#f8f9fc] text-slate-900 flex flex-col font-sans">

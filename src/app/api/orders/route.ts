@@ -163,10 +163,45 @@ export async function POST(request: NextRequest) {
       appliedDiscountSource = 'CLIENT_CUSTOM';
       appliedDiscountLabel = `${existingProfile.businessOrFarmName || existingProfile.name} VIP Discount (${discountVal}%)`;
     } else if (!isWholesale) {
-      // Priority 2: General 5% Storewide Universal Discount for Retail Customers
-      discountAmount = Math.round(subtotal * 0.05);
-      appliedDiscountSource = 'GENERAL_STOREWIDE';
-      appliedDiscountLabel = 'Website 5% Universal Discount';
+      // Priority 2: Product Individual Promo dominates; Dynamic Universal Discount applies only on non-discounted items
+      const siteSettings = await prisma.siteSettings.findUnique({
+        where: { id: 'default' },
+        select: { enableGeneralDiscount: true, generalRetailDiscountPercent: true },
+      });
+
+      const isUniversalEnabled = siteSettings?.enableGeneralDiscount ?? true;
+      const universalPercent = isUniversalEnabled ? (Number(siteSettings?.generalRetailDiscountPercent) || 0) : 0;
+      const universalRate = universalPercent / 100;
+
+      let individualDiscountSum = 0;
+      let universalDiscountSum = 0;
+      let hasIndividualDiscount = false;
+
+      for (const item of orderItemData) {
+        const unitSelling = Number(item.unitSellingPrice);
+        const unitMrp = Number(item.unitMrpPrice);
+        const lineTotal = Number(item.lineTotal);
+        if (unitSelling < unitMrp) {
+          hasIndividualDiscount = true;
+          individualDiscountSum += (unitMrp - unitSelling) * item.quantity;
+        } else if (universalRate > 0) {
+          universalDiscountSum += Math.round(lineTotal * universalRate);
+        }
+      }
+
+      if (hasIndividualDiscount && universalDiscountSum === 0) {
+        discountAmount = individualDiscountSum;
+        appliedDiscountSource = 'INDIVIDUAL_PRODUCT';
+        appliedDiscountLabel = 'Product Promotional Discount';
+      } else if (hasIndividualDiscount && universalDiscountSum > 0) {
+        discountAmount = individualDiscountSum + universalDiscountSum;
+        appliedDiscountSource = 'INDIVIDUAL_PRODUCT';
+        appliedDiscountLabel = `Product Promo + ${universalPercent}% Universal Discount`;
+      } else if (universalDiscountSum > 0) {
+        discountAmount = universalDiscountSum;
+        appliedDiscountSource = 'GENERAL_STOREWIDE';
+        appliedDiscountLabel = `Website ${universalPercent}% Universal Discount`;
+      }
     }
 
     // 5. Calculate Shipping Fee based on District

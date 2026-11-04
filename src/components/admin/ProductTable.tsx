@@ -55,7 +55,7 @@ export default function ProductTable({
                 <th className="py-3 px-4 w-[34%]">Product & Identity</th>
                 <th className="py-3 px-3.5 w-[14%]">Pack Size</th>
                 <th className="py-3 px-3 w-[12%] text-right whitespace-nowrap">TP (Trade Price)</th>
-                <th className="py-3 px-3 w-[14%] text-right whitespace-nowrap">MRP (BDT)</th>
+                <th className="py-3 px-3 w-[14%] text-right whitespace-nowrap">Selling / MRP</th>
                 <th className="py-3 px-3 w-[12%] text-center whitespace-nowrap">Stock</th>
                 <th className="py-3 px-3 w-[6%] text-center">Units</th>
                 <th className="py-3 px-4 w-[8%] text-right">Actions</th>

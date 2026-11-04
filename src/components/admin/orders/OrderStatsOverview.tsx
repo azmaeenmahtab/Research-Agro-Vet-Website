@@ -5,16 +5,22 @@ import {
   Calendar as CalendarIcon,
   ShoppingBag,
   CircleDollarSign,
-  TrendingUp,
   CheckCircle2,
+  CheckCheck,
   Clock,
   Printer,
   Download,
   X,
   CreditCard,
   ChevronDown,
-  Layers,
-  Sparkles,
+  Truck,
+  Package,
+  RotateCcw,
+  XCircle,
+  AlertOctagon,
+  BadgeCheck,
+  Coins,
+  AlertCircle,
 } from 'lucide-react';
 import { RangeCalendar } from '@heroui/react';
 import { parseDate, today, getLocalTimeZone, DateValue } from '@internationalized/date';
@@ -29,6 +35,11 @@ interface OrderStatsOverviewProps {
   onPrintAllInvoices: () => void;
   onExportCsv: () => void;
   filteredOrdersCount: number;
+  onOpenManualOrder?: () => void;
+  currentStatus?: string;
+  onStatusSelect?: (status: string) => void;
+  currentPaymentStatus?: string;
+  onPaymentStatusSelect?: (paymentStatus: string) => void;
 }
 
 export default function OrderStatsOverview({
@@ -40,6 +51,11 @@ export default function OrderStatsOverview({
   onPrintAllInvoices,
   onExportCsv,
   filteredOrdersCount,
+  onOpenManualOrder,
+  currentStatus = 'ALL',
+  onStatusSelect,
+  currentPaymentStatus = 'ALL',
+  onPaymentStatusSelect,
 }: OrderStatsOverviewProps) {
   const [isCalendarOpen, setIsCalendarOpen] = useState(false);
   const calendarRef = useRef<HTMLDivElement>(null);
@@ -100,15 +116,32 @@ export default function OrderStatsOverview({
     }
   };
 
-  // State for HeroUI RangeCalendar selection
-  const nowCalendar = today(getLocalTimeZone());
-  const [selectedRange, setSelectedRange] = useState<any>({
-    start: startDate ? parseDate(startDate) : nowCalendar,
-    end: endDate ? parseDate(endDate) : nowCalendar,
-  });
+  // Convert string dates to Calendar DateValue
+  const getInitialCalendarRange = () => {
+    try {
+      if (startDate && endDate) {
+        return {
+          start: parseDate(startDate),
+          end: parseDate(endDate),
+        };
+      }
+    } catch (e) {
+      // Fallback
+    }
+    const t = today(getLocalTimeZone());
+    return {
+      start: t.subtract({ days: 7 }),
+      end: t,
+    };
+  };
+
+  const [selectedRange, setSelectedRange] = useState<{
+    start: DateValue;
+    end: DateValue;
+  }>(getInitialCalendarRange());
 
   const handleApplyCalendarRange = () => {
-    if (selectedRange?.start && selectedRange?.end) {
+    if (selectedRange && selectedRange.start && selectedRange.end) {
       const startStr = selectedRange.start.toString();
       const endStr = selectedRange.end.toString();
       onRangeSelect('CUSTOM', startStr, endStr);
@@ -116,42 +149,172 @@ export default function OrderStatsOverview({
     }
   };
 
-  // Formatted date range label for UI
-  const getRangeDisplayText = () => {
-    if (currentRange === 'LIFETIME') return 'Lifetime All Orders';
-    if (currentRange === 'TODAY') return 'Today (Last 24 Hours)';
-    if (currentRange === 'YESTERDAY') return 'Yesterday';
-    if (currentRange === 'WEEK') return 'Last 7 Days (Past Week)';
-    if (currentRange === 'MONTH') return 'Last 30 Days (Past Month)';
-    if (currentRange === 'THIS_MONTH') return 'This Month';
-    if (startDate && endDate) {
-      return `${startDate} → ${endDate}`;
-    }
-    return 'Custom Date Range';
+  const handleToggleCalendar = () => {
+    setIsCalendarOpen((prev) => !prev);
   };
 
-  // Completion calculation
-  const completionRate =
-    stats.totalOrders > 0
-      ? Math.round((stats.deliveredCount / stats.totalOrders) * 100)
-      : 0;
+  const getRangeDisplayText = () => {
+    if (currentRange === 'LIFETIME') return 'Lifetime';
+    if (currentRange === 'TODAY') return 'Today';
+    if (currentRange === 'YESTERDAY') return 'Yesterday';
+    if (currentRange === 'WEEK') return 'Last 7 Days';
+    if (currentRange === 'MONTH') return 'Last 30 Days';
+    if (currentRange === 'THIS_MONTH') return 'This Month';
+    if (startDate && endDate) {
+      return `${startDate} ~ ${endDate}`;
+    }
+    return 'Custom Range';
+  };
+
+  // Status Cards config
+  const orderStatusCards = [
+    {
+      id: 'PENDING',
+      label: 'Pending',
+      count: stats.pendingCount || 0,
+      icon: Clock,
+      color: 'text-amber-700 bg-amber-50/70 border-amber-200/80',
+      activeRing: 'ring-2 ring-amber-500 border-amber-500 bg-amber-50',
+      badgeColor: 'bg-amber-100 text-amber-800',
+    },
+    {
+      id: 'CONFIRMED',
+      label: 'Confirmed',
+      count: stats.confirmedCount || 0,
+      icon: CheckCircle2,
+      color: 'text-blue-700 bg-blue-50/70 border-blue-200/80',
+      activeRing: 'ring-2 ring-blue-500 border-blue-500 bg-blue-50',
+      badgeColor: 'bg-blue-100 text-blue-800',
+    },
+    {
+      id: 'PACKED',
+      label: 'Packed',
+      count: stats.packedCount || 0,
+      icon: Package,
+      color: 'text-indigo-700 bg-indigo-50/70 border-indigo-200/80',
+      activeRing: 'ring-2 ring-indigo-500 border-indigo-500 bg-indigo-50',
+      badgeColor: 'bg-indigo-100 text-indigo-800',
+    },
+    {
+      id: 'SHIPPED',
+      label: 'Shipped',
+      count: stats.shippedCount || 0,
+      icon: Truck,
+      color: 'text-sky-700 bg-sky-50/70 border-sky-200/80',
+      activeRing: 'ring-2 ring-sky-500 border-sky-500 bg-sky-50',
+      badgeColor: 'bg-sky-100 text-sky-800',
+    },
+    {
+      id: 'DELIVERED',
+      label: 'Delivered',
+      count: stats.deliveredCount || 0,
+      icon: CheckCheck,
+      color: 'text-emerald-700 bg-emerald-50/70 border-emerald-200/80',
+      activeRing: 'ring-2 ring-emerald-500 border-emerald-500 bg-emerald-50',
+      badgeColor: 'bg-emerald-100 text-emerald-800',
+    },
+    {
+      id: 'RETURNED',
+      label: 'Returned',
+      count: stats.returnedCount || 0,
+      icon: RotateCcw,
+      color: 'text-rose-700 bg-rose-50/70 border-rose-200/80',
+      activeRing: 'ring-2 ring-rose-500 border-rose-500 bg-rose-50',
+      badgeColor: 'bg-rose-100 text-rose-800',
+    },
+    {
+      id: 'CANCELLED',
+      label: 'Cancelled',
+      count: stats.cancelledCount || 0,
+      icon: XCircle,
+      color: 'text-slate-700 bg-slate-50/70 border-slate-200/80',
+      activeRing: 'ring-2 ring-slate-500 border-slate-500 bg-slate-100',
+      badgeColor: 'bg-slate-200 text-slate-800',
+    },
+  ];
+
+  // Payment Status Cards config
+  const paymentStatusCards = [
+    {
+      id: 'PAID',
+      label: 'Paid (Full)',
+      count: stats.paidCount ?? stats.paidOrdersCount ?? 0,
+      icon: BadgeCheck,
+      color: 'text-emerald-700 bg-emerald-50/70 border-emerald-200/80',
+      activeRing: 'ring-2 ring-emerald-500 border-emerald-500 bg-emerald-50',
+      badgeColor: 'bg-emerald-100 text-emerald-800',
+    },
+    {
+      id: 'PARTIAL',
+      label: 'Partial Paid',
+      count: stats.partialCount || 0,
+      icon: Coins,
+      color: 'text-amber-700 bg-amber-50/70 border-amber-200/80',
+      activeRing: 'ring-2 ring-amber-500 border-amber-500 bg-amber-50',
+      badgeColor: 'bg-amber-100 text-amber-800',
+    },
+    {
+      id: 'UNPAID',
+      label: 'Unpaid (COD)',
+      count: stats.unpaidCount || 0,
+      icon: Clock,
+      color: 'text-orange-700 bg-orange-50/70 border-orange-200/80',
+      activeRing: 'ring-2 ring-orange-500 border-orange-500 bg-orange-50',
+      badgeColor: 'bg-orange-100 text-orange-800',
+    },
+    {
+      id: 'REFUNDED',
+      label: 'Refunded',
+      count: stats.refundedCount || 0,
+      icon: RotateCcw,
+      color: 'text-purple-700 bg-purple-50/70 border-purple-200/80',
+      activeRing: 'ring-2 ring-purple-500 border-purple-500 bg-purple-50',
+      badgeColor: 'bg-purple-100 text-purple-800',
+    },
+    {
+      id: 'FAILED',
+      label: 'Failed / Dropped',
+      count: stats.failedCount || 0,
+      icon: AlertOctagon,
+      color: 'text-rose-700 bg-rose-50/70 border-rose-200/80',
+      activeRing: 'ring-2 ring-rose-500 border-rose-500 bg-rose-50',
+      badgeColor: 'bg-rose-100 text-rose-800',
+    },
+  ];
 
   return (
-    <div className="bg-white rounded-2xl p-5 border border-slate-200/80 shadow-2xs space-y-5">
-      {/* Top Header: Title, Presets & Batch Print Actions */}
-      <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4 pb-4 border-b border-slate-100">
-        <div>
-          <div className="flex items-center gap-2">
-            <span className="w-2.5 h-6 bg-[#005d42] rounded-full inline-block"></span>
-            <h2 className="font-bold text-slate-900 text-lg tracking-tight">
-              Order Analytics & Sales Performance
-            </h2>
+    <div className="space-y-4">
+      {/* Top Bar: Financial Metrics + Action Tools */}
+      <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-3 bg-white p-4 rounded-2xl border border-slate-200/80 shadow-2xs">
+        {/* Left: Gross Sales & Total Orders Summary */}
+        <div className="flex items-center gap-4 flex-wrap">
+          <div className="flex items-center gap-2 px-3.5 py-2 rounded-xl bg-slate-50 border border-slate-200/80">
+            <ShoppingBag className="w-4 h-4 text-[#005d42]" />
+            <div>
+              <span className="text-[10px] uppercase font-bold text-slate-500 tracking-wider block">
+                Total Orders
+              </span>
+              <span className="text-lg font-black text-slate-900 leading-tight">
+                {stats.totalOrders}
+              </span>
+            </div>
           </div>
-          
+
+          <div className="flex items-center gap-2 px-3.5 py-2 rounded-xl bg-emerald-50/80 border border-emerald-200/80">
+            <CircleDollarSign className="w-4 h-4 text-[#005d42]" />
+            <div>
+              <span className="text-[10px] uppercase font-bold text-emerald-800 tracking-wider block">
+                Gross Sales
+              </span>
+              <span className="text-lg font-black text-[#005d42] leading-tight">
+                ৳{(stats.totalRevenue || 0).toLocaleString()}
+              </span>
+            </div>
+          </div>
         </div>
 
-        {/* Action Buttons: Batch Print Receipts & Export CSV */}
-        <div className="flex items-center gap-2.5 flex-wrap">
+        {/* Right: Quick Range & Actions */}
+        <div className="flex items-center gap-2 flex-wrap">
           <button
             type="button"
             onClick={onPrintAllInvoices}
@@ -176,19 +339,19 @@ export default function OrderStatsOverview({
         </div>
       </div>
 
-      {/* Date Range Selection Bar */}
+      {/* Date Range Presets Bar */}
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-3 bg-slate-50 p-3 rounded-xl border border-slate-200/80">
         <div className="flex items-center gap-1.5 overflow-x-auto pb-1 md:pb-0">
           <button
             type="button"
             onClick={() => handlePreset('LIFETIME')}
-            className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all whitespace-nowrap flex items-center gap-1 ${
+            className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all whitespace-nowrap ${
               currentRange === 'LIFETIME'
                 ? 'bg-[#005d42] text-white shadow-xs'
                 : 'bg-white text-slate-600 border border-slate-200 hover:bg-slate-100'
             }`}
           >
-            <span>Lifetime (All)</span>
+            Lifetime (All)
           </button>
 
           <button
@@ -252,11 +415,11 @@ export default function OrderStatsOverview({
           </button>
         </div>
 
-        {/* HeroUI Range Calendar Picker Popover Button */}
+        {/* HeroUI Range Calendar Picker Popover */}
         <div className="relative" ref={calendarRef}>
           <button
             type="button"
-            onClick={() => setIsCalendarOpen(!isCalendarOpen)}
+            onClick={handleToggleCalendar}
             className={`px-3.5 py-1.5 rounded-lg text-xs font-bold flex items-center gap-2 border transition-all ${
               currentRange === 'CUSTOM'
                 ? 'bg-emerald-50 text-[#005d42] border-[#005d42]'
@@ -268,7 +431,6 @@ export default function OrderStatsOverview({
             <ChevronDown className="w-3.5 h-3.5 text-slate-400" />
           </button>
 
-          {/* Calendar Popover */}
           {isCalendarOpen && (
             <div className="absolute right-0 top-full mt-2 z-50 bg-white rounded-2xl shadow-2xl border border-slate-200 p-4 animate-in fade-in zoom-in-95 duration-150">
               <div className="flex items-center justify-between pb-3 border-b border-slate-100 mb-3">
@@ -285,7 +447,6 @@ export default function OrderStatsOverview({
                 </button>
               </div>
 
-              {/* HeroUI Built-in Range Calendar Component */}
               <div className="flex justify-center">
                 <RangeCalendar
                   aria-label="Filter Orders Date Range"
@@ -326,80 +487,111 @@ export default function OrderStatsOverview({
         </div>
       </div>
 
-      {/* Bento Grid Stats Cards */}
-      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3">
-        {/* Card 1: Total Orders */}
-        <div className="p-4 rounded-xl bg-slate-50/80 border border-slate-200/80 space-y-1">
-          <div className="flex items-center justify-between text-slate-500">
-            <span className="text-[11px] font-semibold">Orders in Range</span>
-            <ShoppingBag className="w-4 h-4 text-emerald-600" />
-          </div>
-          <p className="text-xl sm:text-2xl font-extrabold text-slate-900">
-            {stats.totalOrders}
-          </p>
-          
+      {/* SECTION 1: ALL ORDER STATUS CARDS */}
+      <div className="space-y-2">
+        <div className="flex items-center justify-between">
+          <span className="text-[11px] font-bold uppercase tracking-wider text-slate-500 flex items-center gap-1.5">
+            <Package className="w-3.5 h-3.5 text-[#005d42]" />
+            Order Statuses (Fulfillment Lifecycle)
+          </span>
+          {currentStatus !== 'ALL' && onStatusSelect && (
+            <button
+              type="button"
+              onClick={() => onStatusSelect('ALL')}
+              className="text-[11px] font-bold text-[#005d42] hover:underline"
+            >
+              Reset to All Orders
+            </button>
+          )}
         </div>
 
-        {/* Card 2: Range Revenue */}
-        <div className="p-4 rounded-xl bg-emerald-50/60 border border-emerald-100 space-y-1">
-          <div className="flex items-center justify-between text-emerald-800">
-            <span className="text-[11px] font-bold">Gross Sales</span>
-            <CircleDollarSign className="w-4 h-4 text-[#005d42]" />
-          </div>
-          <p className="text-xl sm:text-2xl font-extrabold text-[#005d42]">
-            ৳{(stats.totalRevenue || 0).toLocaleString()}
-          </p>
-          
+        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-7 gap-2.5">
+          {orderStatusCards.map((card) => {
+            const Icon = card.icon;
+            const isSelected = currentStatus === card.id;
+
+            return (
+              <button
+                key={card.id}
+                type="button"
+                onClick={() => {
+                  if (onStatusSelect) {
+                    onStatusSelect(isSelected ? 'ALL' : card.id);
+                  }
+                }}
+                className={`text-left p-3 rounded-xl border transition-all cursor-pointer ${
+                  isSelected ? card.activeRing : `${card.color} hover:shadow-xs`
+                }`}
+              >
+                <div className="flex items-center justify-between mb-1.5">
+                  <span className="text-[11px] font-bold truncate">{card.label}</span>
+                  <Icon className="w-3.5 h-3.5 opacity-80 shrink-0" />
+                </div>
+                <div className="flex items-baseline justify-between">
+                  <span className="text-xl font-black tabular-nums">{card.count}</span>
+                  {isSelected && (
+                    <span className="text-[9px] font-bold uppercase px-1.5 py-0.5 rounded-full bg-white/80 shadow-2xs">
+                      Active
+                    </span>
+                  )}
+                </div>
+              </button>
+            );
+          })}
+        </div>
+      </div>
+
+      {/* SECTION 2: ALL PAYMENT STATUS CARDS */}
+      <div className="space-y-2">
+        <div className="flex items-center justify-between">
+          <span className="text-[11px] font-bold uppercase tracking-wider text-slate-500 flex items-center gap-1.5">
+            <CreditCard className="w-3.5 h-3.5 text-[#005d42]" />
+            Payment Statuses (Accounts & Settlements)
+          </span>
+          {currentPaymentStatus !== 'ALL' && onPaymentStatusSelect && (
+            <button
+              type="button"
+              onClick={() => onPaymentStatusSelect('ALL')}
+              className="text-[11px] font-bold text-[#005d42] hover:underline"
+            >
+              Reset to All Payments
+            </button>
+          )}
         </div>
 
-        {/* Card 3: Average Order Value */}
-        <div className="p-4 rounded-xl bg-slate-50/80 border border-slate-200/80 space-y-1">
-          <div className="flex items-center justify-between text-slate-500">
-            <span className="text-[11px] font-semibold">Average Order (AOV)</span>
-            <TrendingUp className="w-4 h-4 text-blue-600" />
-          </div>
-          <p className="text-xl sm:text-2xl font-extrabold text-slate-900">
-            ৳{(stats.averageOrderValue || 0).toLocaleString()}
-          </p>
-          
-        </div>
+        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-2.5">
+          {paymentStatusCards.map((card) => {
+            const Icon = card.icon;
+            const isSelected = currentPaymentStatus === card.id;
 
-        {/* Card 4: Delivered Fulfillment */}
-        <div className="p-4 rounded-xl bg-slate-50/80 border border-slate-200/80 space-y-1">
-          <div className="flex items-center justify-between text-slate-500">
-            <span className="text-[11px] font-semibold">Delivered Success</span>
-            <CheckCircle2 className="w-4 h-4 text-emerald-600" />
-          </div>
-          <p className="text-xl sm:text-2xl font-extrabold text-emerald-700">
-            {stats.deliveredCount}
-          </p>
-         
-        </div>
-
-        {/* Card 5: Pending Confirmation */}
-        <div className="p-4 rounded-xl bg-amber-50/60 border border-amber-200/70 space-y-1">
-          <div className="flex items-center justify-between text-amber-800">
-            <span className="text-[11px] font-bold">Pending Action</span>
-            <Clock className="w-4 h-4 text-amber-600" />
-          </div>
-          <p className="text-xl sm:text-2xl font-extrabold text-amber-800">
-            {stats.pendingCount}
-          </p>
-          
-        </div>
-
-        {/* Card 6: Payment Methods */}
-        <div className="p-4 rounded-xl bg-slate-50/80 border border-slate-200/80 space-y-1">
-          <div className="flex items-center justify-between text-slate-500">
-            <span className="text-[11px] font-semibold">Payment Settlement</span>
-            <CreditCard className="w-4 h-4 text-purple-600" />
-          </div>
-          <div className="text-sm font-extrabold text-slate-900 pt-1">
-            <span className="text-emerald-700">{stats.paidOrdersCount || 0} Paid</span>
-            <span className="text-slate-300 mx-1.5">•</span>
-            <span className="text-slate-700">{stats.codOrdersCount || 0} COD</span>
-          </div>
-          
+            return (
+              <button
+                key={card.id}
+                type="button"
+                onClick={() => {
+                  if (onPaymentStatusSelect) {
+                    onPaymentStatusSelect(isSelected ? 'ALL' : card.id);
+                  }
+                }}
+                className={`text-left p-3 rounded-xl border transition-all cursor-pointer ${
+                  isSelected ? card.activeRing : `${card.color} hover:shadow-xs`
+                }`}
+              >
+                <div className="flex items-center justify-between mb-1.5">
+                  <span className="text-[11px] font-bold truncate">{card.label}</span>
+                  <Icon className="w-3.5 h-3.5 opacity-80 shrink-0" />
+                </div>
+                <div className="flex items-baseline justify-between">
+                  <span className="text-xl font-black tabular-nums">{card.count}</span>
+                  {isSelected && (
+                    <span className="text-[9px] font-bold uppercase px-1.5 py-0.5 rounded-full bg-white/80 shadow-2xs">
+                      Active
+                    </span>
+                  )}
+                </div>
+              </button>
+            );
+          })}
         </div>
       </div>
     </div>

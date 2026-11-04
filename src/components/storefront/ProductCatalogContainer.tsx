@@ -6,6 +6,7 @@ import ProductCard, { ProductCardData } from './ProductCard';
 import ProductFilters from './ProductFilters';
 import { toBengaliNumber } from '@/lib/formatters';
 import { PackageSearch, X, ChevronLeft, ChevronRight, Loader2, Search } from 'lucide-react';
+import { getApiUrl } from '@/lib/api-client';
 
 const SPECIES_NAMES: Record<string, string> = {
   CATTLE_BUFFALO: 'গরু ও মহিষ',
@@ -180,7 +181,7 @@ export default function ProductCatalogContainer({
       params.set('page', String(targetPage));
       params.set('limit', String(pageSize));
 
-      const res = await fetch(`/api/products?${params.toString()}`);
+      const res = await fetch(getApiUrl(`/api/products?${params.toString()}`));
       const data = await res.json();
 
       if (data.success && Array.isArray(data.products)) {

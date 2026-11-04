@@ -22,6 +22,8 @@ import {
   AlertCircle,
   Pill,
   Star,
+  ChevronLeft,
+  ChevronRight,
 } from 'lucide-react';
 
 interface ProductDetailsViewProps {
@@ -84,13 +86,10 @@ export default function ProductDetailsView({
   const currentVariant = variants[selectedVariantIdx] || variants[0];
 
   const mrp = currentVariant ? Number(currentVariant.mrpPrice || 0) : 0;
-  const sellingPrice = currentVariant
-    ? Number(currentVariant.sellingPrice) < mrp
-      ? Number(currentVariant.sellingPrice)
-      : Math.round(mrp * 0.95)
-    : 0;
-
-  const savingsPerUnit = mrp > sellingPrice ? mrp - sellingPrice : 0;
+  const sellingPrice = currentVariant ? Number(currentVariant.sellingPrice || mrp) : 0;
+  const hasIndividualDiscount = mrp > 0 && sellingPrice < mrp;
+  const individualDiscountPct = hasIndividualDiscount ? Math.round(((mrp - sellingPrice) / mrp) * 100) : 0;
+  const savingsPerUnit = hasIndividualDiscount ? mrp - sellingPrice : 0;
   const subtotal = sellingPrice * quantity;
 
   const reviews = product.reviews || [];
@@ -154,10 +153,26 @@ export default function ProductDetailsView({
     }
   };
 
-  const imagesList = [
+  // Deduplicate product images so the same picture never appears twice
+  const rawImages = [
     product.thumbnail,
-    ...(product.images && product.images.length > 0 ? product.images : []),
-  ].filter(Boolean);
+    ...(Array.isArray(product.images) ? product.images : []),
+  ].filter(Boolean) as string[];
+
+  const imagesList = Array.from(new Set(rawImages));
+  const currentImgIndex = Math.max(0, imagesList.indexOf(selectedImage));
+
+  const handlePrevImage = () => {
+    if (imagesList.length <= 1) return;
+    const prevIdx = currentImgIndex <= 0 ? imagesList.length - 1 : currentImgIndex - 1;
+    setSelectedImage(imagesList[prevIdx]);
+  };
+
+  const handleNextImage = () => {
+    if (imagesList.length <= 1) return;
+    const nextIdx = currentImgIndex >= imagesList.length - 1 ? 0 : currentImgIndex + 1;
+    setSelectedImage(imagesList[nextIdx]);
+  };
 
   return (
     <div className="space-y-12">
@@ -173,8 +188,38 @@ export default function ProductDetailsView({
                 <ShieldCheck className="w-3.5 h-3.5 text-emerald-600" />
                 DLS অনুমোদিত
               </span>
-              
             </div>
+
+            {/* Navigation Arrows (if multiple unique pictures exist) */}
+            {imagesList.length > 1 && (
+              <>
+                <button
+                  type="button"
+                  onClick={(e) => {
+                    e.preventDefault();
+                    handlePrevImage();
+                  }}
+                  className="absolute left-3 top-1/2 -translate-y-1/2 w-9 h-9 rounded-full bg-white/95 hover:bg-white border border-slate-200/90 shadow-md flex items-center justify-center text-slate-700 hover:text-[#005d42] transition-all z-20 cursor-pointer active:scale-95"
+                  aria-label="Previous image"
+                >
+                  <ChevronLeft className="w-5 h-5" />
+                </button>
+                <button
+                  type="button"
+                  onClick={(e) => {
+                    e.preventDefault();
+                    handleNextImage();
+                  }}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 w-9 h-9 rounded-full bg-white/95 hover:bg-white border border-slate-200/90 shadow-md flex items-center justify-center text-slate-700 hover:text-[#005d42] transition-all z-20 cursor-pointer active:scale-95"
+                  aria-label="Next image"
+                >
+                  <ChevronRight className="w-5 h-5" />
+                </button>
+                <span className="absolute bottom-3 right-3 px-2 py-0.5 rounded-full bg-slate-900/60 backdrop-blur-xs text-white text-[10px] font-mono font-bold z-10">
+                  {currentImgIndex + 1} / {imagesList.length}
+                </span>
+              </>
+            )}
 
             {/* Product Image */}
             <div className="w-full h-full flex items-center justify-center p-4">
@@ -184,20 +229,9 @@ export default function ProductDetailsView({
                 className="max-h-full max-w-full object-contain mix-blend-multiply group-hover:scale-105 transition-transform duration-300"
               />
             </div>
-
-            {/* Bottom Security Seal */}
-            {/* <div className="absolute bottom-3 inset-x-3 bg-slate-50/90 backdrop-blur-xs rounded-lg py-1.5 px-3 flex items-center justify-between text-slate-600 text-[11px] font-medium border border-slate-200/60">
-              <span className="flex items-center gap-1">
-                <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
-                ডিএলএস নিয়ন্ত্রিত ব্যাচ
-              </span>
-              <span className="font-mono font-bold text-emerald-800">
-                {product.dlsLicenseNo || 'DLS Verified'}
-              </span>
-            </div> */}
           </div>
 
-          {/* Gallery Thumbnails (if multiple exist) */}
+          {/* Gallery Thumbnails (only if multiple unique pictures exist) */}
           {imagesList.length > 1 && (
             <div className="flex items-center gap-2 overflow-x-auto py-1">
               {imagesList.map((img, i) => (
@@ -205,13 +239,13 @@ export default function ProductDetailsView({
                   key={i}
                   type="button"
                   onClick={() => setSelectedImage(img)}
-                  className={`w-16 h-16 rounded-lg bg-white border p-1 shrink-0 transition-all ${
+                  className={`w-16 h-16 rounded-xl bg-white border p-1 shrink-0 transition-all cursor-pointer ${
                     selectedImage === img
-                      ? 'border-emerald-600 ring-2 ring-emerald-500/20'
-                      : 'border-slate-200 hover:border-slate-300'
+                      ? 'border-[#005d42] ring-2 ring-emerald-500/20 shadow-xs'
+                      : 'border-slate-200 hover:border-slate-300 opacity-70 hover:opacity-100'
                   }`}
                 >
-                  <img src={img} alt="Thumbnail" className="w-full h-full object-contain mix-blend-multiply" />
+                  <img src={img} alt={`Thumbnail ${i + 1}`} className="w-full h-full object-contain mix-blend-multiply" />
                 </button>
               ))}
             </div>
@@ -314,9 +348,16 @@ export default function ProductDetailsView({
                       MRP: ৳{toBengaliNumber(mrp)}
                     </span>
                   )}
-                  <span className="px-2 py-0.5 rounded bg-[#ffdcc3] text-[#7d4200] text-xs font-bold">
-                    ৫% সার্বজনীন ছাড়
-                  </span>
+                  {hasIndividualDiscount ? (
+                    <span className="px-2.5 py-0.5 rounded-full bg-red-100 text-red-800 border border-red-200 text-xs font-extrabold flex items-center gap-1">
+                      <span>{toBengaliNumber(individualDiscountPct)}% প্রমোশনাল ছাড়</span>
+                      <span>(৳{toBengaliNumber(savingsPerUnit)} সাশ্রয়)</span>
+                    </span>
+                  ) : (
+                    <span className="px-2 py-0.5 rounded bg-emerald-100 text-[#005d42] text-xs font-bold border border-emerald-200">
+                      সেরা অফার
+                    </span>
+                  )}
                 </div>
                 {/* {savingsPerUnit > 0 && (
                   <p className="text-xs font-bold text-emerald-800 mt-1">
@@ -355,10 +396,7 @@ export default function ProductDetailsView({
                 {variants.map((v, idx) => {
                   const isSelected = idx === selectedVariantIdx;
                   const vMrp = Number(v.mrpPrice || 0);
-                  const vPrice =
-                    Number(v.sellingPrice) < vMrp
-                      ? Number(v.sellingPrice)
-                      : Math.round(vMrp * 0.95);
+                  const vPrice = Number(v.sellingPrice || vMrp);
 
                   return (
                     <button

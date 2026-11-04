@@ -107,36 +107,19 @@ export default function ProductTableRow({
                       )}
                     </div>
 
-                      {/* Metadata: Categories, Form factor, Regulatory */}
-                      <div className="flex items-center gap-1.5 text-xs text-slate-500 flex-wrap">
-                        {product.categories && product.categories.length > 0 ? (
-                          product.categories.map((cat) => (
-                            <span
-                              key={cat.id}
-                              className="bg-emerald-50 text-emerald-800 border border-emerald-200/70 px-2 py-0.5 rounded text-[10.5px] font-medium"
-                            >
-                              {cat.nameEn}
-                            </span>
-                          ))
-                        ) : product.category ? (
-                          <span className="bg-slate-200/70 text-slate-700 px-2 py-0.5 rounded text-[11px] font-medium">
-                            {product.category.nameEn}
-                          </span>
-                        ) : null}
-                      <span className="text-slate-300">•</span>
-                      <span className="text-[11px] font-medium text-slate-600">
-                        {product.formFactor === 'BOLUS' ? 'BOLUS / TABLET' : product.formFactor}
+                    {/* DLS Number Only */}
+                    {product.dlsLicenseNo ? (
+                      <div className="flex items-center gap-1 text-xs text-slate-600 font-medium">
+                        <ShieldCheck className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
+                        <span className="font-mono text-[11.5px]">
+                          DLS: {product.dlsLicenseNo}
+                        </span>
+                      </div>
+                    ) : (
+                      <span className="text-[11px] text-slate-400 font-mono">
+                        DLS: N/A
                       </span>
-                      {product.dlsLicenseNo && (
-                        <>
-                          <span className="text-slate-300">•</span>
-                          <span className="text-[11px] text-emerald-700 flex items-center gap-1 font-medium">
-                            <ShieldCheck className="w-3.5 h-3.5" />
-                            <span>DLS: {product.dlsLicenseNo}</span>
-                          </span>
-                        </>
-                      )}
-                    </div>
+                    )}
 
                     {/* Short Active Composition summary if available */}
                     {/* {product.composition && (
@@ -182,11 +165,21 @@ export default function ProductTableRow({
               </span>
             </td>
 
-            {/* 4. MRP (BDT) */}
+            {/* 4. MRP & Selling Price (BDT) */}
             <td className="py-3.5 px-3 align-middle text-right whitespace-nowrap">
-              <span className="inline-block px-3 py-1 rounded-lg text-sm sm:text-[15px] font-extrabold text-[#005d42] bg-emerald-50 border border-emerald-200/90 tabular-nums shadow-2xs">
-                ৳{Number(variant.mrpPrice).toLocaleString()}
-              </span>
+              <div className="flex flex-col items-end gap-0.5">
+                <span className="inline-block px-3 py-1 rounded-lg text-sm sm:text-[15px] font-extrabold text-[#005d42] bg-emerald-50 border border-emerald-200/90 tabular-nums shadow-2xs">
+                  ৳{Number(variant.sellingPrice || variant.mrpPrice).toLocaleString()}
+                </span>
+                {Number(variant.sellingPrice) < Number(variant.mrpPrice) && (
+                  <div className="flex items-center gap-1 text-[10px] text-slate-400 font-mono">
+                    <span className="line-through">৳{Number(variant.mrpPrice).toLocaleString()}</span>
+                    <span className="text-red-600 font-bold bg-red-50 px-1 rounded border border-red-200">
+                      -{Math.round(((Number(variant.mrpPrice) - Number(variant.sellingPrice)) / Number(variant.mrpPrice)) * 100)}%
+                    </span>
+                  </div>
+                )}
+              </div>
             </td>
 
             {/* 5. STOCK STATUS BADGE */}

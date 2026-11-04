@@ -36,7 +36,7 @@ export default function AdminSidebar({ isOpen, onClose }: AdminSidebarProps) {
           badge: null,
         },
         {
-          label: 'Live Orders',
+          label: 'Manage Orders',
           href: '/admin/orders',
           icon: ShoppingCart,
           badge: null,
@@ -48,7 +48,7 @@ export default function AdminSidebar({ isOpen, onClose }: AdminSidebarProps) {
           badge: null,
         },
         {
-          label: 'Coupons & VIP',
+          label: 'Discount Management',
           href: '/admin/discounts',
           icon: Percent,
           badge: null,

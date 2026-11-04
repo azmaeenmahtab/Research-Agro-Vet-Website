@@ -4,6 +4,7 @@ import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
+import { getApiUrl } from '@/lib/api-client';
 import {
   ShieldCheck,
   Truck,
@@ -64,6 +65,24 @@ export default function CheckoutPage() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
+  // Dynamic Universal Discount
+  const [universalDiscount, setUniversalDiscount] = useState<{
+    enabled: boolean;
+    percent: number;
+    label: string;
+  }>({ enabled: true, percent: 5, label: 'Website 5% Universal Discount' });
+
+  useEffect(() => {
+    fetch(getApiUrl('/api/discounts/universal'))
+      .then((res) => res.json())
+      .then((res) => {
+        if (res?.data) {
+          setUniversalDiscount(res.data);
+        }
+      })
+      .catch(() => {});
+  }, []);
+
   useEffect(() => {
     setMounted(true);
   }, []);
@@ -90,7 +109,7 @@ export default function CheckoutPage() {
     if (raw.length === 11 && raw.startsWith('01')) {
       setIsLookingUp(true);
       try {
-        const res = await fetch(`/api/orders/lookup?phone=${raw}`);
+        const res = await fetch(getApiUrl(`/api/orders/lookup?phone=${raw}`));
         const data = await res.json();
         if (data.found && data.customer) {
           const c = data.customer;
@@ -139,9 +158,9 @@ export default function CheckoutPage() {
   if (recognizedCustomer?.hasDiscount && recognizedCustomer.discountPct > 0) {
     discountAmount = Math.round((subtotal * recognizedCustomer.discountPct) / 100);
     discountLabel = `VIP Discount (${recognizedCustomer.discountPct}%)`;
-  } else if (buyerMode !== 'WHOLESALE' && subtotal > 0) {
-    discountAmount = Math.round(subtotal * 0.05);
-    discountLabel = 'Website 5% Universal Discount';
+  } else if (buyerMode !== 'WHOLESALE' && subtotal > 0 && universalDiscount.enabled && universalDiscount.percent > 0) {
+    discountAmount = Math.round(subtotal * (universalDiscount.percent / 100));
+    discountLabel = universalDiscount.label || `Website ${universalDiscount.percent}% Universal Discount`;
   }
 
   const grandTotal = Math.max(0, subtotal - discountAmount + shippingFee);
@@ -186,7 +205,7 @@ export default function CheckoutPage() {
     setIsSubmitting(true);
 
     try {
-      const res = await fetch('/api/orders', {
+      const res = await fetch(getApiUrl('/api/orders'), {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({

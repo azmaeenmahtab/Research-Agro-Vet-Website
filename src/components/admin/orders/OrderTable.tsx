@@ -70,6 +70,8 @@ export default function OrderTable({
         return 'bg-indigo-100 text-indigo-900 border-indigo-300';
       case 'DELIVERED':
         return 'bg-emerald-100 text-emerald-900 border-emerald-300';
+      case 'RETURNED':
+        return 'bg-rose-100 text-rose-900 border-rose-300';
       case 'CANCELLED':
         return 'bg-red-100 text-red-900 border-red-300';
       default:
@@ -85,6 +87,10 @@ export default function OrderTable({
         return 'bg-amber-100 text-amber-800 border-amber-300';
       case 'UNPAID':
         return 'bg-red-50 text-red-700 border-red-200';
+      case 'REFUNDED':
+        return 'bg-purple-100 text-purple-800 border-purple-300';
+      case 'FAILED':
+        return 'bg-rose-100 text-rose-800 border-rose-300';
       default:
         return 'bg-slate-100 text-slate-700 border-slate-200';
     }

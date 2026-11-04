@@ -2,6 +2,8 @@
 
 import React, { useState, useEffect } from 'react';
 import Image from 'next/image';
+import { toast } from '@heroui/react';
+import { getApiUrl } from '@/lib/api-client';
 import {
   X,
   Plus,
@@ -335,7 +337,7 @@ export default function ProductFormModal({
 
   const removeVariant = (index: number) => {
     if (variants.length <= 1) {
-      alert('A product must have at least one pack-size variant.');
+      toast.warning('A product must have at least one pack-size variant.');
       return;
     }
     setVariants(variants.filter((_, idx) => idx !== index));
@@ -438,8 +440,9 @@ export default function ProductFormModal({
         const thumbFormData = new FormData();
         thumbFormData.append('file', thumbnailFile);
 
-        const thumbRes = await fetch('/api/admin/upload', {
+        const thumbRes = await fetch(getApiUrl('/api/admin/upload'), {
           method: 'POST',
+          credentials: 'include',
           body: thumbFormData,
         });
 
@@ -462,8 +465,9 @@ export default function ProductFormModal({
           }
         });
 
-        const galleryRes = await fetch('/api/admin/upload', {
+        const galleryRes = await fetch(getApiUrl('/api/admin/upload'), {
           method: 'POST',
+          credentials: 'include',
           body: galleryFormData,
         });
 
@@ -527,9 +531,10 @@ export default function ProductFormModal({
         : '/api/admin/products';
       const method = isEditing ? 'PUT' : 'POST';
 
-      const res = await fetch(url, {
+      const res = await fetch(getApiUrl(url), {
         method,
         headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
         body: JSON.stringify(payload),
       });
 
@@ -1387,6 +1392,79 @@ export default function ProductFormModal({
                             </button>
                           </div>
                         </div>
+                      </div>
+
+                      {/* Live Individual Discount Calculator & Status */}
+                      <div className={`p-3 rounded-xl border flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 transition-all ${
+                        variant.mrpPrice > 0 && variant.sellingPrice < variant.mrpPrice
+                          ? 'bg-emerald-50/70 border-emerald-200'
+                          : 'bg-slate-50/70 border-slate-200/80'
+                      }`}>
+                        <div className="flex items-center gap-2">
+                          <Tag className={`w-4 h-4 shrink-0 ${
+                            variant.mrpPrice > 0 && variant.sellingPrice < variant.mrpPrice
+                              ? 'text-[#005d42]'
+                              : 'text-slate-400'
+                          }`} />
+                          <div>
+                            {variant.mrpPrice > 0 && variant.sellingPrice < variant.mrpPrice ? (
+                              <div className="flex items-center gap-2 flex-wrap">
+                                <span className="text-xs font-bold text-[#005d42]">
+                                  🎉 Individual Discount: {Math.round(((variant.mrpPrice - variant.sellingPrice) / variant.mrpPrice) * 100)}% OFF
+                                </span>
+                                <span className="text-[11px] font-bold text-emerald-800 bg-white px-2 py-0.5 rounded border border-emerald-300 font-mono shadow-2xs">
+                                  Customer Saves ৳{(variant.mrpPrice - variant.sellingPrice).toFixed(2)}
+                                </span>
+                                <span className="text-[10px] text-slate-500">
+                                  (Dominates universal discount at checkout)
+                                </span>
+                              </div>
+                            ) : variant.sellingPrice > variant.mrpPrice ? (
+                              <span className="text-xs font-bold text-amber-700">
+                                ⚠️ Warning: Selling Price (৳{variant.sellingPrice}) is higher than Printed MRP (৳{variant.mrpPrice})
+                              </span>
+                            ) : (
+                              <span className="text-xs font-medium text-slate-500">
+                                No individual discount set (Standard MRP: ৳{variant.mrpPrice || 0} — will receive storewide Universal Discount at checkout)
+                              </span>
+                            )}
+                          </div>
+                        </div>
+
+                        {/* Quick Discount Setters */}
+                        {variant.mrpPrice > 0 && (
+                          <div className="flex items-center gap-1 shrink-0">
+                            <span className="text-[10px] font-bold text-slate-400 uppercase mr-1">Quick Set:</span>
+                            {[5, 10, 15, 20].map((pct) => (
+                              <button
+                                key={pct}
+                                type="button"
+                                onClick={() => {
+                                  const calculatedSelling = Math.round(variant.mrpPrice * (1 - pct / 100));
+                                  updateVariant(idx, 'sellingPrice', calculatedSelling);
+                                }}
+                                className={`px-2 py-0.5 rounded-lg text-[10px] font-bold transition-all border ${
+                                  discountPercent === pct
+                                    ? 'bg-[#005d42] text-white border-[#005d42]'
+                                    : 'bg-white text-slate-600 border-slate-200 hover:bg-emerald-50 hover:text-[#005d42]'
+                                }`}
+                                title={`Set ${pct}% discount`}
+                              >
+                                {pct}%
+                              </button>
+                            ))}
+                            {variant.sellingPrice !== variant.mrpPrice && (
+                              <button
+                                type="button"
+                                onClick={() => updateVariant(idx, 'sellingPrice', variant.mrpPrice)}
+                                className="px-2 py-0.5 rounded-lg text-[10px] font-bold bg-white text-slate-500 border border-slate-200 hover:bg-slate-100"
+                                title="Reset selling price to printed MRP"
+                              >
+                                Reset (0%)
+                              </button>
+                            )}
+                          </div>
+                        )}
                       </div>
                     </div>
                   );

@@ -70,9 +70,21 @@ export default function CartDrawer() {
                     <div className="flex-1 min-w-0">
                       <h4 className="text-xs font-bold text-slate-900 truncate">{item.nameEn}</h4>
                       {item.nameBn && <p className="text-[11px] text-slate-500 truncate">{item.nameBn}</p>}
-                      <p className="text-[11px] text-emerald-700 font-semibold mt-0.5">
-                        প্যাক সাইজ: {item.packSize} • ৳{unitPrice}
-                      </p>
+                      <div className="flex items-center gap-1.5 flex-wrap text-[11px] font-semibold mt-0.5">
+                        <span className="text-slate-600">প্যাক সাইজ: {item.packSize}</span>
+                        <span className="text-slate-300">•</span>
+                        <span className="text-emerald-700 font-bold">৳{unitPrice}</span>
+                        {item.mrpPrice > unitPrice && (
+                          <>
+                            <span className="line-through text-slate-400 text-[10px]">
+                              ৳{item.mrpPrice}
+                            </span>
+                            <span className="text-[10px] text-red-600 font-bold bg-red-50 px-1 rounded border border-red-200">
+                              {Math.round(((item.mrpPrice - unitPrice) / item.mrpPrice) * 100)}% ছাড়
+                            </span>
+                          </>
+                        )}
+                      </div>
 
                       <div className="flex items-center justify-between mt-2">
                         {/* Quantity controls */}

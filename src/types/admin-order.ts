@@ -1,20 +1,9 @@
-import {
-  BuyerTier,
-  CourierProvider,
-  DiscountSource,
-  OrderStatus,
-  PaymentMethod,
-  PaymentStatus,
-} from '@prisma/client';
-
-export type {
-  BuyerTier,
-  CourierProvider,
-  DiscountSource,
-  OrderStatus,
-  PaymentMethod,
-  PaymentStatus,
-};
+export type BuyerTier = 'RETAIL' | 'WHOLESALE';
+export type CourierProvider = 'STEADFAST' | 'PATHAO' | 'REDX' | 'SUNDARBAN' | 'MANUAL';
+export type DiscountSource = 'INDIVIDUAL_PRODUCT' | 'CLIENT_CUSTOM' | 'GENERAL_STOREWIDE' | 'COUPON' | 'ADMIN_MANUAL';
+export type OrderStatus = 'PENDING' | 'CONFIRMED' | 'PACKED' | 'SHIPPED' | 'DELIVERED' | 'CANCELLED' | 'RETURNED';
+export type PaymentMethod = 'SSLCOMMERZ' | 'COD' | 'PARTIAL_ADVANCE';
+export type PaymentStatus = 'UNPAID' | 'PAID' | 'PARTIAL' | 'FAILED' | 'CANCELLED' | 'REFUNDED';
 
 export interface AdminOrderItem {
   id: string;
@@ -87,11 +76,21 @@ export interface OrderStatsSummary {
   totalOrders: number;
   totalRevenue?: number;
   averageOrderValue?: number;
+  // Order Statuses
   pendingCount: number;
   confirmedCount: number;
+  packedCount?: number;
   shippedCount: number;
   deliveredCount: number;
+  returnedCount?: number;
   cancelledCount: number;
+  // Payment Statuses
+  paidCount?: number;
+  partialCount?: number;
+  unpaidCount?: number;
+  refundedCount?: number;
+  failedCount?: number;
+  // Legacy / Period
   codOrdersCount?: number;
   paidOrdersCount?: number;
   todayCount: number;

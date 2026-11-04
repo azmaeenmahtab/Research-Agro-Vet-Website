@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
+import { getApiUrl } from '@/lib/api-client';
 import {
   Tags,
   Plus,
@@ -19,6 +20,7 @@ import {
   FolderTree,
 } from 'lucide-react';
 import CategoryFormModal, { AdminCategory } from '@/components/admin/modals/CategoryFormModal';
+import { toast } from '@heroui/react';
 
 export default function AdminCategoriesPage() {
   const [categories, setCategories] = useState<AdminCategory[]>([]);
@@ -38,7 +40,7 @@ export default function AdminCategoriesPage() {
   const fetchCategories = async () => {
     try {
       setLoading(true);
-      const res = await fetch('/api/admin/categories');
+      const res = await fetch(getApiUrl('/api/admin/categories'));
       const data = await res.json();
       if (data.success && Array.isArray(data.categories)) {
         setCategories(data.categories);
@@ -65,6 +67,7 @@ export default function AdminCategoriesPage() {
   };
 
   const handleSaved = (savedCategory: AdminCategory) => {
+    toast.success(`Category "${savedCategory.nameEn}" saved successfully!`);
     setCategories((prev) => {
       const idx = prev.findIndex((c) => c.id === savedCategory.id);
       if (idx >= 0) {
@@ -84,7 +87,7 @@ export default function AdminCategoriesPage() {
     );
 
     try {
-      const res = await fetch(`/api/admin/categories/${cat.id}`, {
+      const res = await fetch(getApiUrl(`/api/admin/categories/${cat.id}`), {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ isActive: nextStatus }),
@@ -95,13 +98,16 @@ export default function AdminCategoriesPage() {
         setCategories((prev) =>
           prev.map((c) => (c.id === cat.id ? { ...c, isActive: cat.isActive } : c))
         );
-        alert(data.message || 'Failed to update category status.');
+        toast.danger(data.message || 'Failed to update category status.');
+      } else {
+        toast.success(`Category "${cat.nameEn}" marked as ${nextStatus ? 'Active' : 'Inactive'}`);
       }
     } catch (err) {
       // Rollback
       setCategories((prev) =>
         prev.map((c) => (c.id === cat.id ? { ...c, isActive: cat.isActive } : c))
       );
+      toast.danger('Failed to update category status.');
     }
   };
 
@@ -111,7 +117,7 @@ export default function AdminCategoriesPage() {
     setDeleteError(null);
 
     try {
-      const res = await fetch(`/api/admin/categories/${deletingCategory.id}`, {
+      const res = await fetch(getApiUrl(`/api/admin/categories/${deletingCategory.id}`), {
         method: 'DELETE',
       });
       const data = await res.json();
@@ -119,10 +125,12 @@ export default function AdminCategoriesPage() {
         throw new Error(data.message || 'Failed to delete category.');
       }
 
+      toast.success(`Category "${deletingCategory.nameEn}" deleted successfully!`);
       setCategories((prev) => prev.filter((c) => c.id !== deletingCategory.id));
       setDeletingCategory(null);
     } catch (err: any) {
       setDeleteError(err.message || 'Failed to delete category.');
+      toast.danger(err.message || 'Failed to delete category.');
     } finally {
       setIsDeleting(false);
     }

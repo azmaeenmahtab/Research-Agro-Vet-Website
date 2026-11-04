@@ -8,3 +8,13 @@
   --accent-soft: rgba(0, 93, 66, 0.15);
   --accent-soft-foreground: #005d42;
 }
+
+/* Hide spin buttons / number stepper arrows for accuracy */
+input[type="number"]::-webkit-outer-spin-button,
+input[type="number"]::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+input[type="number"] {
+  -moz-appearance: textfield;
+}

@@ -13,6 +13,7 @@ import {
   ChevronRight,
 } from 'lucide-react';
 import { toBengaliNumber } from '@/lib/formatters';
+import { getApiUrl } from '@/lib/api-client';
 
 export interface ProductReviewItem {
   id: string;
@@ -132,7 +133,7 @@ export default function ProductReviewsSection({
 
     setIsSubmitting(true);
     try {
-      const res = await fetch(`/api/products/${productId}/reviews`, {
+      const res = await fetch(getApiUrl(`/api/products/${productId}/reviews`), {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({

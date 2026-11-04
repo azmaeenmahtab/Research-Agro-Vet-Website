@@ -250,9 +250,15 @@ export default function ProductCard({ product }: ProductCardProps) {
               </span>
             )}
           </div>
-          <span className="text-[10px] font-bold text-[#a05600] bg-[#ffdcc3] px-2 py-0.5 rounded">
-            ৫% ছাড়
-          </span>
+          {mrp > sellingPrice ? (
+            <span className="text-[10px] font-extrabold text-red-700 bg-red-100 border border-red-200 px-2 py-0.5 rounded-full flex items-center gap-0.5">
+              <span>{toBengaliNumber(Math.round(((mrp - sellingPrice) / mrp) * 100))}% ছাড়</span>
+            </span>
+          ) : (
+            <span className="text-[10px] font-bold text-[#a05600] bg-[#ffdcc3] px-2 py-0.5 rounded">
+              সেরা অফার
+            </span>
+          )}
         </div>
 
         {/* Action Buttons */}

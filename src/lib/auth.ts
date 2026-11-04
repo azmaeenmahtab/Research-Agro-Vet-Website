@@ -1,15 +1,18 @@
-export interface AdminSession {
-  id: string;
-  email: string;
-  role: 'SUPER_ADMIN' | 'ADMIN' | 'STAFF';
-  name: string;
-}
+import { betterAuth } from 'better-auth';
+import { prismaAdapter } from 'better-auth/adapters/prisma';
+import { admin } from 'better-auth/plugins';
+import { prisma } from './prisma';
 
-export async function verifyAdminSession(): Promise<AdminSession | null> {
-  // Skeleton session guard for Next.js App Router admin protection
-  return null;
-}
+export const auth = betterAuth({
+  database: prismaAdapter(prisma, {
+    provider: 'postgresql',
+  }),
+  emailAndPassword: {
+    enabled: true,
+  },
+  plugins: [
+    admin(),
+  ],
+});
 
-export function isAuthenticated(session: AdminSession | null): boolean {
-  return Boolean(session && session.id);
-}
+export type Session = typeof auth.$Infer.Session;

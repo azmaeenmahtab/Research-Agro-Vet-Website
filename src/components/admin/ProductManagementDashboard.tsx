@@ -5,7 +5,8 @@ import ProductStatsBento from './ProductStatsBento';
 import ProductFilters from './ProductFilters';
 import ProductTable from './ProductTable';
 import { ConfirmationModal, ProductFormModal, ClinicalDataModal } from './modals';
-import AdminToast, { ToastState } from './AdminToast';
+import { toast } from '@heroui/react';
+import { getApiUrl } from '@/lib/api-client';
 import {
   AdminProduct,
   AdminVariant,
@@ -47,8 +48,6 @@ export default function ProductManagementDashboard() {
   const [productToDelete, setProductToDelete] = useState<AdminProduct | null>(null);
   const [isDeleting, setIsDeleting] = useState(false);
 
-  // Toast
-  const [toast, setToast] = useState<ToastState | null>(null);
   const [debouncedSearch, setDebouncedSearch] = useState(searchQuery);
 
   // Debounce search query to prevent typing stutter and race conditions
@@ -60,7 +59,13 @@ export default function ProductManagementDashboard() {
   }, [searchQuery]);
 
   const showToast = (message: string, type: 'success' | 'error' | 'info' = 'success') => {
-    setToast({ message, type });
+    if (type === 'success') {
+      toast.success(message);
+    } else if (type === 'error') {
+      toast.danger(message);
+    } else {
+      toast.info(message);
+    }
   };
 
   // Fetch Products & Stats from API
@@ -72,7 +77,9 @@ export default function ProductManagementDashboard() {
       if (selectedCategory !== 'ALL') params.set('category', selectedCategory);
       if (selectedStatus !== 'ALL') params.set('status', selectedStatus);
 
-      const res = await fetch(`/api/admin/products?${params.toString()}`);
+      const res = await fetch(getApiUrl(`/api/admin/products?${params.toString()}`), {
+        credentials: 'include',
+      });
       const data = await res.json();
 
       if (data.success) {
@@ -152,8 +159,9 @@ export default function ProductManagementDashboard() {
     setIsDeleting(true);
 
     try {
-      const res = await fetch(`/api/admin/products/${productToDelete.id}`, {
+      const res = await fetch(getApiUrl(`/api/admin/products/${productToDelete.id}`), {
         method: 'DELETE',
+        credentials: 'include',
       });
       const data = await res.json();
       if (!res.ok || !data.success) {
@@ -343,9 +351,6 @@ export default function ProductManagementDashboard() {
           setProductToDelete(null);
         }}
       />
-
-      {/* Toast Notification */}
-      <AdminToast toast={toast} onClose={() => setToast(null)} />
     </div>
   );
 }
