@@ -284,60 +284,6 @@ export default function OrderStatsOverview({
 
   return (
     <div className="space-y-4">
-      {/* Top Bar: Financial Metrics + Action Tools */}
-      <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-3 bg-white p-4 rounded-2xl border border-slate-200/80 shadow-2xs">
-        {/* Left: Gross Sales & Total Orders Summary */}
-        <div className="flex items-center gap-4 flex-wrap">
-          <div className="flex items-center gap-2 px-3.5 py-2 rounded-xl bg-slate-50 border border-slate-200/80">
-            <ShoppingBag className="w-4 h-4 text-[#005d42]" />
-            <div>
-              <span className="text-[10px] uppercase font-bold text-slate-500 tracking-wider block">
-                Total Orders
-              </span>
-              <span className="text-lg font-black text-slate-900 leading-tight">
-                {stats.totalOrders}
-              </span>
-            </div>
-          </div>
-
-          <div className="flex items-center gap-2 px-3.5 py-2 rounded-xl bg-emerald-50/80 border border-emerald-200/80">
-            <CircleDollarSign className="w-4 h-4 text-[#005d42]" />
-            <div>
-              <span className="text-[10px] uppercase font-bold text-emerald-800 tracking-wider block">
-                Gross Sales
-              </span>
-              <span className="text-lg font-black text-[#005d42] leading-tight">
-                ৳{(stats.totalRevenue || 0).toLocaleString()}
-              </span>
-            </div>
-          </div>
-        </div>
-
-        {/* Right: Quick Range & Actions */}
-        <div className="flex items-center gap-2 flex-wrap">
-          <button
-            type="button"
-            onClick={onPrintAllInvoices}
-            disabled={filteredOrdersCount === 0}
-            className="px-3.5 py-2 rounded-xl bg-[#005d42] hover:bg-[#004e37] text-white text-xs font-bold flex items-center gap-1.5 shadow-sm transition-all disabled:opacity-50"
-            title="Batch print delivery invoices or thermal slips for all matching orders"
-          >
-            <Printer className="w-4 h-4" />
-            <span>Print Receipts ({filteredOrdersCount})</span>
-          </button>
-
-          <button
-            type="button"
-            onClick={onExportCsv}
-            disabled={filteredOrdersCount === 0}
-            className="px-3.5 py-2 rounded-xl border border-slate-300 text-slate-700 hover:bg-slate-50 text-xs font-bold flex items-center gap-1.5 shadow-2xs transition-all disabled:opacity-50"
-            title="Download CSV for Excel or Courier Bulk Upload"
-          >
-            <Download className="w-4 h-4 text-slate-500" />
-            <span>Export CSV</span>
-          </button>
-        </div>
-      </div>
 
       {/* Date Range Presets Bar */}
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-3 bg-slate-50 p-3 rounded-xl border border-slate-200/80">
@@ -486,6 +432,63 @@ export default function OrderStatsOverview({
           )}
         </div>
       </div>
+      
+      {/* Top Bar: Financial Metrics + Action Tools */}
+      <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-3 bg-white p-4 rounded-2xl border border-slate-200/80 shadow-2xs">
+        {/* Left: Gross Sales & Total Orders Summary */}
+        <div className="flex items-center gap-4 flex-wrap">
+          <div className="flex items-center gap-2 px-3.5 py-2 rounded-xl bg-slate-50 border border-slate-200/80">
+            <ShoppingBag className="w-4 h-4 text-[#005d42]" />
+            <div>
+              <span className="text-[10px] uppercase font-bold text-slate-500 tracking-wider block">
+                Total Orders
+              </span>
+              <span className="text-lg font-black text-slate-900 leading-tight">
+                {stats.totalOrders}
+              </span>
+            </div>
+          </div>
+
+          <div className="flex items-center gap-2 px-3.5 py-2 rounded-xl bg-emerald-50/80 border border-emerald-200/80">
+            <CircleDollarSign className="w-4 h-4 text-[#005d42]" />
+            <div>
+              <span className="text-[10px] uppercase font-bold text-emerald-800 tracking-wider block">
+                Gross Sales
+              </span>
+              <span className="text-lg font-black text-[#005d42] leading-tight">
+                ৳{(stats.totalRevenue || 0).toLocaleString()}
+              </span>
+            </div>
+          </div>
+        </div>
+
+        {/* Right: Quick Range & Actions */}
+        <div className="flex items-center gap-2 flex-wrap">
+          <button
+            type="button"
+            onClick={onPrintAllInvoices}
+            disabled={filteredOrdersCount === 0}
+            className="px-3.5 py-2 rounded-xl bg-[#005d42] hover:bg-[#004e37] text-white text-xs font-bold flex items-center gap-1.5 shadow-sm transition-all disabled:opacity-50"
+            title="Batch print delivery invoices or thermal slips for all matching orders"
+          >
+            <Printer className="w-4 h-4" />
+            <span>Print Receipts ({filteredOrdersCount})</span>
+          </button>
+
+          <button
+            type="button"
+            onClick={onExportCsv}
+            disabled={filteredOrdersCount === 0}
+            className="px-3.5 py-2 rounded-xl border border-slate-300 text-slate-700 hover:bg-slate-50 text-xs font-bold flex items-center gap-1.5 shadow-2xs transition-all disabled:opacity-50"
+            title="Download CSV for Excel or Courier Bulk Upload"
+          >
+            <Download className="w-4 h-4 text-slate-500" />
+            <span>Export CSV</span>
+          </button>
+        </div>
+      </div>
+
+      
 
       {/* SECTION 1: ALL ORDER STATUS CARDS */}
       <div className="space-y-2">

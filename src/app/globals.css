@@ -1,6 +1,11 @@
 @import "tailwindcss";
 @import "@heroui/styles";
 
+@theme {
+  --font-sans: var(--font-roboto), var(--font-anek-bangla), sans-serif;
+  --font-mono: var(--font-roboto-mono), monospace;
+}
+
 /* Research Agro Vet Theme for HeroUI RangeCalendar */
 :root {
   --accent: #005d42;

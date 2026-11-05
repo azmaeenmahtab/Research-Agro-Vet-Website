@@ -7,11 +7,22 @@ export async function listProducts(req: Request, res: Response) {
   try {
     const isFeatured = req.query.featured as string | undefined;
 
+    const settings = await prisma.siteSettings.findUnique({
+      where: { id: 'default' },
+      select: { enableGeneralDiscount: true, generalRetailDiscountPercent: true },
+    });
+    const percent = Number(settings?.generalRetailDiscountPercent) || 0;
+    const universalDiscount = {
+      enabled: Boolean(settings?.enableGeneralDiscount) && percent > 0,
+      percent,
+      label: `Website ${percent}% Universal Discount`,
+    };
+
     // Quick path for homepage featured feed
     if (isFeatured === 'true' && !req.query.search && !req.query.category) {
       const limit = Number(req.query.limit) || 8;
       const products = await getFeaturedProducts(limit);
-      return res.json({ success: true, products });
+      return res.json({ success: true, products, universalDiscount });
     }
 
     const filters = {
@@ -24,7 +35,7 @@ export async function listProducts(req: Request, res: Response) {
     };
 
     const result = await getProducts(filters);
-    return res.json({ success: true, ...result });
+    return res.json({ success: true, ...result, universalDiscount });
   } catch (error: any) {
     return res.status(500).json({ success: false, message: error.message || 'Failed to fetch products' });
   }

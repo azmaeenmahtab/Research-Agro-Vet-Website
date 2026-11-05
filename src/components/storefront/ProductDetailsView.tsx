@@ -57,6 +57,10 @@ interface ProductDetailsViewProps {
       tradePrice: number;
       mrpPrice: number;
       sellingPrice: number;
+      discountPercent?: number;
+      savingsPerUnit?: number;
+      discountType?: 'INDIVIDUAL' | 'UNIVERSAL' | 'NONE';
+      hasDiscount?: boolean;
       inStock: boolean;
       packagingInfo?: string | null;
       unitsPerBox?: number | null;
@@ -64,11 +68,13 @@ interface ProductDetailsViewProps {
     reviews?: ProductReviewItem[];
   };
   relatedProducts?: ProductCardData[];
+  universalDiscount?: any;
 }
 
 export default function ProductDetailsView({
   product,
   relatedProducts = [],
+  universalDiscount,
 }: ProductDetailsViewProps) {
   const [selectedVariantIdx, setSelectedVariantIdx] = useState(0);
   const [quantity, setQuantity] = useState(1);
@@ -87,9 +93,10 @@ export default function ProductDetailsView({
 
   const mrp = currentVariant ? Number(currentVariant.mrpPrice || 0) : 0;
   const sellingPrice = currentVariant ? Number(currentVariant.sellingPrice || mrp) : 0;
-  const hasIndividualDiscount = mrp > 0 && sellingPrice < mrp;
-  const individualDiscountPct = hasIndividualDiscount ? Math.round(((mrp - sellingPrice) / mrp) * 100) : 0;
-  const savingsPerUnit = hasIndividualDiscount ? mrp - sellingPrice : 0;
+  const hasDiscount = currentVariant?.hasDiscount ?? (mrp > 0 && sellingPrice < mrp);
+  const discountPct = currentVariant?.discountPercent ?? (hasDiscount ? Math.round(((mrp - sellingPrice) / mrp) * 100) : 0);
+  const savingsPerUnit = currentVariant?.savingsPerUnit ?? (hasDiscount ? mrp - sellingPrice : 0);
+  const discountType = currentVariant?.discountType || (hasDiscount ? 'INDIVIDUAL' : 'NONE');
   const subtotal = sellingPrice * quantity;
 
   const reviews = product.reviews || [];
@@ -348,9 +355,12 @@ export default function ProductDetailsView({
                       MRP: ৳{toBengaliNumber(mrp)}
                     </span>
                   )}
-                  {hasIndividualDiscount ? (
+                  {hasDiscount ? (
                     <span className="px-2.5 py-0.5 rounded-full bg-red-100 text-red-800 border border-red-200 text-xs font-extrabold flex items-center gap-1">
-                      <span>{toBengaliNumber(individualDiscountPct)}% প্রমোশনাল ছাড়</span>
+                      <span>
+                        {toBengaliNumber(discountPct)}%{' '}
+                        {discountType === 'UNIVERSAL' ? 'সার্বজনীন ছাড়' : 'প্রমোশনাল ছাড়'}
+                      </span>
                       <span>(৳{toBengaliNumber(savingsPerUnit)} সাশ্রয়)</span>
                     </span>
                   ) : (

@@ -48,6 +48,30 @@ export default function ProductManagementDashboard() {
   const [productToDelete, setProductToDelete] = useState<AdminProduct | null>(null);
   const [isDeleting, setIsDeleting] = useState(false);
 
+  // Universal Storewide Discount
+  const [universalDiscount, setUniversalDiscount] = useState<{
+    enabled: boolean;
+    percent: number;
+    label?: string;
+  }>({ enabled: true, percent: 5, label: 'Website 5% Universal Discount' });
+
+  // Fetch Universal Discount Policy
+  const fetchUniversalDiscount = async () => {
+    try {
+      const res = await fetch(getApiUrl('/api/discounts/universal'));
+      const data = await res.json();
+      if (data?.success && data?.data) {
+        setUniversalDiscount(data.data);
+      }
+    } catch (err) {
+      console.error('Failed to load universal discount:', err);
+    }
+  };
+
+  useEffect(() => {
+    fetchUniversalDiscount();
+  }, []);
+
   const [debouncedSearch, setDebouncedSearch] = useState(searchQuery);
 
   // Debounce search query to prevent typing stutter and race conditions
@@ -228,8 +252,10 @@ export default function ProductManagementDashboard() {
       'SKU',
       'Pack Size',
       'Trade Price (TP)',
-      'MRP',
-      'Selling Price',
+      'MRP (BDT)',
+      'Effective Selling Price (BDT)',
+      'Discount Type',
+      'Discount %',
       'In Stock',
       'Stock Quantity',
     ];
@@ -238,6 +264,25 @@ export default function ProductManagementDashboard() {
 
     products.forEach((p) => {
       p.variants.forEach((v) => {
+        const mrp = Number(v.mrpPrice) || 0;
+        const rawSelling = Number(v.sellingPrice) || mrp;
+        const hasIndividual = mrp > 0 && rawSelling < mrp;
+        const isUniv = !hasIndividual && Boolean(universalDiscount?.enabled) && Number(universalDiscount?.percent) > 0;
+        
+        let effectiveSelling = mrp;
+        let discType = 'None';
+        let discPct = 0;
+
+        if (hasIndividual) {
+          effectiveSelling = rawSelling;
+          discType = 'Individual';
+          discPct = Math.round(((mrp - rawSelling) / mrp) * 100);
+        } else if (isUniv) {
+          discType = 'Universal';
+          discPct = Number(universalDiscount.percent);
+          effectiveSelling = Math.round(mrp * (1 - discPct / 100));
+        }
+
         rows.push([
           `"${p.id}"`,
           `"${p.nameEn.replace(/"/g, '""')}"`,
@@ -249,8 +294,10 @@ export default function ProductManagementDashboard() {
           `"${v.sku}"`,
           `"${v.packSize}"`,
           String(v.tradePrice),
-          String(v.mrpPrice),
-          String(v.sellingPrice),
+          String(mrp),
+          String(effectiveSelling),
+          discType,
+          `${discPct}%`,
           v.inStock ? 'TRUE' : 'FALSE',
           String(v.stockQuantity),
         ]);
@@ -314,6 +361,7 @@ export default function ProductManagementDashboard() {
         products={products}
         isLoading={isLoading}
         expandedProductIds={expandedProductIds}
+        universalDiscount={universalDiscount}
         onToggleExpand={handleToggleExpand}
         onEditProduct={handleEditProduct}
         onEditClinical={handleEditClinical}

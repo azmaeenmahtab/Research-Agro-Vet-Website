@@ -16,6 +16,11 @@ interface ProductTableRowProps {
   product: AdminProduct;
   rowIndex: number;
   isExpanded: boolean;
+  universalDiscount?: {
+    enabled: boolean;
+    percent: number;
+    label?: string;
+  };
   onToggleExpand: () => void;
   onEditProduct: (product: AdminProduct) => void;
   onEditClinical: (product: AdminProduct) => void;
@@ -26,6 +31,7 @@ export default function ProductTableRow({
   product,
   rowIndex,
   isExpanded,
+  universalDiscount,
   onToggleExpand,
   onEditProduct,
   onEditClinical,
@@ -51,6 +57,30 @@ export default function ProductTableRow({
       {variantsToShow.map((variant, index) => {
         const isFirstRow = index === 0;
 
+        const mrp = Number(variant.mrpPrice) || 0;
+        const rawSellingPrice = Number(variant.sellingPrice) || mrp;
+        const tp = Number(variant.tradePrice) || 0;
+
+        // Individual Discount Dominance: if sellingPrice < mrpPrice, individual promo dominates
+        const hasIndividualDiscount = mrp > 0 && rawSellingPrice < mrp;
+        const individualDiscountPercent = hasIndividualDiscount
+          ? Math.round(((mrp - rawSellingPrice) / mrp) * 100)
+          : 0;
+
+        // Universal Discount applies only if no individual discount is set
+        const isUniversalActive =
+          !hasIndividualDiscount &&
+          Boolean(universalDiscount?.enabled) &&
+          Number(universalDiscount?.percent) > 0;
+        const universalDiscountPercent = isUniversalActive ? Number(universalDiscount?.percent) : 0;
+
+        // Calculate effective selling price
+        const effectiveSellingPrice = hasIndividualDiscount
+          ? rawSellingPrice
+          : isUniversalActive
+          ? Math.round(mrp * (1 - universalDiscountPercent / 100))
+          : mrp;
+
         return (
           <tr
             key={variant.id || `${product.id}-var-${index}`}
@@ -63,7 +93,7 @@ export default function ProductTableRow({
                 className={`py-4 px-4 align-top border-r border-slate-200/80 ${
                   isEven ? 'bg-white' : 'bg-slate-50/90'
                 }`}
-                style={{ width: '32%' }}
+                style={{ width: '25%' }}
               >
                 <div className="flex items-start gap-3">
                   {/* Expand / Collapse Chevron */}
@@ -160,26 +190,46 @@ export default function ProductTableRow({
 
             {/* 3. TRADE PRICE (TP) */}
             <td className="py-3.5 px-3 align-middle text-right whitespace-nowrap">
-              <span className="inline-block px-3 py-1 rounded-lg text-sm sm:text-[15px] font-extrabold text-orange-800 bg-orange-50 border border-orange-200/90 tabular-nums shadow-2xs">
-                ৳{Number(variant.tradePrice).toLocaleString()}
+              <span className="inline-block px-2.5 py-1 rounded-lg text-xs sm:text-sm font-extrabold text-orange-800 bg-orange-50 border border-orange-200/90 tabular-nums shadow-2xs">
+                ৳{tp.toLocaleString()}
               </span>
             </td>
 
-            {/* 4. MRP & Selling Price (BDT) */}
+            {/* 4. MRP (BDT) */}
             <td className="py-3.5 px-3 align-middle text-right whitespace-nowrap">
-              <div className="flex flex-col items-end gap-0.5">
-                <span className="inline-block px-3 py-1 rounded-lg text-sm sm:text-[15px] font-extrabold text-[#005d42] bg-emerald-50 border border-emerald-200/90 tabular-nums shadow-2xs">
-                  ৳{Number(variant.sellingPrice || variant.mrpPrice).toLocaleString()}
+              <span className="inline-block px-2.5 py-1 rounded-lg text-xs sm:text-sm font-extrabold text-slate-700 bg-slate-100/90 border border-slate-200 tabular-nums shadow-2xs">
+                ৳{mrp.toLocaleString()}
+              </span>
+            </td>
+
+            {/* 5. SELLING PRICE */}
+            <td className="py-3.5 px-3 align-middle text-right whitespace-nowrap">
+              <span className="inline-block px-3 py-1 rounded-lg text-xs sm:text-sm font-extrabold text-[#005d42] bg-emerald-50 border border-emerald-200/90 tabular-nums shadow-2xs">
+                ৳{effectiveSellingPrice.toLocaleString()}
+              </span>
+            </td>
+
+            {/* 6. DISCOUNT (Dominance: Individual > Universal > None) */}
+            <td className="py-3.5 px-3 align-middle text-center whitespace-nowrap">
+              {hasIndividualDiscount ? (
+                <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-bold text-rose-700 bg-rose-50 border border-rose-200 shadow-2xs">
+                  <span className="font-extrabold tabular-nums">-{individualDiscountPercent}%</span>
+                  <span className="text-[9.5px] uppercase font-bold tracking-wider text-rose-600 bg-rose-100 px-1 py-0.5 rounded">
+                    Indi
+                  </span>
                 </span>
-                {Number(variant.sellingPrice) < Number(variant.mrpPrice) && (
-                  <div className="flex items-center gap-1 text-[10px] text-slate-400 font-mono">
-                    <span className="line-through">৳{Number(variant.mrpPrice).toLocaleString()}</span>
-                    <span className="text-red-600 font-bold bg-red-50 px-1 rounded border border-red-200">
-                      -{Math.round(((Number(variant.mrpPrice) - Number(variant.sellingPrice)) / Number(variant.mrpPrice)) * 100)}%
-                    </span>
-                  </div>
-                )}
-              </div>
+              ) : isUniversalActive ? (
+                <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-bold text-blue-700 bg-blue-50 border border-blue-200 shadow-2xs">
+                  <span className="font-extrabold tabular-nums">-{universalDiscountPercent}%</span>
+                  <span className="text-[9.5px] uppercase font-bold tracking-wider text-blue-600 bg-blue-100 px-1 py-0.5 rounded">
+                    Uni
+                  </span>
+                </span>
+              ) : (
+                <span className="inline-block px-2.5 py-0.5 rounded text-xs font-semibold text-slate-400 bg-slate-50 border border-slate-200/70">
+                  None
+                </span>
+              )}
             </td>
 
             {/* 5. STOCK STATUS BADGE */}
@@ -191,12 +241,8 @@ export default function ProductTableRow({
                     : 'bg-red-100 text-red-800'
                 }`}
               >
-                <span
-                  className={`w-1.5 h-1.5 rounded-full ${
-                    variant.inStock ? 'bg-emerald-600' : 'bg-red-600'
-                  }`}
-                />
-                <span>{variant.inStock ? 'IN STOCK' : 'OUT'}</span>
+               
+                <span>{variant.inStock ? 'IN' : 'OUT'}</span>
               </span>
             </td>
 
@@ -214,7 +260,7 @@ export default function ProductTableRow({
                 className={`py-4 px-4 align-middle text-right border-l border-slate-200/80 ${
                   isEven ? 'bg-white' : 'bg-slate-50/90'
                 }`}
-                style={{ width: '15%' }}
+                style={{ width: '8%' }}
               >
                 <div className="flex items-center justify-end gap-2">
                   {/* Edit Details Button */}

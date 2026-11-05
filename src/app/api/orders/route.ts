@@ -87,7 +87,22 @@ export async function POST(request: NextRequest) {
     const isWholesale = buyerMode === 'WHOLESALE';
 
     // 3. Compute Itemized Totals & Subtotal
-    let subtotal = 0;
+    // 3. Query SiteSettings for Universal Discount Policy
+    const siteSettings = await prisma.siteSettings.findUnique({
+      where: { id: 'default' },
+      select: { enableGeneralDiscount: true, generalRetailDiscountPercent: true },
+    });
+
+    const isUniversalEnabled = Boolean(siteSettings?.enableGeneralDiscount);
+    const universalPercent = isUniversalEnabled ? (Number(siteSettings?.generalRetailDiscountPercent) || 0) : 0;
+    const universalRate = universalPercent / 100;
+
+    let baselineSubtotal = 0;
+    let actualItemsPayable = 0;
+    let individualDiscountSum = 0;
+    let universalDiscountSum = 0;
+    let hasIndividualDiscount = false;
+
     const orderItemData: Array<{
       productId: string;
       variantId: string;
@@ -110,10 +125,30 @@ export async function POST(request: NextRequest) {
       const qty = Math.max(1, Number(item.quantity) || 1);
       const unitMrp = Number(variant.mrpPrice);
       const unitTp = Number(variant.tradePrice);
-      const unitSelling = isWholesale ? unitTp : Number(variant.sellingPrice || variant.mrpPrice);
-      const lineTotal = unitSelling * qty;
+      const rawSelling = Number(variant.sellingPrice || variant.mrpPrice);
 
-      subtotal += lineTotal;
+      const baseUnit = isWholesale ? unitTp : unitMrp;
+      baselineSubtotal += baseUnit * qty;
+
+      // Individual Dominance:
+      const hasItemIndividualPromo = !isWholesale && unitMrp > 0 && rawSelling < unitMrp;
+      let effectiveUnitSelling = baseUnit;
+
+      if (isWholesale) {
+        effectiveUnitSelling = unitTp;
+      } else if (hasItemIndividualPromo) {
+        hasIndividualDiscount = true;
+        effectiveUnitSelling = rawSelling;
+        individualDiscountSum += (unitMrp - rawSelling) * qty;
+      } else if (universalRate > 0) {
+        effectiveUnitSelling = Math.round(unitMrp * (1 - universalRate));
+        universalDiscountSum += (unitMrp - effectiveUnitSelling) * qty;
+      } else {
+        effectiveUnitSelling = unitMrp;
+      }
+
+      const lineTotal = effectiveUnitSelling * qty;
+      actualItemsPayable += lineTotal;
 
       orderItemData.push({
         productId: variant.productId,
@@ -125,7 +160,7 @@ export async function POST(request: NextRequest) {
         priceTierApplied: isWholesale ? BuyerTier.WHOLESALE : BuyerTier.RETAIL,
         unitTradePrice: new Prisma.Decimal(unitTp),
         unitMrpPrice: new Prisma.Decimal(unitMrp),
-        unitSellingPrice: new Prisma.Decimal(unitSelling),
+        unitSellingPrice: new Prisma.Decimal(effectiveUnitSelling),
         quantity: qty,
         lineTotal: new Prisma.Decimal(lineTotal),
       });
@@ -151,54 +186,27 @@ export async function POST(request: NextRequest) {
       existingProfile &&
       existingProfile.hasCustomDiscount &&
       Number(existingProfile.discountValue) > 0 &&
-      subtotal >= Number(existingProfile.minOrderForDiscount || 0)
+      baselineSubtotal >= Number(existingProfile.minOrderForDiscount || 0)
     ) {
       // Priority 1: Customer Profile Custom Discount
       const discountVal = Number(existingProfile.discountValue);
       if (existingProfile.discountType === 'PERCENTAGE') {
-        discountAmount = Math.round((subtotal * discountVal) / 100);
+        discountAmount = Math.round((baselineSubtotal * discountVal) / 100);
       } else {
-        discountAmount = Math.min(subtotal, discountVal);
+        discountAmount = Math.min(baselineSubtotal, discountVal);
       }
       appliedDiscountSource = 'CLIENT_CUSTOM';
       appliedDiscountLabel = `${existingProfile.businessOrFarmName || existingProfile.name} VIP Discount (${discountVal}%)`;
     } else if (!isWholesale) {
-      // Priority 2: Product Individual Promo dominates; Dynamic Universal Discount applies only on non-discounted items
-      const siteSettings = await prisma.siteSettings.findUnique({
-        where: { id: 'default' },
-        select: { enableGeneralDiscount: true, generalRetailDiscountPercent: true },
-      });
+      discountAmount = baselineSubtotal - actualItemsPayable;
 
-      const isUniversalEnabled = siteSettings?.enableGeneralDiscount ?? true;
-      const universalPercent = isUniversalEnabled ? (Number(siteSettings?.generalRetailDiscountPercent) || 0) : 0;
-      const universalRate = universalPercent / 100;
-
-      let individualDiscountSum = 0;
-      let universalDiscountSum = 0;
-      let hasIndividualDiscount = false;
-
-      for (const item of orderItemData) {
-        const unitSelling = Number(item.unitSellingPrice);
-        const unitMrp = Number(item.unitMrpPrice);
-        const lineTotal = Number(item.lineTotal);
-        if (unitSelling < unitMrp) {
-          hasIndividualDiscount = true;
-          individualDiscountSum += (unitMrp - unitSelling) * item.quantity;
-        } else if (universalRate > 0) {
-          universalDiscountSum += Math.round(lineTotal * universalRate);
-        }
-      }
-
-      if (hasIndividualDiscount && universalDiscountSum === 0) {
-        discountAmount = individualDiscountSum;
-        appliedDiscountSource = 'INDIVIDUAL_PRODUCT';
-        appliedDiscountLabel = 'Product Promotional Discount';
-      } else if (hasIndividualDiscount && universalDiscountSum > 0) {
-        discountAmount = individualDiscountSum + universalDiscountSum;
+      if (hasIndividualDiscount && universalDiscountSum > 0) {
         appliedDiscountSource = 'INDIVIDUAL_PRODUCT';
         appliedDiscountLabel = `Product Promo + ${universalPercent}% Universal Discount`;
+      } else if (hasIndividualDiscount) {
+        appliedDiscountSource = 'INDIVIDUAL_PRODUCT';
+        appliedDiscountLabel = 'Product Promotional Discount';
       } else if (universalDiscountSum > 0) {
-        discountAmount = universalDiscountSum;
         appliedDiscountSource = 'GENERAL_STOREWIDE';
         appliedDiscountLabel = `Website ${universalPercent}% Universal Discount`;
       }
@@ -209,7 +217,7 @@ export async function POST(request: NextRequest) {
     const shippingFee = isDhaka ? 70 : 130;
 
     // 6. Compute Grand Total & Due Amount
-    const grandTotal = Math.max(0, subtotal - discountAmount + shippingFee);
+    const grandTotal = Math.max(0, baselineSubtotal - discountAmount + shippingFee);
     const dueAmount = grandTotal; // Cash On Delivery collects full amount
 
     // 7. Execute Atomic DB Transaction
@@ -274,7 +282,7 @@ export async function POST(request: NextRequest) {
           address: address.trim(),
           orderNote: (orderNote || '').trim() || null,
 
-          subtotal: new Prisma.Decimal(subtotal),
+          subtotal: new Prisma.Decimal(baselineSubtotal),
           discountAmount: new Prisma.Decimal(discountAmount),
           appliedDiscountSource,
           appliedDiscountLabel,

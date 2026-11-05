@@ -1,16 +1,21 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getProducts, getFeaturedProducts } from '@/services/product.service';
+import { getUniversalDiscountConfig } from '@/lib/pricing';
+
+export const dynamic = 'force-dynamic';
+export const revalidate = 0;
 
 export async function GET(request: NextRequest) {
   try {
     const { searchParams } = new URL(request.url);
     const isFeatured = searchParams.get('featured');
+    const universalDiscount = await getUniversalDiscountConfig();
 
     // Quick path for homepage featured feed premix / products
     if (isFeatured === 'true' && !searchParams.get('search') && !searchParams.get('category')) {
       const limit = Number(searchParams.get('limit')) || 8;
       const products = await getFeaturedProducts(limit);
-      return NextResponse.json({ success: true, products });
+      return NextResponse.json({ success: true, products, universalDiscount });
     }
 
     const filters = {
@@ -23,7 +28,7 @@ export async function GET(request: NextRequest) {
     };
 
     const result = await getProducts(filters);
-    return NextResponse.json({ success: true, ...result });
+    return NextResponse.json({ success: true, ...result, universalDiscount });
   } catch (error: any) {
     return NextResponse.json(
       { success: false, message: error.message || 'Failed to fetch products' },

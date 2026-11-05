@@ -14,6 +14,8 @@ export interface ProductVariantData {
   tradePrice: number | string;
   mrpPrice: number | string;
   sellingPrice: number | string;
+  discountPercent?: number;
+  discountType?: 'INDIVIDUAL' | 'UNIVERSAL' | 'NONE';
   inStock?: boolean;
   packagingInfo?: string | null;
   unitsPerBox?: number | null;
@@ -82,6 +84,13 @@ export default function ProductCard({ product }: ProductCardProps) {
 
   const mrp = currentVariant ? Number(currentVariant.mrpPrice || 0) : 0;
   const sellingPrice = currentVariant ? Number(currentVariant.sellingPrice || 0) : 0;
+
+  const hasDiscount = mrp > 0 && sellingPrice < mrp;
+  const rawDiscount = hasDiscount ? ((mrp - sellingPrice) / mrp) * 100 : 0;
+  const discountPct =
+    currentVariant?.discountPercent !== undefined && currentVariant.discountPercent > 0
+      ? currentVariant.discountPercent
+      : Math.round(rawDiscount);
 
   const handleAddToCart = (e: React.MouseEvent) => {
     e.preventDefault();
@@ -252,7 +261,7 @@ export default function ProductCard({ product }: ProductCardProps) {
           </div>
           {mrp > sellingPrice ? (
             <span className="text-[10px] font-extrabold text-red-700 bg-red-100 border border-red-200 px-2 py-0.5 rounded-full flex items-center gap-0.5">
-              <span>{toBengaliNumber(Math.round(((mrp - sellingPrice) / mrp) * 100))}% ছাড়</span>
+              <span>{toBengaliNumber(discountPct)}% ছাড়</span>
             </span>
           ) : (
             <span className="text-[10px] font-bold text-[#a05600] bg-[#ffdcc3] px-2 py-0.5 rounded">

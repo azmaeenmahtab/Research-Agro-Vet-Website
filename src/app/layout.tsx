@@ -1,22 +1,27 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono, Anek_Bangla } from "next/font/google";
+import { Roboto, Roboto_Mono, Anek_Bangla } from "next/font/google";
 import HeroToastProvider from "@/components/providers/HeroToastProvider";
 import "./globals.css";
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
+const roboto = Roboto({
+  variable: "--font-roboto",
   subsets: ["latin"],
+  weight: ["300", "400", "500", "700", "900"],
+  display: "swap",
 });
 
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
+const robotoMono = Roboto_Mono({
+  variable: "--font-roboto-mono",
   subsets: ["latin"],
+  weight: ["400", "500", "600", "700"],
+  display: "swap",
 });
 
 const anekBangla = Anek_Bangla({
   variable: "--font-anek-bangla",
-  subsets: ["bengali", "latin"],
+  subsets: ["bengali"],
   weight: ["400", "500", "600", "700", "800"],
+  display: "swap",
 });
 
 export const metadata: Metadata = {
@@ -28,9 +33,9 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
     <html
       lang="bn"
-      className={`${anekBangla.variable} ${geistSans.variable} ${geistMono.variable} h-full antialiased`}
+      className={`${roboto.variable} ${robotoMono.variable} ${anekBangla.variable} h-full antialiased`}
     >
-      <body className="min-h-full flex flex-col font-[family-name:var(--font-anek-bangla),family-name:var(--font-geist-sans),sans-serif]">
+      <body className="min-h-full flex flex-col font-[family-name:var(--font-roboto),family-name:var(--font-anek-bangla),sans-serif]">
         <HeroToastProvider />
         {children}
       </body>

@@ -4,6 +4,7 @@ import React from 'react';
 import { BadgePercent } from 'lucide-react';
 import ProductCard from './ProductCard';
 import type { ProductCardData } from './ProductCard';
+import { toBengaliNumber } from '@/lib/formatters';
 
 // Keep the old name as an alias so any existing imports still work
 export type FeaturedProductData = ProductCardData;
@@ -13,11 +14,17 @@ export { toBengaliNumber } from './ProductCard';
 // Placeholder array so STITCH_FALLBACK_PRODUCTS reference doesn't break
 const STITCH_FALLBACK_PRODUCTS: ProductCardData[] = [];
 
+import { calculateVariantPricing, UniversalDiscountConfig } from '@/lib/pricing';
+
 interface FeaturedProductsProps {
   initialProducts?: any[];
+  universalDiscount?: UniversalDiscountConfig;
 }
 
-export default function FeaturedProducts({ initialProducts = [] }: FeaturedProductsProps) {
+export default function FeaturedProducts({
+  initialProducts = [],
+  universalDiscount,
+}: FeaturedProductsProps) {
   // Merge database products with Stitch mockup if database has fewer items
   const displayProducts: ProductCardData[] =
     initialProducts && initialProducts.length > 0
@@ -38,32 +45,27 @@ export default function FeaturedProducts({ initialProducts = [] }: FeaturedProdu
           indication: p.indication || 'উন্নত স্বাস্থ্য ও উৎপাদন বৃদ্ধি সহায়ক',
           variants:
             p.variants && p.variants.length > 0
-              ? p.variants.map((v: any) => ({
-                  id: v.id,
-                  sku: v.sku,
-                  packSize: v.packSize,
-                  tradePrice: Number(v.tradePrice || 0),
-                  mrpPrice: Number(v.mrpPrice || v.sellingPrice || 0),
-                  // Apply 5% discount to match storefront campaign
-                  sellingPrice:
-                    Number(v.sellingPrice) < Number(v.mrpPrice)
-                      ? Number(v.sellingPrice)
-                      : Math.round(Number(v.mrpPrice) * 0.95),
-                  inStock: v.inStock !== false,
-                  packagingInfo: v.packagingInfo || null,
-                  unitsPerBox: v.unitsPerBox || null,
-                }))
-              : [
-                  {
-                    id: `var-${p.id}-1`,
-                    sku: `SKU-${p.id}`,
-                    packSize: 'Standard',
-                    tradePrice: 100,
-                    mrpPrice: 120,
-                    sellingPrice: 114,
-                    inStock: true,
-                  },
-                ],
+              ? p.variants.map((v: any) => {
+                  const pricing = calculateVariantPricing(
+                    Number(v.mrpPrice || v.sellingPrice || 0),
+                    Number(v.sellingPrice),
+                    universalDiscount
+                  );
+                  return {
+                    id: v.id,
+                    sku: v.sku,
+                    packSize: v.packSize,
+                    tradePrice: Number(v.tradePrice || 0),
+                    mrpPrice: pricing.mrpPrice,
+                    sellingPrice: pricing.sellingPrice,
+                    discountPercent: pricing.discountPercent,
+                    discountType: pricing.discountType,
+                    inStock: v.inStock !== false,
+                    packagingInfo: v.packagingInfo || null,
+                    unitsPerBox: v.unitsPerBox || null,
+                  };
+                })
+              : [],
         }))
       : STITCH_FALLBACK_PRODUCTS;
 
@@ -79,10 +81,17 @@ export default function FeaturedProducts({ initialProducts = [] }: FeaturedProdu
         </div>
 
         <div className="flex items-center gap-2">
-          <span className="px-3 py-1 bg-[#ffdcc3] text-[#2f1500] rounded-md text-xs font-bold flex items-center gap-1.5 shadow-2xs border border-amber-200/80">
-            <BadgePercent className="w-3.5 h-3.5 stroke-[2.5]" />
-            <span>৫% ডিসকাউন্ট এক্টিভ</span>
-          </span>
+          {universalDiscount?.enabled && universalDiscount.percent > 0 ? (
+            <span className="px-3 py-1 bg-[#ffdcc3] text-[#2f1500] rounded-md text-xs font-bold flex items-center gap-1.5 shadow-2xs border border-amber-200/80">
+              <BadgePercent className="w-3.5 h-3.5 stroke-[2.5]" />
+              <span>{toBengaliNumber(universalDiscount.percent)}% সার্বজনীন ছাড় এক্টিভ</span>
+            </span>
+          ) : (
+            <span className="px-3 py-1 bg-emerald-50 text-emerald-900 rounded-md text-xs font-bold flex items-center gap-1.5 shadow-2xs border border-emerald-200/80">
+              <BadgePercent className="w-3.5 h-3.5 stroke-[2.5]" />
+              <span>সেরা মূল্যের নিশ্চয়তা</span>
+            </span>
+          )}
         </div>
       </div>
 

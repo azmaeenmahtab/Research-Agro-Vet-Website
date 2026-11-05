@@ -3,6 +3,7 @@ import Link from 'next/link';
 import { getProducts } from '@/services/product.service';
 import { ProductCardData } from '@/components/storefront/ProductCard';
 import ProductCatalogContainer from '@/components/storefront/ProductCatalogContainer';
+import { getUniversalDiscountConfig, calculateVariantPricing, UniversalDiscountConfig } from '@/lib/pricing';
 
 
 interface ProductsPageProps {
@@ -35,25 +36,30 @@ async function ProductsCatalog({ searchParams }: ProductsPageProps) {
   const search = resolvedParams.q || resolvedParams.search;
   const page = Number(resolvedParams.page) || 1;
 
-  // Fetch initial products from database for fast initial SSR / SEO
+  // Fetch initial products and live universal discount config
   let rawProducts: any[] = [];
   let totalCount = 0;
+  let universalDiscount: UniversalDiscountConfig = { enabled: false, percent: 0, label: '' };
 
   try {
-    const result = await getProducts({
-      species,
-      category,
-      search,
-      limit: PAGE_SIZE,
-      page,
-    });
+    const [result, discountConfig] = await Promise.all([
+      getProducts({
+        species,
+        category,
+        search,
+        limit: PAGE_SIZE,
+        page,
+      }),
+      getUniversalDiscountConfig(),
+    ]);
     rawProducts = JSON.parse(JSON.stringify(result.products || []));
     totalCount = result.total || rawProducts.length;
+    universalDiscount = discountConfig;
   } catch (error) {
     console.error('Error fetching products in ProductsPage:', error);
   }
 
-  // Format initial database products for ProductCard
+  // Format initial database products for ProductCard with Individual Dominance & Universal Fallback
   const initialProducts: ProductCardData[] = rawProducts.map((p) => ({
     id: p.id,
     slug: p.slug,
@@ -67,31 +73,27 @@ async function ProductsCatalog({ searchParams }: ProductsPageProps) {
     indication: p.indication || null,
     variants:
       p.variants && p.variants.length > 0
-        ? p.variants.map((v: any) => ({
-            id: v.id,
-            sku: v.sku,
-            packSize: v.packSize,
-            tradePrice: Number(v.tradePrice || 0),
-            mrpPrice: Number(v.mrpPrice || v.sellingPrice || 0),
-            sellingPrice:
-              Number(v.sellingPrice) < Number(v.mrpPrice)
-                ? Number(v.sellingPrice)
-                : Math.round(Number(v.mrpPrice) * 0.95),
-            inStock: v.inStock !== false,
-            packagingInfo: v.packagingInfo || null,
-            unitsPerBox: v.unitsPerBox || null,
-          }))
-        : [
-            {
-              id: `var-${p.id}`,
-              sku: `SKU-${p.id}`,
-              packSize: 'Standard',
-              tradePrice: 100,
-              mrpPrice: 120,
-              sellingPrice: 114,
-              inStock: true,
-            },
-          ],
+        ? p.variants.map((v: any) => {
+            const pricing = calculateVariantPricing(
+              Number(v.mrpPrice || v.sellingPrice || 0),
+              Number(v.sellingPrice),
+              universalDiscount
+            );
+            return {
+              id: v.id,
+              sku: v.sku,
+              packSize: v.packSize,
+              tradePrice: Number(v.tradePrice || 0),
+              mrpPrice: pricing.mrpPrice,
+              sellingPrice: pricing.sellingPrice,
+              discountPercent: pricing.discountPercent,
+              discountType: pricing.discountType,
+              inStock: v.inStock !== false,
+              packagingInfo: v.packagingInfo || null,
+              unitsPerBox: v.unitsPerBox || null,
+            };
+          })
+        : [],
   }));
 
   return (
@@ -148,6 +150,7 @@ async function ProductsCatalog({ searchParams }: ProductsPageProps) {
           initialSpecies={species}
           initialCategory={category}
           initialSearch={search}
+          universalDiscount={universalDiscount}
           pageSize={PAGE_SIZE}
         />
       </main>

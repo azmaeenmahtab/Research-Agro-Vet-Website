@@ -4,6 +4,7 @@ import { notFound } from 'next/navigation';
 import { getProductBySlug, getProducts } from '@/services/product.service';
 import ProductDetailsView from '@/components/storefront/ProductDetailsView';
 import { ProductCardData } from '@/components/storefront/ProductCard';
+import { getUniversalDiscountConfig, calculateVariantPricing } from '@/lib/pricing';
 
 interface ProductDetailPageProps {
   params: Promise<{
@@ -40,7 +41,10 @@ export async function generateMetadata({ params }: ProductDetailPageProps) {
 
 async function ProductDetailContent({ params }: ProductDetailPageProps) {
   const { slug } = await params;
-  const rawProduct = await getProductBySlug(slug);
+  const [rawProduct, universalDiscount] = await Promise.all([
+    getProductBySlug(slug),
+    getUniversalDiscountConfig(),
+  ]);
 
   if (!rawProduct) {
     notFound();
@@ -48,6 +52,26 @@ async function ProductDetailContent({ params }: ProductDetailPageProps) {
 
   // Serialize Prisma Decimals & Relations
   const product = JSON.parse(JSON.stringify(rawProduct));
+
+  // Apply Individual Dominance & Universal Fallback to product variants
+  if (product.variants && Array.isArray(product.variants)) {
+    product.variants = product.variants.map((v: any) => {
+      const pricing = calculateVariantPricing(
+        Number(v.mrpPrice || v.sellingPrice || 0),
+        Number(v.sellingPrice),
+        universalDiscount
+      );
+      return {
+        ...v,
+        mrpPrice: pricing.mrpPrice,
+        sellingPrice: pricing.sellingPrice,
+        discountPercent: pricing.discountPercent,
+        savingsPerUnit: pricing.savingsPerUnit,
+        discountType: pricing.discountType,
+        hasDiscount: pricing.hasDiscount,
+      };
+    });
+  }
 
   // Fetch related products (e.g. from the same species or general active)
   let relatedProducts: ProductCardData[] = [];
@@ -71,20 +95,24 @@ async function ProductDetailContent({ params }: ProductDetailPageProps) {
       indication: p.indication || null,
       variants:
         p.variants && p.variants.length > 0
-          ? p.variants.map((v: any) => ({
-              id: v.id,
-              sku: v.sku,
-              packSize: v.packSize,
-              tradePrice: Number(v.tradePrice || 0),
-              mrpPrice: Number(v.mrpPrice || v.sellingPrice || 0),
-              sellingPrice:
-                Number(v.sellingPrice) < Number(v.mrpPrice)
-                  ? Number(v.sellingPrice)
-                  : Math.round(Number(v.mrpPrice) * 0.95),
-              inStock: v.inStock !== false,
-              packagingInfo: v.packagingInfo || null,
-              unitsPerBox: v.unitsPerBox || null,
-            }))
+          ? p.variants.map((v: any) => {
+              const pricing = calculateVariantPricing(
+                Number(v.mrpPrice || v.sellingPrice || 0),
+                Number(v.sellingPrice),
+                universalDiscount
+              );
+              return {
+                id: v.id,
+                sku: v.sku,
+                packSize: v.packSize,
+                tradePrice: Number(v.tradePrice || 0),
+                mrpPrice: pricing.mrpPrice,
+                sellingPrice: pricing.sellingPrice,
+                inStock: v.inStock !== false,
+                packagingInfo: v.packagingInfo || null,
+                unitsPerBox: v.unitsPerBox || null,
+              };
+            })
           : [],
     }));
   } catch (err) {
@@ -123,7 +151,11 @@ async function ProductDetailContent({ params }: ProductDetailPageProps) {
 
       {/* Main Content Area */}
       <main className="max-w-7xl mx-auto px-4 py-6 sm:py-8">
-        <ProductDetailsView product={product} relatedProducts={relatedProducts} />
+        <ProductDetailsView
+          product={product}
+          relatedProducts={relatedProducts}
+          universalDiscount={universalDiscount}
+        />
       </main>
     </div>
   );

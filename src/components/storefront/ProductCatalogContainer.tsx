@@ -7,6 +7,7 @@ import ProductFilters from './ProductFilters';
 import { toBengaliNumber } from '@/lib/formatters';
 import { PackageSearch, X, ChevronLeft, ChevronRight, Loader2, Search } from 'lucide-react';
 import { getApiUrl } from '@/lib/api-client';
+import { calculateVariantPricing, UniversalDiscountConfig } from '@/lib/pricing';
 
 const SPECIES_NAMES: Record<string, string> = {
   CATTLE_BUFFALO: 'গরু ও মহিষ',
@@ -15,7 +16,7 @@ const SPECIES_NAMES: Record<string, string> = {
   AQUA: 'মৎস্য ও চিংড়ি',
 };
 
-function formatRawProduct(p: any): ProductCardData {
+function formatRawProduct(p: any, universalDiscount?: UniversalDiscountConfig | null): ProductCardData {
   return {
     id: p.id,
     slug: p.slug,
@@ -29,31 +30,27 @@ function formatRawProduct(p: any): ProductCardData {
     indication: p.indication || null,
     variants:
       p.variants && p.variants.length > 0
-        ? p.variants.map((v: any) => ({
-            id: v.id,
-            sku: v.sku,
-            packSize: v.packSize,
-            tradePrice: Number(v.tradePrice || 0),
-            mrpPrice: Number(v.mrpPrice || v.sellingPrice || 0),
-            sellingPrice:
-              Number(v.sellingPrice) < Number(v.mrpPrice)
-                ? Number(v.sellingPrice)
-                : Math.round(Number(v.mrpPrice) * 0.95),
-            inStock: v.inStock !== false,
-            packagingInfo: v.packagingInfo || null,
-            unitsPerBox: v.unitsPerBox || null,
-          }))
-        : [
-            {
-              id: `var-${p.id}`,
-              sku: `SKU-${p.id}`,
-              packSize: 'Standard',
-              tradePrice: 100,
-              mrpPrice: 120,
-              sellingPrice: 114,
-              inStock: true,
-            },
-          ],
+        ? p.variants.map((v: any) => {
+            const pricing = calculateVariantPricing(
+              Number(v.mrpPrice || v.sellingPrice || 0),
+              Number(v.sellingPrice),
+              universalDiscount
+            );
+            return {
+              id: v.id,
+              sku: v.sku,
+              packSize: v.packSize,
+              tradePrice: Number(v.tradePrice || 0),
+              mrpPrice: pricing.mrpPrice,
+              sellingPrice: pricing.sellingPrice,
+              discountPercent: pricing.discountPercent,
+              discountType: pricing.discountType,
+              inStock: v.inStock !== false,
+              packagingInfo: v.packagingInfo || null,
+              unitsPerBox: v.unitsPerBox || null,
+            };
+          })
+        : [],
   };
 }
 
@@ -65,6 +62,7 @@ interface ProductCatalogContainerProps {
   initialCategory?: string;
   initialSearch?: string;
   pageSize?: number;
+  universalDiscount?: UniversalDiscountConfig;
 }
 
 export default function ProductCatalogContainer({
@@ -75,6 +73,7 @@ export default function ProductCatalogContainer({
   initialCategory,
   initialSearch,
   pageSize = 9,
+  universalDiscount,
 }: ProductCatalogContainerProps) {
   const searchParamsHook = useSearchParams();
   const [products, setProducts] = useState<ProductCardData[]>(initialProducts);
@@ -84,6 +83,7 @@ export default function ProductCatalogContainer({
   const [category, setCategory] = useState<string | undefined>(initialCategory);
   const [search, setSearch] = useState<string | undefined>(initialSearch);
   const [searchInput, setSearchInput] = useState<string>(initialSearch || '');
+  const [currentDiscount, setCurrentDiscount] = useState<UniversalDiscountConfig | undefined>(universalDiscount);
   const [isPending, startTransition] = useTransition();
   const [isLoading, setIsLoading] = useState(false);
 
@@ -185,8 +185,12 @@ export default function ProductCatalogContainer({
       const data = await res.json();
 
       if (data.success && Array.isArray(data.products)) {
+        if (data.universalDiscount) {
+          setCurrentDiscount(data.universalDiscount);
+        }
+        const activeDiscount = data.universalDiscount || currentDiscount;
         startTransition(() => {
-          setProducts(data.products.map(formatRawProduct));
+          setProducts(data.products.map((p: any) => formatRawProduct(p, activeDiscount)));
           setTotalCount(data.total ?? data.products.length);
           setCurrentPage(targetPage);
         });

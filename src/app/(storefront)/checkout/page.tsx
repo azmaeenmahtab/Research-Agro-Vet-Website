@@ -147,23 +147,62 @@ export default function CheckoutPage() {
   }
 
   // Financial calculations
-  const subtotal = getCartSubtotal();
-  const isDhaka = district.toLowerCase().includes('dhaka') || district === 'ঢাকা';
-  const shippingFee = items.length === 0 ? 0 : isDhaka ? 70 : 130;
+  // Baseline MRP subtotal (or TP for wholesale)
+  const baselineSubtotal = items.reduce((sum, item) => {
+    const baseUnit = buyerMode === 'WHOLESALE' ? item.tradePrice : (item.mrpPrice || item.sellingPrice);
+    return sum + baseUnit * item.quantity;
+  }, 0);
 
-  // Discount calculation
+  // Calculate items payable total with Individual Dominance & Universal Fallback:
+  let individualDiscountSum = 0;
+  let universalDiscountSum = 0;
+  let hasIndividualDiscount = false;
+
+  const universalRate =
+    !recognizedCustomer?.hasDiscount &&
+    buyerMode !== 'WHOLESALE' &&
+    universalDiscount.enabled &&
+    universalDiscount.percent > 0
+      ? universalDiscount.percent / 100
+      : 0;
+
+  items.forEach((item) => {
+    if (buyerMode === 'WHOLESALE') return;
+    const mrp = Number(item.mrpPrice) || Number(item.sellingPrice) || 0;
+    const dbSelling = Number(item.sellingPrice) || mrp;
+    const hasItemIndividualPromo = mrp > 0 && dbSelling < mrp;
+
+    if (hasItemIndividualPromo) {
+      hasIndividualDiscount = true;
+      individualDiscountSum += (mrp - dbSelling) * item.quantity;
+    } else if (universalRate > 0) {
+      const discountedUnit = Math.round(mrp * (1 - universalRate));
+      universalDiscountSum += (mrp - discountedUnit) * item.quantity;
+    }
+  });
+
   let discountAmount = 0;
   let discountLabel = '';
 
   if (recognizedCustomer?.hasDiscount && recognizedCustomer.discountPct > 0) {
-    discountAmount = Math.round((subtotal * recognizedCustomer.discountPct) / 100);
+    discountAmount = Math.round((baselineSubtotal * recognizedCustomer.discountPct) / 100);
     discountLabel = `VIP Discount (${recognizedCustomer.discountPct}%)`;
-  } else if (buyerMode !== 'WHOLESALE' && subtotal > 0 && universalDiscount.enabled && universalDiscount.percent > 0) {
-    discountAmount = Math.round(subtotal * (universalDiscount.percent / 100));
-    discountLabel = universalDiscount.label || `Website ${universalDiscount.percent}% Universal Discount`;
+  } else if (buyerMode !== 'WHOLESALE') {
+    if (hasIndividualDiscount && universalDiscountSum > 0) {
+      discountAmount = individualDiscountSum + universalDiscountSum;
+      discountLabel = `প্রমোশনাল + ${universalDiscount.percent}% সার্বজনীন ছাড়`;
+    } else if (hasIndividualDiscount) {
+      discountAmount = individualDiscountSum;
+      discountLabel = 'প্রমোশনাল ছাড় (Individual Promo)';
+    } else if (universalDiscountSum > 0) {
+      discountAmount = universalDiscountSum;
+      discountLabel = `সার্বজনীন ছাড় (${universalDiscount.percent}%)`;
+    }
   }
 
-  const grandTotal = Math.max(0, subtotal - discountAmount + shippingFee);
+  const isDhaka = district.toLowerCase().includes('dhaka') || district === 'ঢাকা';
+  const shippingFee = items.length === 0 ? 0 : isDhaka ? 70 : 130;
+  const grandTotal = Math.max(0, baselineSubtotal - discountAmount + shippingFee);
 
   // Form submission handler
   const handlePlaceOrder = async (e?: React.FormEvent) => {
@@ -562,7 +601,19 @@ export default function CheckoutPage() {
               {/* Items List */}
               <div className="space-y-3 max-h-[280px] overflow-y-auto pr-1 divide-y divide-slate-100">
                 {items.map((item) => {
-                  const unitPrice = buyerMode === 'WHOLESALE' ? item.tradePrice : item.sellingPrice;
+                  const mrp = Number(item.mrpPrice) || Number(item.sellingPrice) || 0;
+                  const dbSelling = Number(item.sellingPrice) || mrp;
+                  const hasItemIndividualPromo = buyerMode !== 'WHOLESALE' && mrp > 0 && dbSelling < mrp;
+
+                  const unitPrice =
+                    buyerMode === 'WHOLESALE'
+                      ? item.tradePrice
+                      : hasItemIndividualPromo
+                      ? dbSelling
+                      : universalRate > 0
+                      ? Math.round(mrp * (1 - universalRate))
+                      : mrp;
+
                   const itemLineTotal = unitPrice * item.quantity;
 
                   return (
@@ -646,9 +697,9 @@ export default function CheckoutPage() {
               {/* Price Calculation Summary Box */}
               <div className="p-4 rounded-xl bg-slate-50 border border-slate-200/80 space-y-2 text-xs">
                 <div className="flex items-center justify-between text-slate-600">
-                  <span>মোট পণ্যের মূল্য (Subtotal):</span>
+                  <span>মোট পণ্যের মূল্য (MRP Subtotal):</span>
                   <span className="font-bold text-slate-900 font-mono">
-                    ৳{subtotal.toLocaleString()}
+                    ৳{baselineSubtotal.toLocaleString()}
                   </span>
                 </div>
 

@@ -5,18 +5,24 @@ import SpeciesGrid from '@/components/storefront/SpeciesGrid';
 import TherapeuticPills from '@/components/storefront/TherapeuticPills';
 import FeaturedProducts from '@/components/storefront/FeaturedProducts';
 import { getFeaturedProducts } from '@/services/product.service';
+import { getUniversalDiscountConfig, UniversalDiscountConfig } from '@/lib/pricing';
 
 async function FeaturedProductsLoader() {
   let products: any[] = [];
+  let universalDiscount: UniversalDiscountConfig = { enabled: false, percent: 0, label: '' };
   try {
-    const rawProducts = await getFeaturedProducts(8);
+    const [rawProducts, discountConfig] = await Promise.all([
+      getFeaturedProducts(8),
+      getUniversalDiscountConfig(),
+    ]);
     // Serialize Prisma Decimals for the Client Component boundary
     products = JSON.parse(JSON.stringify(rawProducts));
+    universalDiscount = discountConfig;
   } catch (error) {
     console.error('Database query fallback in HomePage:', error);
   }
 
-  return <FeaturedProducts initialProducts={products} />;
+  return <FeaturedProducts initialProducts={products} universalDiscount={universalDiscount} />;
 }
 
 export default function HomePage() {

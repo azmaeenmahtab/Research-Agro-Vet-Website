@@ -9,6 +9,11 @@ interface ProductTableProps {
   products: AdminProduct[];
   isLoading: boolean;
   expandedProductIds: Set<string>;
+  universalDiscount?: {
+    enabled: boolean;
+    percent: number;
+    label?: string;
+  };
   onToggleExpand: (productId: string) => void;
   onEditProduct: (product: AdminProduct) => void;
   onEditClinical: (product: AdminProduct) => void;
@@ -19,6 +24,7 @@ export default function ProductTable({
   products,
   isLoading,
   expandedProductIds,
+  universalDiscount,
   onToggleExpand,
   onEditProduct,
   onEditClinical,
@@ -52,13 +58,15 @@ export default function ProductTable({
           <table className="w-full text-left border-collapse">
             <thead>
               <tr className="bg-slate-50 border-b border-slate-200 text-slate-600 text-xs font-bold uppercase tracking-wider">
-                <th className="py-3 px-4 w-[34%]">Product & Identity</th>
-                <th className="py-3 px-3.5 w-[14%]">Pack Size</th>
-                <th className="py-3 px-3 w-[12%] text-right whitespace-nowrap">TP (Trade Price)</th>
-                <th className="py-3 px-3 w-[14%] text-right whitespace-nowrap">Selling / MRP</th>
-                <th className="py-3 px-3 w-[12%] text-center whitespace-nowrap">Stock</th>
-                <th className="py-3 px-3 w-[6%] text-center">Units</th>
-                <th className="py-3 px-4 w-[8%] text-right">Actions</th>
+                <th className="py-3 px-4 w-[25%]">Product & Identity</th>
+                <th className="py-3 px-3 w-[10%]">Pack Size</th>
+                <th className="py-3 px-3 w-[10%] text-right whitespace-nowrap">TP (BDT)</th>
+                <th className="py-3 px-3 w-[10%] text-right whitespace-nowrap">MRP (BDT)</th>
+                <th className="py-3 px-3 w-[11%] text-right whitespace-nowrap">Selling Price</th>
+                <th className="py-3 px-3 w-[13%] text-center whitespace-nowrap">Discount</th>
+                <th className="py-3 px-3 w-[9%] text-center whitespace-nowrap">Stock</th>
+                <th className="py-3 px-2.5 w-[5%] text-center">Units</th>
+                <th className="py-3 px-4 w-[7%] text-right">Actions</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-200 text-slate-800 text-sm">
@@ -68,6 +76,7 @@ export default function ProductTable({
                   product={product}
                   rowIndex={index}
                   isExpanded={expandedProductIds.has(product.id)}
+                  universalDiscount={universalDiscount}
                   onToggleExpand={() => onToggleExpand(product.id)}
                   onEditProduct={onEditProduct}
                   onEditClinical={onEditClinical}
