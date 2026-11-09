@@ -12,7 +12,7 @@ export default function HeroSection() {
           <h1 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold text-slate-900 tracking-tight leading-[1.25]">
             গবাদিপশু ও পোল্ট্রির শতভাগ আসল ও অনুমোদিত{' '}
             <span className="text-emerald-700  decoration-emerald-300 decoration-4 underline-offset-4">
-              Medicated খাদ্য প্রি-মিক্স
+              মেডিকেটেড খাদ্য প্রি-মিক্স
             </span>
           </h1>
 

@@ -44,14 +44,14 @@ export async function generateMetadata({ params }: ProductDetailPageProps): Prom
     ? `${product.nameEn} (${product.nameBn})`
     : product.nameEn;
 
-  // Keep description within ~135 characters for clean social cards without mid-sentence truncations
+  // Keep description within ~120 characters for clean social previews without truncation
   const rawDescription =
     product.shortDescription ||
     product.indication?.replace(/\r?\n|\r/g, ' ') ||
     'ডিএলএস অনুমোদিত উন্নত ভেটেরিনারি ফিড প্রিমিক্স ও পুষ্টি সম্পূরক।';
   const description =
-    rawDescription.length > 135
-      ? `${rawDescription.slice(0, 132).trim()}...`
+    rawDescription.length > 120
+      ? `${rawDescription.slice(0, 117).trim()}...`
       : rawDescription;
 
   const ogImageUrl = getProductOgImageUrl(product.thumbnail);

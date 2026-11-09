@@ -183,7 +183,7 @@ export default function ProductDetailsView({
   };
 
   return (
-    <div className="space-y-12">
+    <div className="sm:space-y-8 space-y-5">
       {/* Product Primary 2-Column Presentation */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
         {/* Left Column: Media Stage & Hotline (5 cols) */}
@@ -344,7 +344,7 @@ export default function ProductDetailsView({
             )}
 
             {/* Dynamic Price Box */}
-            <div className="bg-slate-50 border border-slate-200/90 p-4 rounded-xl flex flex-wrap items-center justify-between gap-4 mt-3">
+            <div className="bg-slate-50 border border-slate-200/90 p-4 rounded-xl grid grid-cols-2 gap-4 mt-3">
               <div>
                 <div className="flex items-baseline gap-2.5">
                   <span className="text-3xl font-black text-[#047857] font-mono tracking-tight">
@@ -357,15 +357,11 @@ export default function ProductDetailsView({
                   )}
                   {hasDiscount ? (
                     <span className="px-2.5 py-0.5 rounded-full bg-red-100 text-red-800 border border-red-200 text-sm font-extrabold flex items-center gap-1">
-                      <span>
-                        {toBengaliNumber(discountPct)}%{' '}
-                        {discountType === 'UNIVERSAL' ? 'সার্বজনীন ছাড়' : 'প্রমোশনাল ছাড়'}
-                      </span>
-                      
+                      <span>{toBengaliNumber(discountPct)}% ছাড়</span>
                     </span>
                   ) : (
                     <span className="px-2 py-0.5 rounded bg-emerald-100 text-[#005d42] text-xs font-bold border border-emerald-200">
-                      সেরা অফার
+                      Best Deal
                     </span>
                   )}
                 </div>
@@ -377,11 +373,25 @@ export default function ProductDetailsView({
               </div>
 
               <div className="text-right sm:border-l sm:border-slate-200 sm:pl-4">
-                <span className="text-xs text-slate-500 font-medium block">সারাদেশে ডেলিভারি</span>
-                <span className="text-xs font-bold text-slate-800 flex items-center justify-end gap-1 mt-0.5">
-                  <Truck className="w-3.5 h-3.5 text-emerald-700" />
-                  ২৪-৪৮ ঘণ্টায় হোম ডেলিভারি
-                </span>
+                {/* Mobile screen: compact "Home Delivery" */}
+                <div className="sm:hidden text-right leading-tight">
+                  <span className="text-xs font-bold text-slate-800 flex items-center justify-end gap-1">
+                    <Truck className="w-3.5 h-3.5 text-emerald-700" />
+                    Home
+                  </span>
+                  <span className="text-xs font-bold text-slate-800 block">
+                    Delivery
+                  </span>
+                </div>
+
+                {/* Desktop & tablet screen: full delivery note */}
+                <div className="hidden sm:block">
+                  <span className="text-xs text-slate-500 font-medium block">সারাদেশে ডেলিভারি</span>
+                  <span className="text-xs font-bold text-slate-800 flex items-center justify-end gap-1 mt-0.5">
+                    <Truck className="w-3.5 h-3.5 text-emerald-700" />
+                    ২৪-৪৮ ঘণ্টায় হোম ডেলিভারি
+                  </span>
+                </div>
               </div>
             </div>
           </div>
