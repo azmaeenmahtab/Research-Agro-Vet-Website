@@ -1,8 +1,7 @@
 'use client';
 
 import React from 'react';
-import Link from 'next/link';
-import { useSession } from '@/lib/auth-client';
+import { useSession, authClient } from '@/lib/auth-client';
 import { ShieldAlert, Lock, ArrowRight, Loader2 } from 'lucide-react';
 
 interface AdminAuthGuardProps {
@@ -51,14 +50,20 @@ export default function AdminAuthGuard({ children }: AdminAuthGuardProps) {
           </div>
 
           <div className="pt-2">
-            <Link
-              href="/admin/auth/login"
-              className="w-full py-3 px-4 bg-[#005d42] hover:bg-emerald-800 text-white font-bold text-sm rounded-xl flex items-center justify-center gap-2 transition-all shadow-md hover:shadow-lg active:scale-95"
+            <button
+              type="button"
+              onClick={async () => {
+                try {
+                  await authClient.signOut();
+                } catch (e) {}
+                window.location.href = '/admin/auth/login';
+              }}
+              className="w-full py-3 px-4 bg-[#005d42] hover:bg-emerald-800 text-white font-bold text-sm rounded-xl flex items-center justify-center gap-2 transition-all shadow-md hover:shadow-lg active:scale-95 cursor-pointer"
             >
               <Lock className="w-4 h-4" />
               <span>Sign In as Admin</span>
               <ArrowRight className="w-4 h-4" />
-            </Link>
+            </button>
           </div>
         </div>
       </div>

@@ -65,7 +65,7 @@ export default function AdminLoginForm() {
       // Navigate to original destination or admin orders dashboard
       const params = new URLSearchParams(window.location.search);
       const destination = params.get('from') || '/admin/orders';
-      router.push(destination);
+      window.location.href = destination;
     } catch (err: any) {
       setErrorMessage(err.message || 'Authentication failed. Please verify credentials.');
       toast.danger('Login failed', {

@@ -12,12 +12,8 @@ export async function proxy(request: NextRequest) {
     request.cookies.get('better-auth.session_token')?.value ||
     request.cookies.get('__Secure-better-auth.session_token')?.value;
 
-  // 1. Allow public admin auth pages (e.g. /admin/auth/login)
+  // 1. Always allow public admin auth pages (e.g. /admin/auth/login)
   if (pathname.startsWith('/admin/auth')) {
-    // If admin is already authenticated, redirect to orders dashboard
-    if (sessionToken) {
-      return NextResponse.redirect(new URL('/admin/orders', request.url));
-    }
     return NextResponse.next();
   }
 

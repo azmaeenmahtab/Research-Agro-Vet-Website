@@ -35,8 +35,8 @@ export default async function HomePage() {
         <SpeciesNav />
       </Suspense>
       <HeroSection />
-      <SpeciesGrid />
-      <TherapeuticPills />
+      {/* <SpeciesGrid /> */}
+      {/* <TherapeuticPills /> */}
       <FeaturedProductsLoader />
     </div>
   );

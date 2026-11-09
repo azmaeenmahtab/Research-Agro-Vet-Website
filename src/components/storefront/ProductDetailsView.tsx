@@ -407,7 +407,7 @@ export default function ProductDetailsView({
                 )}
               </div>
 
-              <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
+              <div className="grid grid-cols-4 gap-2">
                 {variants.map((v, idx) => {
                   const isSelected = idx === selectedVariantIdx;
                   const vMrp = Number(v.mrpPrice || 0);
@@ -460,7 +460,7 @@ export default function ProductDetailsView({
             )}
 
             {/* Quantity Stepper & Running Subtotal */}
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pt-1">
+            <div className="flex flex-row items-center justify-between gap-4 pt-1">
               <div className="flex items-center gap-3">
                 <span className="text-xs font-bold text-slate-700">পরিমাণ:</span>
                 <div className="inline-flex items-center border border-slate-300 rounded-lg bg-white overflow-hidden shadow-2xs">
