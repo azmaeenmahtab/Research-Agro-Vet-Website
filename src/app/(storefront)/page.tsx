@@ -4,6 +4,7 @@ import HeroSection from '@/components/storefront/HeroSection';
 import SpeciesGrid from '@/components/storefront/SpeciesGrid';
 import TherapeuticPills from '@/components/storefront/TherapeuticPills';
 import FeaturedProducts from '@/components/storefront/FeaturedProducts';
+import FounderAchievements from '@/components/storefront/FounderAchievements';
 import { getFeaturedProducts } from '@/services/product.service';
 import { getUniversalDiscountConfig, UniversalDiscountConfig } from '@/lib/pricing';
 
@@ -38,6 +39,7 @@ export default async function HomePage() {
       {/* <SpeciesGrid /> */}
       {/* <TherapeuticPills /> */}
       <FeaturedProductsLoader />
+      <FounderAchievements />
     </div>
   );
 }
