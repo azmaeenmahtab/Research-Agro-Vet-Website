@@ -137,7 +137,7 @@ export default function ProductCard({ product }: ProductCardProps) {
     const msg = encodeURIComponent(
       `আসসালামু আলাইকুম, আমি সরাসরি ${product.nameEn} (${currentVariant.packSize}, মূল্য: ৳${sellingPrice}) অর্ডার করতে চাই।`
     );
-    window.open(`https://wa.me/8801711234567?text=${msg}`, '_blank');
+    window.open(`https://wa.me/8801716019731?text=${msg}`, '_blank');
   };
 
   const tagBadgeText =
@@ -260,7 +260,7 @@ export default function ProductCard({ product }: ProductCardProps) {
             )}
           </div>
           {mrp > sellingPrice ? (
-            <span className="text-[10px] font-extrabold text-red-700 bg-red-100 border border-red-200 px-2 py-0.5 rounded-full flex items-center gap-0.5">
+            <span className="text-[14px] font-extrabold text-red-700 bg-red-100 border border-red-200 px-2 py-0.5 rounded-full flex items-center gap-0.5">
               <span>{toBengaliNumber(discountPct)}% ছাড়</span>
             </span>
           ) : (

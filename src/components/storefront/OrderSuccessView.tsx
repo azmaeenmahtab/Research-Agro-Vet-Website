@@ -183,7 +183,7 @@ export default function OrderSuccessView({ orderNumber }: { orderNumber: string 
               <table className="w-full text-left text-xs border border-slate-100 rounded-xl overflow-hidden">
                 <thead className="bg-slate-50 text-slate-600 font-bold uppercase text-[10px]">
                   <tr>
-                    <th className="py-2.5 px-3">ওষুধের নাম</th>
+                    <th className="py-2.5 px-3">পণ্যের নাম</th>
                     <th className="py-2.5 px-3">প্যাক সাইজ</th>
                     <th className="py-2.5 px-3 text-center">পরিমাণ</th>
                     <th className="py-2.5 px-3 text-right">মোট টাকা</th>
@@ -236,15 +236,15 @@ export default function OrderSuccessView({ orderNumber }: { orderNumber: string 
         <div className="flex flex-col sm:flex-row items-center justify-between gap-3 pt-2">
           <div className="flex items-center gap-2 w-full sm:w-auto">
             <a
-              href="tel:01711234567"
+              href="tel:01716019731"
               className="flex-1 sm:flex-none px-4 py-2.5 rounded-xl bg-white hover:bg-slate-50 text-slate-800 border border-slate-200 font-bold text-xs flex items-center justify-center gap-2 transition-colors shadow-2xs"
             >
               <Phone className="w-4 h-4 text-[#005d42]" />
-              <span>কল হেল্পলাইন (০১৭১১-২৩৪৫৬৭)</span>
+              <span>কল হেল্পলাইন (০১৭১৬-০১৯৭৩১)</span>
             </a>
 
             <a
-              href={`https://wa.me/8801711234567?text=${encodeURIComponent(
+              href={`https://wa.me/8801716019731?text=${encodeURIComponent(
                 `আসসালামু আলাইকুম Research Agro Vet, আমার অর্ডার #${orderNumber} সংক্রান্ত বিষয়ে যোগাযোগ করছি।`
               )}`}
               target="_blank"

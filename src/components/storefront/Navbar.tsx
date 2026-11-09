@@ -46,7 +46,7 @@ export default function Navbar() {
           </div>
           <div className="flex flex-col">
             <span className="font-extrabold text-lg text-emerald-800 leading-tight">Research Agro Vet</span>
-            <span className="text-[10px] text-slate-500 font-medium tracking-tight">Medicated Veterinary Feed Premix</span>
+            <span className="text-[10px] text-slate-500 font-medium tracking-tight">Dairy, Poultry and Fisheries</span>
           </div>
         </Link>
 
@@ -67,12 +67,12 @@ export default function Navbar() {
 
         {/* Actions */}
         <div className="flex items-center gap-2 shrink-0">
-          <Link href="/track-order" className="hidden lg:flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium text-slate-700 hover:bg-slate-100 transition-colors">
+          <Link prefetch={false} href="/track-order" className="hidden lg:flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium text-slate-700 hover:bg-slate-100 transition-colors">
             <span>অর্ডার ট্র্যাক</span>
           </Link>
 
           <a
-            href="https://wa.me/8801711234567?text=আসসালামু%20আলাইকুম,%20ফিড%20প্রিমিক্স%20ও%20খামার%20পরামর্শের%20জন্য%20যোগাযোগ%20করছি।"
+            href="https://wa.me/8801716019731?text=আসসালামু%20আলাইকুম,%20ফিড%20প্রিমিক্স%20ও%20খামার%20পরামর্শের%20জন্য%20যোগাযোগ%20করছি।"
             target="_blank"
             rel="noopener noreferrer"
             className="hidden sm:flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium text-emerald-800 bg-emerald-50 hover:bg-emerald-100 transition-colors"

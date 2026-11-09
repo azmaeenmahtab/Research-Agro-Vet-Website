@@ -49,17 +49,17 @@ export async function GET(request: NextRequest) {
         }
 
         const matchRules = variants.flatMap((v) => [
-          { nameEn: { contains: v, mode: 'insensitive' as const } },
+          { nameEn: { contains: v } },
           { nameBn: { contains: v } },
-          { slug: { contains: v, mode: 'insensitive' as const } },
-          { dlsLicenseNo: { contains: v, mode: 'insensitive' as const } },
-          { bangladeshPatentNo: { contains: v, mode: 'insensitive' as const } },
-          { composition: { contains: v, mode: 'insensitive' as const } },
-          { indication: { contains: v, mode: 'insensitive' as const } },
-          { searchKeywords: { has: v.toLowerCase() } },
-          { variants: { some: { sku: { contains: v, mode: 'insensitive' as const } } } },
-          { variants: { some: { packSize: { contains: v, mode: 'insensitive' as const } } } },
-          { variants: { some: { packagingInfo: { contains: v, mode: 'insensitive' as const } } } },
+          { slug: { contains: v } },
+          { dlsLicenseNo: { contains: v } },
+          { bangladeshPatentNo: { contains: v } },
+          { composition: { contains: v } },
+          { indication: { contains: v } },
+          { searchKeywords: { array_contains: v.toLowerCase() } },
+          { variants: { some: { sku: { contains: v } } } },
+          { variants: { some: { packSize: { contains: v } } } },
+          { variants: { some: { packagingInfo: { contains: v } } } },
         ]);
 
         return { OR: matchRules };
@@ -67,17 +67,17 @@ export async function GET(request: NextRequest) {
 
       // Direct & continuous alphanumeric matches (e.g. "recal", "adplus", "reamino")
       const directConditions: any[] = [
-        { nameEn: { contains: search, mode: 'insensitive' } },
+        { nameEn: { contains: search } },
         { nameBn: { contains: search } },
-        { slug: { contains: search, mode: 'insensitive' } },
-        { variants: { some: { sku: { contains: search, mode: 'insensitive' } } } },
-        { variants: { some: { packSize: { contains: search, mode: 'insensitive' } } } },
+        { slug: { contains: search } },
+        { variants: { some: { sku: { contains: search } } } },
+        { variants: { some: { packSize: { contains: search } } } },
       ];
 
       if (alphanumericOnly && alphanumericOnly.length >= 2) {
         directConditions.push(
-          { slug: { contains: alphanumericOnly, mode: 'insensitive' } },
-          { variants: { some: { sku: { contains: alphanumericOnly, mode: 'insensitive' } } } }
+          { slug: { contains: alphanumericOnly } },
+          { variants: { some: { sku: { contains: alphanumericOnly } } } }
         );
       }
 

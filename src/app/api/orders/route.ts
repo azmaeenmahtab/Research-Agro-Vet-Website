@@ -56,7 +56,7 @@ export async function POST(request: NextRequest) {
 
     if (!Array.isArray(items) || items.length === 0) {
       return NextResponse.json(
-        { success: false, message: 'কার্ট খালি, অন্তত একটি ওষুধ নির্বাচন করুন (Cart is empty)' },
+        { success: false, message: 'কার্ট খালি, অন্তত একটি পণ্য নির্বাচন করুন (Cart is empty)' },
         { status: 400 }
       );
     }
@@ -79,7 +79,7 @@ export async function POST(request: NextRequest) {
 
     if (dbVariants.length === 0) {
       return NextResponse.json(
-        { success: false, message: 'নির্বাচিত ওষুধ পাওয়া যায়নি (No valid products found)' },
+        { success: false, message: 'নির্বাচিত পণ্য পাওয়া যায়নি (No valid products found)' },
         { status: 400 }
       );
     }
@@ -168,7 +168,7 @@ export async function POST(request: NextRequest) {
 
     if (orderItemData.length === 0) {
       return NextResponse.json(
-        { success: false, message: 'কার্টের কোনো বৈধ ওষুধ পাওয়া যায়নি' },
+        { success: false, message: 'কার্টের কোনো বৈধ পণ্য পাওয়া যায়নি' },
         { status: 400 }
       );
     }

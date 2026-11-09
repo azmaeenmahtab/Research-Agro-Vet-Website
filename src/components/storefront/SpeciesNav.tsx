@@ -1,5 +1,6 @@
 'use client';
 
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { usePathname, useSearchParams } from 'next/navigation';
@@ -51,7 +52,7 @@ const speciesList: SpeciesItem[] = [
   {
     label: 'Wholesale',
     labelBn: 'পাইকারি ও ডিলার',
-    href: '/#dealer-contact',
+    href: '/wholesale',
     tag: 'WHOLESALE',
     image: null,
   },
@@ -63,14 +64,51 @@ export default function SpeciesNav() {
   const currentSpecies = searchParams.get('species');
   const isWholesale = searchParams.get('mode') === 'wholesale';
 
+  const [isVisible, setIsVisible] = useState(true);
+
+  useEffect(() => {
+    let lastScrollY = window.scrollY;
+
+    const handleScroll = () => {
+      const currentScrollY = window.scrollY;
+
+      // Always show when near the very top of the page
+      if (currentScrollY < 60) {
+        setIsVisible(true);
+        lastScrollY = currentScrollY;
+        return;
+      }
+
+      // Scrolling down -> hide with threshold to avoid minor twitching
+      if (currentScrollY > lastScrollY && currentScrollY - lastScrollY > 6) {
+        setIsVisible(false);
+      }
+      // Scrolling up -> show
+      else if (currentScrollY < lastScrollY && lastScrollY - currentScrollY > 6) {
+        setIsVisible(true);
+      }
+
+      lastScrollY = currentScrollY;
+    };
+
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
+
   const isActive = (item: SpeciesItem) => {
-    if (item.tag === 'WHOLESALE') return isWholesale;
+    if (item.tag === 'WHOLESALE') return isWholesale || pathname === '/wholesale';
     if (item.tag) return currentSpecies === item.tag;
     return pathname === '/products' && !currentSpecies && !isWholesale;
   };
 
   return (
-    <div className="bg-white/95 backdrop-blur-xs border-b border-slate-200 sticky top-[69px] z-30 py-2 shadow-2xs">
+    <div
+      className={`bg-white/95 backdrop-blur-xs border-b border-slate-200 sticky top-[68px] z-30 py-2 shadow-2xs transition-all duration-300 ease-in-out ${
+        isVisible
+          ? 'translate-y-0 opacity-100 pointer-events-auto'
+          : '-translate-y-full opacity-0 pointer-events-none'
+      }`}
+    >
       <div className="max-w-7xl mx-auto px-4">
         <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-2 sm:gap-2.5">
           {speciesList.map((item) => {

@@ -1,12 +1,13 @@
 // prisma/schema.prisma
-// Master Forward-Compatible PostgreSQL Schema for Agro-Vet E-Commerce Platform
+// Master Forward-Compatible MySQL Schema for Agro-Vet E-Commerce Platform
 
 generator client {
-  provider = "prisma-client-js"
+  provider      = "prisma-client-js"
+  binaryTargets = ["native", "rhel-openssl-1.1.x", "rhel-openssl-3.0.x", "debian-openssl-1.1.x", "debian-openssl-3.0.x"]
 }
 
 datasource db {
-  provider = "postgresql"
+  provider = "mysql"
   url      = env("DATABASE_URL")
 }
 
@@ -133,14 +134,14 @@ model Category {
   nameEn          String
   nameBn          String?
   slug            String    @unique
-  description     String?
+  description     String?   @db.Text
   image           String?
   sortOrder       Int       @default(0)
   isActive        Boolean   @default(true)
 
   // SEO Metadata
   metaTitle       String?
-  metaDescription String?
+  metaDescription String?   @db.Text
 
   primaryProducts Product[] @relation("PrimaryCategory")
   products        Product[] @relation("ProductToCategory")
@@ -162,7 +163,7 @@ model Product {
   nameBn                  String?
   slug                    String            @unique
   formFactor              ProductFormFactor @default(POWDER)
-  speciesTags             String[]          // e.g., ["CATTLE_BUFFALO", "POULTRY", "GOAT_SHEEP", "AQUA"]
+  speciesTags             Json              // JSON array e.g., ["CATTLE_BUFFALO", "POULTRY", "GOAT_SHEEP", "AQUA"]
 
   // Veterinary Regulatory & Trust Signals
   dlsLicenseNo            String?           // e.g., "126-18-(07)-005"
@@ -171,17 +172,17 @@ model Product {
 
   // Storefront Media & Copy
   thumbnail               String            @default("/images/placeholder-medicine.webp")
-  images                  String[]
-  shortDescription        String?
+  images                  Json              // JSON array of image URLs
+  shortDescription        String?           @db.Text
 
   // 1-to-1 Clinical & AI Chatbot Knowledge Base Columns
   composition             String?           @db.Text
   indication              String?           @db.Text
   dosageAndAdministration String?           @db.Text
-  withdrawalPeriod        String?
-  contraindications       String?
-  storageInstructions     String?           @default("আলো থেকে দূরে, ঠান্ডা ও শুষ্ক স্থানে সংরক্ষণ করুন।")
-  searchKeywords          String[]          // Bangla & English symptom/generic keywords for search & RAG
+  withdrawalPeriod        String?           @db.Text
+  contraindications       String?           @db.Text
+  storageInstructions     String?           @db.VarChar(500) @default("আলো থেকে দূরে, ঠান্ডা ও শুষ্ক স্থানে সংরক্ষণ করুন।")
+  searchKeywords          Json              // JSON array of Bangla & English symptom/generic keywords
 
   // Merchandising & Visibility
   isFeatured              Boolean           @default(false)
@@ -190,7 +191,7 @@ model Product {
 
   // Dynamic SEO Overrides
   metaTitle               String?
-  metaDescription         String?
+  metaDescription         String?           @db.Text
 
   // Relations
   categoryId              String?
@@ -329,7 +330,7 @@ model Order {
   district              String
   upazila               String
   address               String           @db.Text
-  orderNote             String?
+  orderNote             String?          @db.Text
 
   // Server-Calculated Financials (Zero Client-Side Price Trust)
   subtotal              Decimal          @db.Decimal(10, 2)
@@ -476,12 +477,12 @@ model IncompleteLead {
   name             String?
   district         String?
   upazila          String?
-  address          String?
+  address          String?    @db.Text
   orderType        BuyerTier  @default(RETAIL)
   cartItems        Json       // Snapshot of cart items
   cartTotal        Decimal    @db.Decimal(10, 2)
   status           LeadStatus @default(NEW)
-  adminNotes       String?
+  adminNotes       String?    @db.Text
   convertedOrderId String?
   createdAt        DateTime   @default(now())
   updatedAt        DateTime   @updatedAt
@@ -519,10 +520,10 @@ model SiteSettings {
   id                           String            @id @default("default")
   storeName                    String            @default("Agro-Vet Medicine Store")
   storeTagline                 String?           @default("Licensed Veterinary Medicine & Nutritional Supplements Dealer")
-  supportPhone                 String            @default("01700000000")
-  whatsappNumber               String            @default("8801700000000")
+  supportPhone                 String            @default("01716019731")
+  whatsappNumber               String            @default("8801716019731")
   supportEmail                 String            @default("info@example.com")
-  physicalAddress              String            @default("Bangladesh")
+  physicalAddress              String            @db.VarChar(500) @default("Bangladesh")
 
   // Mandatory SSLCommerz Legal & Vet Regulatory Compliance
   tradeLicenseNo               String?
@@ -551,7 +552,7 @@ model SiteSettings {
   // Self-Service Marketing Agency Hooks (Tier 1 & Tier 2)
   gtmContainerId               String?
   metaPixelId                  String?
-  metaConversionApiToken       String?
+  metaConversionApiToken       String?           @db.Text
   metaTestEventCode            String?
   googleAdsId                  String?
   tiktokPixelId                String?
@@ -584,7 +585,7 @@ model User {
   updatedAt     DateTime  @updatedAt
   role          String?
   banned        Boolean?  @default(false)
-  banReason     String?
+  banReason     String?   @db.Text
   banExpires    DateTime?
   sessions      Session[]
   accounts      Account[]
@@ -600,7 +601,7 @@ model Session {
   createdAt      DateTime @default(now())
   updatedAt      DateTime @updatedAt
   ipAddress      String?
-  userAgent      String?
+  userAgent      String?  @db.Text
   userId         String
   user           User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   impersonatedBy String?
@@ -615,13 +616,13 @@ model Account {
   providerId            String
   userId                String
   user                  User      @relation(fields: [userId], references: [id], onDelete: Cascade)
-  accessToken           String?
-  refreshToken          String?
-  idToken               String?
+  accessToken           String?   @db.Text
+  refreshToken          String?   @db.Text
+  idToken               String?   @db.Text
   accessTokenExpiresAt  DateTime?
   refreshTokenExpiresAt DateTime?
-  scope                 String?
-  password              String?
+  scope                 String?   @db.Text
+  password              String?   @db.Text
   createdAt             DateTime  @default(now())
   updatedAt             DateTime  @updatedAt
 

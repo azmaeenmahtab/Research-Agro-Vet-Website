@@ -87,12 +87,12 @@ export async function getAdminOrders(filters: OrderQueryFilters = {}) {
   if (search && search.trim()) {
     const term = search.trim();
     where.OR = [
-      { orderNumber: { contains: term, mode: 'insensitive' } },
-      { customerName: { contains: term, mode: 'insensitive' } },
+      { orderNumber: { contains: term } },
+      { customerName: { contains: term } },
       { customerPhone: { contains: term } },
-      { district: { contains: term, mode: 'insensitive' } },
-      { upazila: { contains: term, mode: 'insensitive' } },
-      { consignmentId: { contains: term, mode: 'insensitive' } },
+      { district: { contains: term } },
+      { upazila: { contains: term } },
+      { consignmentId: { contains: term } },
     ];
   }
 

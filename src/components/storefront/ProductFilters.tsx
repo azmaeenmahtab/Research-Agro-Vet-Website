@@ -160,18 +160,18 @@ export default function ProductFilters({
           </div>
         </div>
         <p className="text-[11px] text-slate-300 leading-relaxed">
-          বক্স বা কার্টনে সরাসরি ড্রাগ লাইসেন্সধারী ফার্মেসি বা খামারে ওষুধ পেতে যোগাযোগ করুন।
+          বক্স বা কার্টনে সরাসরি ড্রাগ লাইসেন্সধারী ফার্মেসি বা খামারে পণ্য পেতে যোগাযোগ করুন।
         </p>
         <div className="space-y-1.5 pt-1">
           <a
-            href="tel:01711234567"
+            href="tel:01716019731"
             className="w-full py-1.5 px-3 rounded-lg bg-white text-slate-900 text-xs font-bold flex items-center justify-center gap-1.5 hover:bg-slate-100 transition-colors shadow-2xs"
           >
             <Phone className="w-3.5 h-3.5 text-emerald-700" />
-            <span>০১৭১১-২৩৪৫৬৭</span>
+            <span>০১৭১৬-০১৯৭৩১</span>
           </a>
           <a
-            href="https://wa.me/8801711234567?text=আসসালামু%20আলাইকুম,%20পাইকারি%20রেট%20ও%20ডিলারশিপের%20জন্য%20জানতে%20চাচ্ছি।"
+            href="https://wa.me/8801716019731?text=আসসালামু%20আলাইকুম,%20পাইকারি%20রেট%20ও%20ডিলারশিপের%20জন্য%20জানতে%20চাচ্ছি।"
             target="_blank"
             rel="noopener noreferrer"
             className="w-full py-1.5 px-3 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold flex items-center justify-center gap-1.5 transition-colors shadow-2xs"

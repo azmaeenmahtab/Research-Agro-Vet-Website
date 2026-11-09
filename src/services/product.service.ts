@@ -82,17 +82,17 @@ export function buildProductSearchWhere(search: string): Prisma.ProductWhereInpu
     const variantList = Array.from(variants);
 
     const matchRules: Prisma.ProductWhereInput[] = variantList.flatMap((v) => [
-      { nameEn: { contains: v, mode: 'insensitive' as Prisma.QueryMode } },
+      { nameEn: { contains: v } },
       { nameBn: { contains: v } },
-      { slug: { contains: v, mode: 'insensitive' as Prisma.QueryMode } },
-      { composition: { contains: v, mode: 'insensitive' as Prisma.QueryMode } },
-      { indication: { contains: v, mode: 'insensitive' as Prisma.QueryMode } },
-      { searchKeywords: { has: v.toLowerCase() } },
-      { variants: { some: { sku: { contains: v, mode: 'insensitive' as Prisma.QueryMode } } } },
-      { variants: { some: { packSize: { contains: v, mode: 'insensitive' as Prisma.QueryMode } } } },
-      { category: { nameEn: { contains: v, mode: 'insensitive' as Prisma.QueryMode } } },
+      { slug: { contains: v } },
+      { composition: { contains: v } },
+      { indication: { contains: v } },
+      { searchKeywords: { array_contains: v.toLowerCase() } },
+      { variants: { some: { sku: { contains: v } } } },
+      { variants: { some: { packSize: { contains: v } } } },
+      { category: { nameEn: { contains: v } } },
       { category: { nameBn: { contains: v } } },
-      { categories: { some: { nameEn: { contains: v, mode: 'insensitive' as Prisma.QueryMode } } } },
+      { categories: { some: { nameEn: { contains: v } } } },
       { categories: { some: { nameBn: { contains: v } } } },
     ]);
 
@@ -127,18 +127,18 @@ export function buildProductSearchWhere(search: string): Prisma.ProductWhereInpu
   }
 
   const directConditions: Prisma.ProductWhereInput[] = Array.from(directVariants).flatMap((v) => [
-    { nameEn: { contains: v, mode: 'insensitive' as Prisma.QueryMode } },
+    { nameEn: { contains: v } },
     { nameBn: { contains: v } },
-    { slug: { contains: v, mode: 'insensitive' as Prisma.QueryMode } },
-    { composition: { contains: v, mode: 'insensitive' as Prisma.QueryMode } },
-    { indication: { contains: v, mode: 'insensitive' as Prisma.QueryMode } },
-    { searchKeywords: { has: v.toLowerCase() } },
+    { slug: { contains: v } },
+    { composition: { contains: v } },
+    { indication: { contains: v } },
+    { searchKeywords: { array_contains: v.toLowerCase() } },
   ]);
 
   if (alphanumericOnly && alphanumericOnly.length >= 2) {
     directConditions.push(
-      { slug: { contains: alphanumericOnly, mode: 'insensitive' as Prisma.QueryMode } },
-      { variants: { some: { sku: { contains: alphanumericOnly, mode: 'insensitive' as Prisma.QueryMode } } } }
+      { slug: { contains: alphanumericOnly } },
+      { variants: { some: { sku: { contains: alphanumericOnly } } } }
     );
   }
 
@@ -214,7 +214,7 @@ export async function getProducts(params: ProductFilterParams = {}) {
   const where: Prisma.ProductWhereInput = {
     status: 'ACTIVE',
     ...(featured !== undefined && { isFeatured: featured }),
-    ...(species && { speciesTags: { has: species } }),
+    ...(species && { speciesTags: { array_contains: species } }),
     ...(category && {
       OR: [
         { categoryId: category },

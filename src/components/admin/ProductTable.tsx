@@ -20,6 +20,67 @@ interface ProductTableProps {
   onDeleteProduct: (product: AdminProduct) => void;
 }
 
+function ProductTableSkeleton({ count = 6 }: { count?: number }) {
+  return (
+    <>
+      {Array.from({ length: count }).map((_, i) => (
+        <tr key={i} className="animate-pulse border-b border-slate-100">
+          {/* 1. Product & Identity */}
+          <td className="py-4 px-4 align-middle">
+            <div className="flex items-center gap-2.5">
+              <div className="w-4 h-4 bg-slate-200 rounded shrink-0" />
+              <div className="space-y-1.5 flex-1">
+                <div className="h-4 bg-slate-200 rounded w-36" />
+                <div className="h-3 bg-slate-100 rounded w-20" />
+              </div>
+            </div>
+          </td>
+
+          {/* 2. Pack Size */}
+          <td className="py-4 px-3 align-middle">
+            <div className="h-4 bg-slate-200 rounded w-16" />
+          </td>
+
+          {/* 3. TP */}
+          <td className="py-4 px-3 align-middle text-right">
+            <div className="h-6 bg-slate-200 rounded-lg w-16 ml-auto" />
+          </td>
+
+          {/* 4. MRP */}
+          <td className="py-4 px-3 align-middle text-right">
+            <div className="h-6 bg-slate-200 rounded-lg w-16 ml-auto" />
+          </td>
+
+          {/* 5. Selling Price */}
+          <td className="py-4 px-3 align-middle text-right">
+            <div className="h-6 bg-slate-200 rounded-lg w-16 ml-auto" />
+          </td>
+
+          {/* 6. Discount */}
+          <td className="py-4 px-3 align-middle text-center">
+            <div className="h-6 bg-slate-200 rounded-lg w-18 mx-auto" />
+          </td>
+
+          {/* 7. Stock */}
+          <td className="py-4 px-3 align-middle text-center">
+            <div className="h-5 bg-slate-200 rounded-full w-14 mx-auto" />
+          </td>
+
+          {/* 8. Units */}
+          <td className="py-4 px-2.5 align-middle text-center">
+            <div className="h-4 bg-slate-200 rounded w-8 mx-auto" />
+          </td>
+
+          {/* 9. Actions */}
+          <td className="py-4 px-4 align-middle text-right">
+            <div className="h-7 bg-slate-200 rounded-lg w-16 ml-auto" />
+          </td>
+        </tr>
+      ))}
+    </>
+  );
+}
+
 export default function ProductTable({
   products,
   isLoading,
@@ -30,26 +91,6 @@ export default function ProductTable({
   onEditClinical,
   onDeleteProduct,
 }: ProductTableProps) {
-  if (isLoading) {
-    return (
-      <div className="bg-white rounded-xl border border-slate-200/80 shadow-xs p-12 text-center space-y-3">
-        <div className="w-8 h-8 border-3 border-[#005d42] border-t-transparent rounded-full animate-spin mx-auto" />
-        <p className="text-sm text-slate-500 font-medium">Loading catalog and pricing data...</p>
-      </div>
-    );
-  }
-
-  if (products.length === 0) {
-    return (
-      <div className="bg-white rounded-xl border border-slate-200/80 shadow-xs p-12 text-center space-y-3">
-        <p className="text-base font-bold text-slate-800">No products found</p>
-        <p className="text-xs text-slate-500">
-          Try adjusting your search criteria or filter options above.
-        </p>
-      </div>
-    );
-  }
-
   return (
     <div className="space-y-6">
       {/* Table Container */}
@@ -70,19 +111,34 @@ export default function ProductTable({
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-200 text-slate-800 text-sm">
-              {products.map((product, index) => (
-                <ProductTableRow
-                  key={product.id}
-                  product={product}
-                  rowIndex={index}
-                  isExpanded={expandedProductIds.has(product.id)}
-                  universalDiscount={universalDiscount}
-                  onToggleExpand={() => onToggleExpand(product.id)}
-                  onEditProduct={onEditProduct}
-                  onEditClinical={onEditClinical}
-                  onDeleteProduct={onDeleteProduct}
-                />
-              ))}
+              {isLoading ? (
+                <ProductTableSkeleton count={6} />
+              ) : products.length === 0 ? (
+                <tr>
+                  <td colSpan={9} className="py-16 px-4 text-center">
+                    <div className="max-w-xs mx-auto space-y-2">
+                      <p className="text-base font-bold text-slate-800">No products found</p>
+                      <p className="text-xs text-slate-500">
+                        Try adjusting your search criteria or filter options above.
+                      </p>
+                    </div>
+                  </td>
+                </tr>
+              ) : (
+                products.map((product, index) => (
+                  <ProductTableRow
+                    key={product.id}
+                    product={product}
+                    rowIndex={index}
+                    isExpanded={expandedProductIds.has(product.id)}
+                    universalDiscount={universalDiscount}
+                    onToggleExpand={() => onToggleExpand(product.id)}
+                    onEditProduct={onEditProduct}
+                    onEditClinical={onEditClinical}
+                    onDeleteProduct={onDeleteProduct}
+                  />
+                ))
+              )}
             </tbody>
           </table>
         </div>
@@ -100,43 +156,16 @@ export default function ProductTable({
               Live Catalog
             </span>
             <span>•</span>
-            <span>Showing {products.length} Products</span>
+            <span>
+              {isLoading ? (
+                <span className="inline-block w-24 h-3.5 bg-slate-200 animate-pulse rounded" />
+              ) : (
+                `Showing ${products.length} Products`
+              )}
+            </span>
           </div>
         </div>
       </div>
-
-      {/* Quick Helper Bento Cards (From Stitch Design) */}
-      {/* <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        <div className="bg-white p-4 rounded-xl border border-slate-200 shadow-xs space-y-1.5">
-          <div className="flex items-center gap-2 text-[#005d42] font-bold text-sm">
-            <Calculator className="w-4 h-4" />
-            <span>Automatic Trade Margin</span>
-          </div>
-          <p className="text-xs text-slate-500 leading-relaxed">
-            The difference between Trade Price (TP) and Retail MRP gives retailers and dealers their wholesale margin. Invoices calculate dealer commissions automatically based on buyer status.
-          </p>
-        </div>
-
-        <div className="bg-white p-4 rounded-xl border border-slate-200 shadow-xs space-y-1.5">
-          <div className="flex items-center gap-2 text-amber-700 font-bold text-sm">
-            <Percent className="w-4 h-4" />
-            <span>Storewide & VIP Discounts</span>
-          </div>
-          <p className="text-xs text-slate-500 leading-relaxed">
-            Universal discounts apply automatically at checkout unless a VIP customer has custom negotiated pricing. You can also override selling prices per variant directly in the editor.
-          </p>
-        </div>
-
-        <div className="bg-white p-4 rounded-xl border border-slate-200 shadow-xs space-y-1.5">
-          <div className="flex items-center gap-2 text-blue-700 font-bold text-sm">
-            <Snowflake className="w-4 h-4" />
-            <span>Cold-Chain Compliance</span>
-          </div>
-          <p className="text-xs text-slate-500 leading-relaxed">
-            Temperature-sensitive biologics and vaccines (2°C - 8°C) are packaged with insulated thermal cold-packs. Stock status changes immediately notify courier dispatch.
-          </p>
-        </div>
-      </div> */}
     </div>
   );
 }

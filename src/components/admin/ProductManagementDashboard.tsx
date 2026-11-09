@@ -6,7 +6,7 @@ import ProductFilters from './ProductFilters';
 import ProductTable from './ProductTable';
 import { ConfirmationModal, ProductFormModal, ClinicalDataModal } from './modals';
 import { toast } from '@heroui/react';
-import { getApiUrl } from '@/lib/api-client';
+import { authorizedFetch, getApiUrl } from '@/lib/api-client';
 import {
   AdminProduct,
   AdminVariant,
@@ -101,9 +101,7 @@ export default function ProductManagementDashboard() {
       if (selectedCategory !== 'ALL') params.set('category', selectedCategory);
       if (selectedStatus !== 'ALL') params.set('status', selectedStatus);
 
-      const res = await fetch(getApiUrl(`/api/admin/products?${params.toString()}`), {
-        credentials: 'include',
-      });
+      const res = await authorizedFetch(`/api/admin/products?${params.toString()}`);
       const data = await res.json();
 
       if (data.success) {
@@ -354,6 +352,7 @@ export default function ProductManagementDashboard() {
         onAddProduct={handleAddProduct}
         onExportCsv={handleExportCsv}
         categories={categories}
+        isLoading={isLoading}
       />
 
       {/* Main Multi-Variant Table */}

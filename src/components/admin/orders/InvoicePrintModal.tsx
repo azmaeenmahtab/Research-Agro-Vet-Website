@@ -70,7 +70,7 @@ export default function InvoicePrintModal({
                   Veterinary Pharmaceuticals & Animal Healthcare
                 </p>
                 <p className="text-[11px] text-slate-400 mt-0.5">
-                  DLS Reg: 126-18-(07)-006 • Hotline: 01711-234567
+                  DLS Reg: 126-18-(07)-006 • Hotline: 01716-019731
                 </p>
               </div>
             </div>

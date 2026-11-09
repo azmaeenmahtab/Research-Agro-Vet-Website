@@ -1,6 +1,6 @@
 'use client';
 
-import React from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import {
   Search,
   RotateCcw,
@@ -16,6 +16,7 @@ import {
   Coins,
   AlertOctagon,
   Layers,
+  X,
 } from 'lucide-react';
 import { Label, ListBox, Select } from '@heroui/react';
 import { OrderStatsSummary } from '@/types/admin-order';
@@ -28,6 +29,7 @@ interface OrderFilterTabsProps {
   searchQuery: string;
   onSearchChange: (query: string) => void;
   stats: OrderStatsSummary;
+  isLoading?: boolean;
 }
 
 export default function OrderFilterTabs({
@@ -38,11 +40,55 @@ export default function OrderFilterTabs({
   searchQuery,
   onSearchChange,
   stats,
+  isLoading = false,
 }: OrderFilterTabsProps) {
+  const [localSearch, setLocalSearch] = useState(searchQuery);
+  const isTypingRef = useRef(false);
+
+  // Sync local search when external prop changes (e.g. reset or cleared from outside)
+  useEffect(() => {
+    if (!isTypingRef.current) {
+      setLocalSearch(searchQuery);
+    }
+  }, [searchQuery]);
+
+  // Debounced search trigger (350ms)
+  useEffect(() => {
+    const handler = setTimeout(() => {
+      isTypingRef.current = false;
+      if (localSearch !== searchQuery) {
+        onSearchChange(localSearch);
+      }
+    }, 350);
+
+    return () => clearTimeout(handler);
+  }, [localSearch, searchQuery, onSearchChange]);
+
+  const handleInputChange = (val: string) => {
+    isTypingRef.current = true;
+    setLocalSearch(val);
+  };
+
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      isTypingRef.current = false;
+      onSearchChange(localSearch);
+    }
+  };
+
+  const handleClearSearch = () => {
+    isTypingRef.current = false;
+    setLocalSearch('');
+    onSearchChange('');
+  };
+
   const hasActiveFilters =
     currentStatus !== 'ALL' || currentPaymentStatus !== 'ALL' || searchQuery.trim() !== '';
 
   const handleClearFilters = () => {
+    isTypingRef.current = false;
+    setLocalSearch('');
     onStatusChange('ALL');
     onPaymentStatusChange('ALL');
     onSearchChange('');
@@ -51,7 +97,7 @@ export default function OrderFilterTabs({
   return (
     <div className="bg-white rounded-2xl p-x4 py-3 sm:px-5 border border-slate-200/80 shadow-2xs space-y-3">
       <div className="flex flex-col lg:flex-row items-stretch lg:items-end justify-between gap-3">
-        {/* Search Input */}
+        {/* Search Input with Debounce, Enter trigger, and Clear Button */}
         <div className="relative flex-1">
           <Label className="text-[11px] font-bold text-slate-700 block mb-2">
             Search Orders
@@ -61,10 +107,31 @@ export default function OrderFilterTabs({
             <input
               type="text"
               placeholder="Search by Order ID (AV-...), Customer Name, Phone, or District..."
-              value={searchQuery}
-              onChange={(e) => onSearchChange(e.target.value)}
-              className="w-full pl-9 pr-3.5 py-2 rounded-xl border border-slate-200 text-xs bg-slate-50/70 focus:bg-white focus:ring-2 focus:ring-[#005d42] outline-none transition-all placeholder:text-slate-400 font-medium"
+              value={localSearch}
+              onChange={(e) => handleInputChange(e.target.value)}
+              onKeyDown={handleKeyDown}
+              className="w-full pl-9 pr-24 py-2 rounded-xl border border-slate-200 text-xs bg-slate-50/70 focus:bg-white focus:ring-2 focus:ring-[#005d42] outline-none transition-all placeholder:text-slate-400 font-medium"
             />
+            {/* Input Action Indicators */}
+            <div className="absolute right-2.5 top-1/2 -translate-y-1/2 flex items-center gap-1.5">
+              {isLoading && (
+                <div className="w-3.5 h-3.5 border-2 border-[#005d42] border-t-transparent rounded-full animate-spin" />
+              )}
+              {localSearch && (
+                <button
+                  type="button"
+                  onClick={handleClearSearch}
+                  className="p-1 hover:bg-slate-200/80 text-slate-400 hover:text-slate-700 rounded-md transition-colors"
+                  title="Clear search"
+                  aria-label="Clear search"
+                >
+                  <X className="w-3.5 h-3.5" />
+                </button>
+              )}
+              <span className="hidden sm:inline-block px-1.5 py-0.5 rounded text-[10px] font-mono text-slate-400 bg-slate-100 border border-slate-200 select-none">
+                ↵ Enter
+              </span>
+            </div>
           </div>
         </div>
 

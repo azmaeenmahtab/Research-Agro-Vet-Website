@@ -12,15 +12,15 @@ export default function HeroSection() {
           <h1 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold text-slate-900 tracking-tight leading-[1.25]">
             গবাদিপশু ও পোল্ট্রির শতভাগ আসল ও অনুমোদিত{' '}
             <span className="text-emerald-700  decoration-emerald-300 decoration-4 underline-offset-4">
-              ঔষধিযুক্ত খাদ্য প্রি-মিক্স
+              Medicated খাদ্য প্রি-মিক্স
             </span>
           </h1>
 
           {/* Government Approval Banner */}
           <div className="inline-flex items-center gap-3 bg-emerald-900 text-white px-5 py-2.5 rounded-lg shadow-sm">
             <ShieldCheck className="w-5 h-5 text-emerald-300 shrink-0" />
-            <span className=" font-semibold">গণপ্রজাতন্ত্রী বাংলাদেশ সরকার অনুমোদিত ডিলার</span>
-            <span className="text-sm text-amber-300 font-bold border-l border-emerald-700 pl-3">DLS Reg. 126</span>
+            <span className=" font-semibold">গণপ্রজাতন্ত্রী বাংলাদেশ সরকার অনুমোদিত প্রস্তুতকারক</span>
+            {/* <span className="text-sm text-amber-300 font-bold border-l border-emerald-700 pl-3">DLS Reg. 126</span> */}
           </div>
 
           {/* Description */}
@@ -55,7 +55,7 @@ export default function HeroSection() {
             </Link>
 
             <a
-              href="https://wa.me/8801711234567?text=আসসালামু%20আলাইকুম,%20ফিড%20প্রিমিক্স%20ও%20খামার%20পরামর্শের%20জন্য%20যোগাযোগ%20করছি।"
+              href="https://wa.me/8801716019731?text=আসসালামু%20আলাইকুম,%20ফিড%20প্রিমিক্স%20ও%20খামার%20পরামর্শের%20জন্য%20যোগাযোগ%20করছি।"
               target="_blank"
               rel="noopener noreferrer"
               className="inline-flex items-center gap-2 px-5 py-3 bg-green-600 hover:bg-green-700 text-white rounded-lg text-sm font-bold transition-all shadow-xs"

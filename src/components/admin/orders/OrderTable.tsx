@@ -2,11 +2,6 @@
 
 import React from 'react';
 import {
-  AdminOrder,
-  OrderStatus,
-  PaymentStatus,
-} from '@/types/admin-order';
-import {
   ArrowRight,
   Clock,
   Phone,
@@ -18,7 +13,13 @@ import {
   RotateCw,
   ChevronLeft,
   ChevronRight,
+  Package,
 } from 'lucide-react';
+import {
+  AdminOrder,
+  OrderStatus,
+  PaymentStatus,
+} from '@/types/admin-order';
 
 interface OrderTableProps {
   orders: AdminOrder[];
@@ -31,6 +32,63 @@ interface OrderTableProps {
   onPageChange: (page: number) => void;
   onPageSizeChange: (size: number) => void;
   isLoading: boolean;
+}
+
+function OrderTableSkeleton({ count = 8 }: { count?: number }) {
+  return (
+    <>
+      {Array.from({ length: count }).map((_, i) => (
+        <tr key={i} className="animate-pulse border-b border-slate-100">
+          {/* 1. Order ID & Time */}
+          <td className="py-4 px-4 align-middle">
+            <div className="space-y-1.5">
+              <div className="h-4 bg-slate-200 rounded-md w-24" />
+              <div className="h-3 bg-slate-100 rounded w-16" />
+            </div>
+          </td>
+
+          {/* 2. Customer & Farm */}
+          <td className="py-4 px-3.5 align-middle">
+            <div className="space-y-1.5">
+              <div className="h-4 bg-slate-200 rounded-md w-32" />
+              <div className="h-3 bg-slate-100 rounded w-24" />
+            </div>
+          </td>
+
+          {/* 3. Items */}
+          <td className="py-4 px-3 align-middle">
+            <div className="flex items-center gap-2">
+              <div className="h-5 bg-slate-200 rounded-md w-12" />
+              <div className="h-3.5 bg-slate-100 rounded w-24" />
+            </div>
+          </td>
+
+          {/* 4. Total Amount */}
+          <td className="py-4 px-3 align-middle text-right">
+            <div className="flex flex-col items-end space-y-1">
+              <div className="h-4 bg-slate-200 rounded-md w-16" />
+              <div className="h-3 bg-slate-100 rounded w-12" />
+            </div>
+          </td>
+
+          {/* 5. Payment */}
+          <td className="py-4 px-3 align-middle text-center">
+            <div className="h-6 bg-slate-200 rounded-lg w-20 mx-auto" />
+          </td>
+
+          {/* 6. Status */}
+          <td className="py-4 px-3 align-middle text-center">
+            <div className="h-6 bg-slate-200 rounded-lg w-22 mx-auto" />
+          </td>
+
+          {/* 7. Action */}
+          <td className="py-4 px-4 align-middle text-right">
+            <div className="h-7 bg-slate-200 rounded-lg w-18 ml-auto" />
+          </td>
+        </tr>
+      ))}
+    </>
+  );
 }
 
 function getPaginationItems(current: number, total: number): (number | string)[] {
@@ -107,26 +165,6 @@ export default function OrderTable({
     return `${diffDays}d ago`;
   };
 
-  if (isLoading) {
-    return (
-      <div className="bg-white rounded-2xl border border-slate-200 p-12 text-center space-y-3">
-        <div className="w-8 h-8 border-3 border-[#005d42] border-t-transparent rounded-full animate-spin mx-auto" />
-        <p className="text-xs text-slate-500 font-medium">Loading orders...</p>
-      </div>
-    );
-  }
-
-  if (orders.length === 0) {
-    return (
-      <div className="bg-white rounded-2xl border border-slate-200 p-12 text-center space-y-2">
-        <p className="font-bold text-slate-800 text-sm">No orders found</p>
-        <p className="text-xs text-slate-400">
-          Try adjusting your search filters or status selection.
-        </p>
-      </div>
-    );
-  }
-
   const startRecord = totalOrders === 0 ? 0 : (currentPage - 1) * pageSize + 1;
   const endRecord = Math.min(currentPage * pageSize, totalOrders);
   const paginationItems = getPaginationItems(currentPage, totalPages);
@@ -149,27 +187,40 @@ export default function OrderTable({
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-100 text-slate-800 text-xs">
-              {orders.map((order) => {
-                const isSelected = order.id === selectedOrderId;
-                const totalItemUnits = order.items.reduce(
-                  (sum, item) => sum + item.quantity,
-                  0
-                );
+              {isLoading ? (
+                <OrderTableSkeleton count={pageSize || 8} />
+              ) : orders.length === 0 ? (
+                <tr>
+                  <td colSpan={7} className="py-16 px-4 text-center">
+                    <div className="max-w-xs mx-auto space-y-2">
+                      <div className="w-12 h-12 rounded-full bg-slate-100 flex items-center justify-center mx-auto text-slate-400">
+                        <Package className="w-6 h-6 stroke-[1.5]" />
+                      </div>
+                      <p className="font-bold text-slate-800 text-sm">No orders found</p>
+                      <p className="text-xs text-slate-400">
+                        Try adjusting your search query, status filters, or date range.
+                      </p>
+                    </div>
+                  </td>
+                </tr>
+              ) : (
+                orders.map((order) => {
+                  const isSelected = order.id === selectedOrderId;
+                  const totalItemUnits = order.items.reduce(
+                    (sum, item) => sum + item.quantity,
+                    0
+                  );
 
-                const startRecord = totalOrders === 0 ? 0 : (currentPage - 1) * pageSize + 1;
-  const endRecord = Math.min(currentPage * pageSize, totalOrders);
-  const paginationItems = getPaginationItems(currentPage, totalPages);
-
-  return (
-                  <tr
-                    key={order.id}
-                    onClick={() => onSelectOrder(order)}
-                    className={`cursor-pointer transition-colors ${
-                      isSelected
-                        ? 'bg-emerald-50/70 border-l-4 border-l-[#005d42]'
-                        : 'hover:bg-slate-50/70'
-                    }`}
-                  >
+                  return (
+                    <tr
+                      key={order.id}
+                      onClick={() => onSelectOrder(order)}
+                      className={`cursor-pointer transition-colors ${
+                        isSelected
+                          ? 'bg-emerald-50/70 border-l-4 border-l-[#005d42]'
+                          : 'hover:bg-slate-50/70'
+                      }`}
+                    >
                     {/* 1. Order ID & Time */}
                     <td className="py-3.5 px-4 align-middle whitespace-nowrap">
                       <div className="flex flex-col">
@@ -193,9 +244,9 @@ export default function OrderTable({
                           <Phone className="w-3 h-3 text-slate-400" />
                           <span>{order.customerPhone}</span>
                         </span>
-                        <span className="text-[10px] py-1 text-slate-400 truncate max-w-[280px]" title={order.address}>
+                        {/* <span className="text-[10px] py-1 text-slate-400 truncate max-w-[280px]" title={order.address}>
                           {order.address || `${order.upazila}, ${order.district}`}
-                        </span>
+                        </span> */}
                       </div>
                     </td>
 
@@ -287,7 +338,8 @@ export default function OrderTable({
                     </td>
                   </tr>
                 );
-              })}
+              })
+            )}
             </tbody>
           </table>
         </div>
@@ -297,8 +349,14 @@ export default function OrderTable({
           {/* Left: Range Counter & Rows Per Page */}
           <div className="flex flex-wrap items-center gap-4">
             <span className="text-slate-600">
-              Showing <strong className="text-slate-900 font-bold">{startRecord}–{endRecord}</strong> of{' '}
-              <strong className="text-slate-900 font-bold">{totalOrders}</strong> orders
+              {isLoading ? (
+                <span className="inline-block w-28 h-3.5 bg-slate-200 animate-pulse rounded" />
+              ) : (
+                <>
+                  Showing <strong className="text-slate-900 font-bold">{startRecord}–{endRecord}</strong> of{' '}
+                  <strong className="text-slate-900 font-bold">{totalOrders}</strong> orders
+                </>
+              )}
             </span>
 
             <div className="flex items-center gap-1.5 border-l border-slate-200 pl-4">

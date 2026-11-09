@@ -11,11 +11,11 @@ export default function Footer() {
             <span className="font-extrabold text-base text-white">Research Agro Vet</span>
           </div>
           <p className="text-slate-400 text-xs leading-relaxed">
-            লাইভস্টক, ডেইরি, পোল্ট্রি ও মৎস্য খামারীদের জন্য অনুমোদিত Medicated Veterinary Feed Premix ও পুষ্টি সম্পূরক সরবরাহকারী।
+            লাইভস্টক, ডেইরি, পোল্ট্রি ও মৎস্য খামারীদের জন্য অনুমোদিত Medicated Veterinary Feed Premix প্রস্তুতকারক
           </p>
           <div className="inline-flex items-center gap-1.5 px-2.5 py-1 bg-slate-800 text-emerald-400 rounded border border-slate-700 text-[11px] font-semibold">
             <ShieldCheck className="w-3.5 h-3.5 shrink-0" />
-            <span>DLS Reg: 126</span>
+            <span>Verified Manufacturer</span>
           </div>
         </div>
 
@@ -27,7 +27,7 @@ export default function Footer() {
             <li><Link href="/products?species=POULTRY" className="hover:text-emerald-400 transition-colors">পোল্ট্রি ও হাঁস (Poultry)</Link></li>
             <li><Link href="/products?species=GOAT_SHEEP" className="hover:text-emerald-400 transition-colors">ছাগল ও ভেড়া (Goat & Sheep)</Link></li>
             <li><Link href="/products?species=AQUA" className="hover:text-emerald-400 transition-colors">মৎস্য ও একুয়া (Fisheries)</Link></li>
-            <li><Link href="/#dealer-contact" className="hover:text-amber-400 transition-colors">পাইকারি ও ডিলার যোগাযোগ</Link></li>
+            <li><Link href="/wholesale" className="hover:text-amber-400 transition-colors">পাইকারি ও ডিলার যোগাযোগ</Link></li>
           </ul>
         </div>
 
@@ -35,10 +35,10 @@ export default function Footer() {
         <div className="space-y-2.5">
           <h4 className="font-bold text-white text-xs uppercase tracking-wider">গ্রাহক সেবা ও পলিসি</h4>
           <ul className="space-y-1.5">
-            <li><Link href="/track-order" className="hover:text-emerald-400 transition-colors">অর্ডার ট্র্যাকিং</Link></li>
-            <li><Link href="/terms" className="hover:text-emerald-400 transition-colors">শর্তাবলী (Terms & Conditions)</Link></li>
-            <li><Link href="/privacy" className="hover:text-emerald-400 transition-colors">প্রাইভেসি পলিসি (Privacy Policy)</Link></li>
-            <li><Link href="/refund" className="hover:text-emerald-400 transition-colors">রিটার্ন ও রিফান্ড নীতি</Link></li>
+            <li><Link prefetch={false} href="/track-order" className="hover:text-emerald-400 transition-colors">অর্ডার ট্র্যাকিং</Link></li>
+            {/* <li><Link prefetch={false} href="/terms" className="hover:text-emerald-400 transition-colors">শর্তাবলী (Terms & Conditions)</Link></li>
+            <li><Link prefetch={false} href="/privacy" className="hover:text-emerald-400 transition-colors">প্রাইভেসি পলিসি (Privacy Policy)</Link></li> */}
+            <li><Link prefetch={false} href="/refund" className="hover:text-emerald-400 transition-colors">রিটার্ন ও রিফান্ড নীতি</Link></li>
           </ul>
         </div>
 
@@ -56,7 +56,7 @@ export default function Footer() {
             </p>
             <p className="flex items-start gap-2">
               <MapPin className="w-3.5 h-3.5 text-emerald-400 shrink-0 mt-0.5" />
-              <span>হাতিগাড়া, বেড়া, পাবনা, বাংলাদেশ • ৬৪ জেলায় ক্যাশ অন ডেলিভারি</span>
+              <span>হাতিগাড়া, বেড়া, পাবনা, বাংলাদেশ</span>
             </p>
           </div>
         </div>

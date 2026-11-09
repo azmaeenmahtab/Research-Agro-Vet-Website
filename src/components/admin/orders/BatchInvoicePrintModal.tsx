@@ -182,7 +182,7 @@ export default function BatchInvoicePrintModal({
                         Veterinary Pharmaceuticals, Medicated Feed Premix & Animal Care
                       </p>
                       <p className="text-[11px] text-slate-400 mt-0.5">
-                        DLS Reg: 126-18-(07)-006 • Hotline: 01711-234567 • www.researchagrovet.com
+                        DLS Reg: 126-18-(07)-006 • Hotline: 01716-019731 • www.researchagrovet.com
                       </p>
                     </div>
                   </div>
@@ -421,7 +421,7 @@ export default function BatchInvoicePrintModal({
                     </span>
                   )}
                   <p className="mt-1 text-[9px] text-slate-400">
-                    Hotline: 01711-234567 • Research Agro Vet
+                    Hotline: 01716-019731 • Research Agro Vet
                   </p>
                 </div>
               </div>

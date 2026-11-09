@@ -23,7 +23,7 @@ import {
 } from 'lucide-react';
 import { BANGLADESH_DISTRICTS } from '@/constants/districts';
 import { bdPhoneRegex } from '@/lib/validators';
-import { getApiUrl } from '@/lib/api-client';
+import { authorizedFetch, getApiUrl } from '@/lib/api-client';
 
 // ─── Types ───────────────────────────────────────────────────────────────────
 
@@ -659,10 +659,8 @@ export default function ManualOrderModal({
         orderNote: form.orderNote || undefined,
       };
 
-      const res = await fetch(getApiUrl('/api/admin/orders/manual'), {
+      const res = await authorizedFetch('/api/admin/orders/manual', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        credentials: 'include',
         body: JSON.stringify(payload),
       });
 

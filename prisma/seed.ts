@@ -73,13 +73,16 @@ async function main() {
   // 2. Seed Default SiteSettings
   await prisma.siteSettings.upsert({
     where: { id: 'default' },
-    update: {},
+    update: {
+      supportPhone: '01716019731',
+      whatsappNumber: '8801716019731',
+    },
     create: {
       id: 'default',
       storeName: 'Research Agro Vet',
       storeTagline: 'Licensed Veterinary Medicine & Nutritional Supplements Dealer',
-      supportPhone: '01700000000',
-      whatsappNumber: '8801700000000',
+      supportPhone: '01716019731',
+      whatsappNumber: '8801716019731',
       supportEmail: 'contact@researchagrovet.com',
       insideDistrictFee: 70,
       outsideDistrictFee: 130,

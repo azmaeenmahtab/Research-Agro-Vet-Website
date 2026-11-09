@@ -76,7 +76,7 @@ export default function FeaturedProducts({
         <div>
           
           <h2 className="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight">
-            জনপ্রিয় ভেটেরিনারি ঔষধসমূহ
+            জনপ্রিয় ভেটেরিনারি ফিড প্রিমিক্স পণ্যসমূহ
           </h2>
         </div>
 

@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import Image from 'next/image';
 import { toast } from '@heroui/react';
-import { getApiUrl } from '@/lib/api-client';
+import { authorizedFetch } from '@/lib/api-client';
 import {
   X,
   Plus,
@@ -440,9 +440,8 @@ export default function ProductFormModal({
         const thumbFormData = new FormData();
         thumbFormData.append('file', thumbnailFile);
 
-        const thumbRes = await fetch(getApiUrl('/api/admin/upload'), {
+        const thumbRes = await authorizedFetch('/api/admin/upload', {
           method: 'POST',
-          credentials: 'include',
           body: thumbFormData,
         });
 
@@ -465,9 +464,8 @@ export default function ProductFormModal({
           }
         });
 
-        const galleryRes = await fetch(getApiUrl('/api/admin/upload'), {
+        const galleryRes = await authorizedFetch('/api/admin/upload', {
           method: 'POST',
-          credentials: 'include',
           body: galleryFormData,
         });
 
@@ -531,10 +529,8 @@ export default function ProductFormModal({
         : '/api/admin/products';
       const method = isEditing ? 'PUT' : 'POST';
 
-      const res = await fetch(getApiUrl(url), {
+      const res = await authorizedFetch(url, {
         method,
-        headers: { 'Content-Type': 'application/json' },
-        credentials: 'include',
         body: JSON.stringify(payload),
       });
 

@@ -161,19 +161,6 @@ async function ProductDetailContent({ params }: ProductDetailPageProps) {
   );
 }
 
-export default function ProductDetailPage({ params }: ProductDetailPageProps) {
-  return (
-    <Suspense
-      fallback={
-        <div className="bg-slate-50 min-h-screen py-16 px-4 max-w-7xl mx-auto flex items-center justify-center">
-          <div className="text-center space-y-3">
-            <div className="w-10 h-10 border-3 border-emerald-600 border-t-transparent rounded-full animate-spin mx-auto" />
-            <p className="text-xs text-slate-600 font-bold">পণ্যের বিস্তারিত লোড হচ্ছে...</p>
-          </div>
-        </div>
-      }
-    >
-      <ProductDetailContent params={params} />
-    </Suspense>
-  );
+export default async function ProductDetailPage({ params }: ProductDetailPageProps) {
+  return <ProductDetailContent params={params} />;
 }

@@ -4,6 +4,7 @@ import React, { useState } from 'react';
 import { usePathname } from 'next/navigation';
 import AdminSidebar from './AdminSidebar';
 import AdminHeader from './AdminHeader';
+import AdminAuthGuard from './AdminAuthGuard';
 
 interface AdminLayoutClientProps {
   children: React.ReactNode;
@@ -32,7 +33,7 @@ export default function AdminLayoutClient({ children }: AdminLayoutClientProps) 
           onOpenMobileSidebar={() => setIsMobileSidebarOpen(true)}
         /> */}
         <main className="flex-1 w-full px-4 sm:px-6 py-4 sm:py-5">
-          {children}
+          <AdminAuthGuard>{children}</AdminAuthGuard>
         </main>
       </div>
     </div>

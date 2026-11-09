@@ -1,11 +1,13 @@
 import { prisma } from '../lib/prisma';
-import type { Prisma } from '@prisma/client';
-import type {
+import {
+  OrderStatus,
+  PaymentStatus,
+  Prisma,
+} from '@prisma/client';
+import {
   AdminOrder,
   OrderStatsSummary,
   UpdateOrderPayload,
-  OrderStatus,
-  PaymentStatus,
 } from '../types/admin-order';
 
 export interface OrderQueryFilters {
@@ -85,12 +87,12 @@ export async function getAdminOrders(filters: OrderQueryFilters = {}) {
   if (search && search.trim()) {
     const term = search.trim();
     where.OR = [
-      { orderNumber: { contains: term, mode: 'insensitive' } },
-      { customerName: { contains: term, mode: 'insensitive' } },
+      { orderNumber: { contains: term } },
+      { customerName: { contains: term } },
       { customerPhone: { contains: term } },
-      { district: { contains: term, mode: 'insensitive' } },
-      { upazila: { contains: term, mode: 'insensitive' } },
-      { consignmentId: { contains: term, mode: 'insensitive' } },
+      { district: { contains: term } },
+      { upazila: { contains: term } },
+      { consignmentId: { contains: term } },
     ];
   }
 
@@ -203,7 +205,7 @@ export async function getOrderStats(params: OrderStatsParams = {}): Promise<Orde
   }
 
   const totalRevenue = rangeOrdersForRevenue.reduce(
-    (acc: number, curr: any) => acc + Number(curr.grandTotal || 0),
+    (acc, curr) => acc + Number(curr.grandTotal || 0),
     0
   );
   const averageOrderValue =
@@ -212,12 +214,12 @@ export async function getOrderStats(params: OrderStatsParams = {}): Promise<Orde
       : 0;
 
   const todayRevenue = todayOrders.reduce(
-    (acc: number, curr: any) => acc + Number(curr.grandTotal || 0),
+    (acc, curr) => acc + Number(curr.grandTotal || 0),
     0
   );
 
   const codOrdersCount = rangeOrdersForRevenue.filter(
-    (o: any) => o.paymentMethod === 'COD'
+    (o) => o.paymentMethod === 'COD'
   ).length;
 
   return {
@@ -298,7 +300,7 @@ export async function updateAdminOrder(id: string, payload: UpdateOrderPayload):
   const dueAmount = Math.max(0, grandTotal - paidAmount);
 
   // Use admin's explicitly chosen paymentStatus if provided; otherwise auto-compute from paidAmount
-  let paymentStatus: PaymentStatus = payload.paymentStatus || current.paymentStatus;
+  let paymentStatus = payload.paymentStatus || current.paymentStatus;
   if (!payload.paymentStatus && payload.paidAmount !== undefined) {
     if (paidAmount >= grandTotal && grandTotal > 0) {
       paymentStatus = 'PAID';
@@ -320,17 +322,17 @@ export async function updateAdminOrder(id: string, payload: UpdateOrderPayload):
       ...(payload.orderStatus && { orderStatus: payload.orderStatus }),
       paymentStatus,
       ...(payload.paymentMethod && { paymentMethod: payload.paymentMethod }),
-      paidAmount,
-      discountAmount,
-      shippingFee,
-      grandTotal,
-      dueAmount: finalDueAmount,
-      codCollectableAmount: finalDueAmount,
+      paidAmount: new Prisma.Decimal(paidAmount),
+      discountAmount: new Prisma.Decimal(discountAmount),
+      shippingFee: new Prisma.Decimal(shippingFee),
+      grandTotal: new Prisma.Decimal(grandTotal),
+      dueAmount: new Prisma.Decimal(finalDueAmount),
+      codCollectableAmount: new Prisma.Decimal(finalDueAmount),
       ...(payload.appliedDiscountLabel !== undefined && {
         appliedDiscountLabel: payload.appliedDiscountLabel,
       }),
       ...(payload.appliedDiscountSource !== undefined && {
-        appliedDiscountSource: payload.appliedDiscountSource as any,
+        appliedDiscountSource: payload.appliedDiscountSource,
       }),
       ...(payload.courierProvider !== undefined && {
         courierProvider: payload.courierProvider,
@@ -371,3 +373,4 @@ export async function updateAdminOrder(id: string, payload: UpdateOrderPayload):
 
   return serializeOrder(updated);
 }
+

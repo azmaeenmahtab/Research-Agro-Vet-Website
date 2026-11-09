@@ -11,7 +11,7 @@ import ManualOrderModal from './ManualOrderModal';
 import InvoicePrintModal from './InvoicePrintModal';
 import BatchInvoicePrintModal from './BatchInvoicePrintModal';
 import { toast } from '@heroui/react';
-import { getApiUrl } from '@/lib/api-client';
+import { authorizedFetch } from '@/lib/api-client';
 import {
   AdminOrder,
   OrderStatsSummary,
@@ -72,9 +72,7 @@ export default function OrderManagementDashboard() {
         params.append('limit', String(activeSize));
         params.append('page', String(activePage));
 
-        const res = await fetch(getApiUrl(`/api/admin/orders?${params.toString()}`), {
-          credentials: 'include',
-        });
+        const res = await authorizedFetch(`/api/admin/orders?${params.toString()}`);
         const data = await res.json();
 
         if (data.success) {
@@ -133,10 +131,8 @@ export default function OrderManagementDashboard() {
 
   // Update order handler
   const handleUpdateOrder = async (id: string, payload: UpdateOrderPayload) => {
-    const res = await fetch(getApiUrl(`/api/admin/orders/${id}`), {
+    const res = await authorizedFetch(`/api/admin/orders/${id}`, {
       method: 'PUT',
-      headers: { 'Content-Type': 'application/json' },
-      credentials: 'include',
       body: JSON.stringify(payload),
     });
 
@@ -277,6 +273,7 @@ export default function OrderManagementDashboard() {
             searchQuery={searchQuery}
             onSearchChange={handleSearchChange}
             stats={stats}
+            isLoading={isLoading || isRefreshing}
           />
         </div>
       </div>

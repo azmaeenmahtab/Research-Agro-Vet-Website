@@ -16,6 +16,7 @@ import {
   ShieldCheck,
   Truck,
   RotateCcw,
+  PhoneCall,
   Package,
   Layers,
   FileText,
@@ -193,7 +194,7 @@ export default function ProductDetailsView({
             <div className="absolute top-4 left-4 z-10 flex flex-col gap-1.5">
               <span className="px-2.5 py-1 rounded-md bg-emerald-50 text-emerald-800 font-bold text-xs border border-emerald-200 flex items-center gap-1 shadow-2xs">
                 <ShieldCheck className="w-3.5 h-3.5 text-emerald-600" />
-                DLS অনুমোদিত
+                অনুমোদিত
               </span>
             </div>
 
@@ -303,13 +304,12 @@ export default function ProductDetailsView({
                         {toBengaliNumber(avgRating)}
                       </span>
                       <span className="text-slate-300">•</span>
-                      <span className="underline decoration-slate-300 group-hover:decoration-emerald-700 text-slate-600">
-                        {toBengaliNumber(totalReviews)} টি খামারি রিভিউ
+                      <span className=" decoration-slate-300 group-hover:decoration-emerald-700 text-slate-600">
+                        {toBengaliNumber(totalReviews)} টি
                       </span>
                     </>
                   ) : (
                     <span className="text-slate-500 hover:underline">
-                      এখনো রিভিউ নেই • প্রথম রিভিউ দিন
                     </span>
                   )}
                 </a>
@@ -356,12 +356,12 @@ export default function ProductDetailsView({
                     </span>
                   )}
                   {hasDiscount ? (
-                    <span className="px-2.5 py-0.5 rounded-full bg-red-100 text-red-800 border border-red-200 text-xs font-extrabold flex items-center gap-1">
+                    <span className="px-2.5 py-0.5 rounded-full bg-red-100 text-red-800 border border-red-200 text-sm font-extrabold flex items-center gap-1">
                       <span>
                         {toBengaliNumber(discountPct)}%{' '}
                         {discountType === 'UNIVERSAL' ? 'সার্বজনীন ছাড়' : 'প্রমোশনাল ছাড়'}
                       </span>
-                      <span>(৳{toBengaliNumber(savingsPerUnit)} সাশ্রয়)</span>
+                      
                     </span>
                   ) : (
                     <span className="px-2 py-0.5 rounded bg-emerald-100 text-[#005d42] text-xs font-bold border border-emerald-200">
@@ -545,8 +545,8 @@ export default function ProductDetailsView({
                 ক্যাশ অন ডেলিভারি
               </span>
               <span className="flex items-center justify-center gap-1">
-                <RotateCcw className="w-3.5 h-3.5 text-emerald-600" />
-                ৭ দিনের রিটার্ন নীতি
+                <PhoneCall className="w-3.5 h-3.5 text-emerald-600" />
+                ফোনে যাচাই ও নিশ্চয়তা
               </span>
             </div>
           </div>
@@ -676,7 +676,7 @@ export default function ProductDetailsView({
               প্রাণীর ওজন অনুযায়ী সঠিক প্রয়োগমাত্রা নির্ধারণ
             </h3>
             <p className="text-xs text-slate-500">
-              সঠিক মাত্রায় প্রয়োগ নিশ্চিত করলে ঔষধের কার্যকারিতা বজায় থাকে এবং অপচয় রোধ হয়।
+              সঠিক মাত্রায় প্রয়োগ নিশ্চিত করলে পণ্যের কার্যকারিতা বজায় থাকে এবং অপচয় রোধ হয়।
             </p>
           </div>
 
@@ -725,8 +725,8 @@ export default function ProductDetailsView({
         <section className="space-y-6 pt-4">
           <div className="flex items-center justify-between">
             <div>
-              <h3 className="text-xl font-bold text-slate-900">সংশ্লিষ্ট অন্যান্য ঔষধসমূহ</h3>
-              <p className="text-xs text-slate-500">খামারীদের সর্বাধিক ব্যবহৃত অন্যান্য প্রয়োজনীয় ঔষধ</p>
+              <h3 className="text-xl font-bold text-slate-900">সংশ্লিষ্ট অন্যান্য পণ্যসমূহ</h3>
+              <p className="text-xs text-slate-500">খামারীদের সর্বাধিক ব্যবহৃত অন্যান্য প্রয়োজনীয় ফিড প্রিমিক্স পণ্য</p>
             </div>
           </div>
 

@@ -15,20 +15,10 @@ async function OrderSuccessContent({
   return <OrderSuccessView orderNumber={orderNumber} />;
 }
 
-export default function OrderSuccessPage({
+export default async function OrderSuccessPage({
   params,
 }: {
   params: Promise<{ orderNumber: string }>;
 }) {
-  return (
-    <Suspense
-      fallback={
-        <div className="min-h-[60vh] flex items-center justify-center">
-          <div className="w-8 h-8 border-3 border-[#005d42] border-t-transparent rounded-full animate-spin" />
-        </div>
-      }
-    >
-      <OrderSuccessContent params={params} />
-    </Suspense>
-  );
+  return <OrderSuccessContent params={params} />;
 }

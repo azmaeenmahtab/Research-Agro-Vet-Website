@@ -26,6 +26,10 @@ dist/
 /dist
 express-api/dist/
 express-api/uploads/
+cpanel-deployment/
+*.zip
+*.sql
+response.html
 
 # misc & OS
 .DS_Store

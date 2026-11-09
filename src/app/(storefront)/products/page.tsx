@@ -18,7 +18,7 @@ interface ProductsPageProps {
 
 export const metadata = {
   title: 'সকল ভেটেরিনারি ফিড প্রিমিক্স পণ্য তালিকা | Research Agro Vet',
-  description: 'গবাদিপশু, পোল্ট্রি ও মাছের জন্য ডিএলএস অনুমোদিত উন্নত ভেটেরিনারি ঔষধিযুক্ত ফিড প্রিমিক্স ক্যাটালগ।',
+  description: 'গবাদিপশু, পোল্ট্রি ও মাছের জন্য ডিএলএস অনুমোদিত উন্নত ভেটেরিনারি ফিড প্রিমিক্স ক্যাটালগ।',
 };
 
 const SPECIES_NAMES: Record<string, string> = {
@@ -158,19 +158,6 @@ async function ProductsCatalog({ searchParams }: ProductsPageProps) {
   );
 }
 
-export default function ProductsPage({ searchParams }: ProductsPageProps) {
-  return (
-    <Suspense
-      fallback={
-        <div className="bg-slate-50 min-h-screen py-12 px-4 max-w-7xl mx-auto flex items-center justify-center">
-          <div className="text-center space-y-2">
-            <div className="w-8 h-8 border-3 border-emerald-600 border-t-transparent rounded-full animate-spin mx-auto" />
-            <p className="text-xs text-slate-500 font-medium">ঔষধ তালিকা লোড হচ্ছে...</p>
-          </div>
-        </div>
-      }
-    >
-      <ProductsCatalog searchParams={searchParams} />
-    </Suspense>
-  );
+export default async function ProductsPage({ searchParams }: ProductsPageProps) {
+  return <ProductsCatalog searchParams={searchParams} />;
 }

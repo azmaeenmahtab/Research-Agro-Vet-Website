@@ -9,6 +9,7 @@ const allowedOrigins = [
   'http://localhost:3000',
   'http://127.0.0.1:3000',
   process.env.FRONTEND_URL || '',
+  process.env.NEXT_PUBLIC_APP_URL || '',
 ].filter(Boolean);
 
 app.use(
@@ -23,7 +24,8 @@ app.use(
     },
     credentials: true,
     methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
-    allowedHeaders: ['Content-Type', 'Authorization', 'Cookie'],
+    allowedHeaders: ['Content-Type', 'Authorization', 'Cookie', 'X-Requested-With'],
+    exposedHeaders: ['set-auth-token'],
   })
 );
 

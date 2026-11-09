@@ -393,7 +393,7 @@ export default function ProductReviewsSection({
                   rows={3}
                   value={comment}
                   onChange={(e) => setComment(e.target.value)}
-                  placeholder="ওষুধটি খাইয়ে কী পরিবর্তন বা উপকার পেলেন? দুধের পরিমাণ, খাবারের রুচি বা পশুর স্বাস্থ্য সম্পর্কে বিস্তারিত লিখুন..."
+                  placeholder="পণ্যটি খাইয়ে কী পরিবর্তন বা উপকার পেলেন? দুধের পরিমাণ, খাবারের রুচি বা পশুর স্বাস্থ্য সম্পর্কে বিস্তারিত লিখুন..."
                   className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-300 rounded-xl text-xs sm:text-sm text-slate-900 focus:bg-white focus:outline-none focus:border-emerald-600 focus:ring-2 focus:ring-emerald-500/20 leading-relaxed"
                 />
               </div>
@@ -541,7 +541,7 @@ export default function ProductReviewsSection({
                 এখনো কোনো রিভিউ দেওয়া হয়নি
               </h4>
               <p className="text-xs text-slate-500 max-w-sm mx-auto leading-relaxed">
-                আপনি কি এই ওষুধটি আপনার খামারে ব্যবহার করেছেন? আপনার প্রথম রিভিউ এবং অভিজ্ঞতা শেয়ার করে অন্য খামারিদের সহযোগিতা করুন।
+                আপনি কি এই পণ্যটি আপনার খামারে ব্যবহার করেছেন? আপনার প্রথম রিভিউ এবং অভিজ্ঞতা শেয়ার করে অন্য খামারিদের সহযোগিতা করুন।
               </p>
               <button
                 type="button"

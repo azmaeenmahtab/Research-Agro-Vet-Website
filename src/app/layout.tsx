@@ -25,7 +25,7 @@ const anekBangla = Anek_Bangla({
 });
 
 export const metadata: Metadata = {
-  title: "Research Agro Vet — Medicated Veterinary Feed Premix & Livestock Nutrition",
+  title: "Research Agro Vet - Medicated Veterinary Feed Premix Manufacturer",
   description: "গবাদিপশু, পোল্ট্রি ও মৎস্য খামারীদের জন্য অনুমোদিত Medicated Veterinary Feed Premix, মিল্ক বুস্টার ও পুষ্টি সম্পূরক।",
 };
 

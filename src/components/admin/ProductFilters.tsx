@@ -1,7 +1,7 @@
 'use client';
 
-import React from 'react';
-import { Search, Plus, Download, ChevronsUpDown } from 'lucide-react';
+import React, { useState, useEffect, useRef } from 'react';
+import { Search, Plus, Download, ChevronsUpDown, X } from 'lucide-react';
 import { ProductStatus } from '@/types/admin-product';
 
 interface CategoryOption {
@@ -23,6 +23,7 @@ interface ProductFiltersProps {
   onAddProduct: () => void;
   onExportCsv: () => void;
   categories: CategoryOption[];
+  isLoading?: boolean;
 }
 
 export default function ProductFilters({
@@ -37,19 +38,82 @@ export default function ProductFilters({
   onAddProduct,
   onExportCsv,
   categories,
+  isLoading = false,
 }: ProductFiltersProps) {
+  const [localSearch, setLocalSearch] = useState(searchQuery);
+  const isTypingRef = useRef(false);
+
+  // Sync with external reset / prop changes
+  useEffect(() => {
+    if (!isTypingRef.current) {
+      setLocalSearch(searchQuery);
+    }
+  }, [searchQuery]);
+
+  // Debounced search trigger (350ms)
+  useEffect(() => {
+    const handler = setTimeout(() => {
+      isTypingRef.current = false;
+      if (localSearch !== searchQuery) {
+        onSearchChange(localSearch);
+      }
+    }, 350);
+
+    return () => clearTimeout(handler);
+  }, [localSearch, searchQuery, onSearchChange]);
+
+  const handleInputChange = (val: string) => {
+    isTypingRef.current = true;
+    setLocalSearch(val);
+  };
+
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      isTypingRef.current = false;
+      onSearchChange(localSearch);
+    }
+  };
+
+  const handleClear = () => {
+    isTypingRef.current = false;
+    setLocalSearch('');
+    onSearchChange('');
+  };
+
   return (
     <div className="bg-white p-4 rounded-xl border border-slate-200/80 shadow-xs flex flex-col lg:flex-row items-stretch lg:items-center justify-between gap-4">
-      {/* Search Input */}
+      {/* Search Input with Debounce, Enter trigger, and Clear Button */}
       <div className="relative flex-1">
         <Search className="w-4 h-4 absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none" />
         <input
           type="text"
-          className="w-full pl-10 pr-4 py-2 bg-slate-50 text-slate-900 text-sm rounded-lg border border-slate-200 focus:bg-white focus:ring-2 focus:ring-[#005d42] focus:border-transparent outline-none transition-all placeholder:text-slate-400"
+          className="w-full pl-10 pr-24 py-2 bg-slate-50 text-slate-900 text-sm rounded-lg border border-slate-200 focus:bg-white focus:ring-2 focus:ring-[#005d42] focus:border-transparent outline-none transition-all placeholder:text-slate-400"
           placeholder="Search by premix name, composition, SKU, or DLS license..."
-          value={searchQuery}
-          onChange={(e) => onSearchChange(e.target.value)}
+          value={localSearch}
+          onChange={(e) => handleInputChange(e.target.value)}
+          onKeyDown={handleKeyDown}
         />
+        {/* Action Indicators */}
+        <div className="absolute right-2.5 top-1/2 -translate-y-1/2 flex items-center gap-1.5">
+          {isLoading && (
+            <div className="w-3.5 h-3.5 border-2 border-[#005d42] border-t-transparent rounded-full animate-spin" />
+          )}
+          {localSearch && (
+            <button
+              type="button"
+              onClick={handleClear}
+              className="p-1 hover:bg-slate-200/80 text-slate-400 hover:text-slate-700 rounded-md transition-colors"
+              title="Clear search"
+              aria-label="Clear search"
+            >
+              <X className="w-3.5 h-3.5" />
+            </button>
+          )}
+          <span className="hidden sm:inline-block px-1.5 py-0.5 rounded text-[10px] font-mono text-slate-400 bg-slate-100 border border-slate-200 select-none">
+            ↵ Enter
+          </span>
+        </div>
       </div>
 
       {/* Filters & Actions */}

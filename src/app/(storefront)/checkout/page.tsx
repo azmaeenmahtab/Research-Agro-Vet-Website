@@ -237,7 +237,7 @@ export default function CheckoutPage() {
     }
 
     if (items.length === 0) {
-      setErrorMessage('আপনার কার্ট খালি রয়েছে, অনুগ্রহ করে অন্তত একটি ওষুধ যুক্ত করুন।');
+      setErrorMessage('আপনার কার্ট খালি রয়েছে, অনুগ্রহ করে অন্তত একটি পণ্য যুক্ত করুন।');
       return;
     }
 
@@ -292,13 +292,13 @@ export default function CheckoutPage() {
         </div>
         <h1 className="text-xl font-bold text-slate-900 mb-2">আপনার শপিং কার্ট বর্তমানে খালি রয়েছে</h1>
         <p className="text-sm text-slate-500 max-w-md mx-auto mb-6">
-          অর্ডার সম্পন্ন করার জন্য আপনার প্রয়োজনীয় ভেটেরিনারি ওষুধ বা ফিড প্রিমিক্স কার্টে যুক্ত করুন।
+          অর্ডার সম্পন্ন করার জন্য আপনার প্রয়োজনীয় ভেটেরিনারি ফিড প্রিমিক্স পণ্য কার্টে যুক্ত করুন।
         </p>
         <Link
           href="/products"
           className="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-[#005d42] hover:bg-[#004e37] text-white font-bold text-sm shadow-xs transition-colors"
         >
-          <span>ওষুধের তালিকা দেখুন</span>
+          <span>পণ্যের তালিকা দেখুন</span>
         </Link>
       </div>
     );
@@ -314,7 +314,7 @@ export default function CheckoutPage() {
             className="flex items-center gap-1.5 text-slate-700 hover:text-[#005d42] font-semibold transition-colors"
           >
             <ArrowLeft className="w-4 h-4" />
-            <span>আরও ওষুধ কিনুন</span>
+            <span>আরও পণ্য কিনুন</span>
           </Link>
 
           <div className="flex items-center gap-4 text-emerald-800 font-medium">
@@ -357,10 +357,10 @@ export default function CheckoutPage() {
                   অর্ডার সহায়তা হেল্পলাইন
                 </span>
                 <a
-                  href="tel:01711234567"
+                  href="tel:01716019731"
                   className="font-mono font-black text-slate-900 text-sm sm:text-base hover:text-[#005d42]"
                 >
-                  ০১৭১১-২৩৪৫৬৭
+                  ০১৭১৬-০১৯৭৩১
                 </a>
               </div>
             </div>
@@ -564,8 +564,8 @@ export default function CheckoutPage() {
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
               <div className="p-4 bg-white rounded-2xl border border-slate-200 shadow-2xs flex flex-col items-center text-center">
                 <ShieldCheck className="w-6 h-6 text-[#005d42] mb-1.5" />
-                <h4 className="font-bold text-slate-900 text-xs">১০০% আসল ওষুধ</h4>
-                <p className="text-[11px] text-slate-500 mt-0.5">DLS অনুমোদিত লাইসেন্সড ড্রাগ</p>
+                <h4 className="font-bold text-slate-900 text-xs">১০০% আসল ও অনুমোদিত পণ্য</h4>
+                <p className="text-[11px] text-slate-500 mt-0.5">DLS অনুমোদিত লাইসেন্সড প্রিমিক্স</p>
               </div>
 
               <div className="p-4 bg-white rounded-2xl border border-slate-200 shadow-2xs flex flex-col items-center text-center">
@@ -636,15 +636,15 @@ export default function CheckoutPage() {
 
                       {/* Product Info */}
                       <div className="flex-1 min-w-0">
-                        <h4 className="font-bold text-xs text-slate-900 truncate">
+                        <h4 className="font-bold text-sm text-slate-900 truncate">
                           {item.nameEn}
                         </h4>
-                        <p className="text-[11px] text-slate-500 font-medium">
+                        <p className="text-xs text-slate-500 font-medium mt-0.5">
                           প্যাক: {item.packSize} • ৳{unitPrice}
                         </p>
 
                         {/* Inline Quantity Changer */}
-                        <div className="flex items-center gap-2 mt-1.5">
+                        <div className="flex items-center gap-2 mt-2">
                           <div className="flex items-center border border-slate-200 rounded-lg bg-slate-50">
                             <button
                               type="button"
@@ -652,9 +652,9 @@ export default function CheckoutPage() {
                               className="p-1 hover:bg-slate-200 text-slate-600 rounded-l"
                               title="পরিমাণ কমান"
                             >
-                              <Minus className="w-3 h-3" />
+                              <Minus className="w-3.5 h-3.5" />
                             </button>
-                            <span className="px-2 text-xs font-bold font-mono text-slate-900">
+                            <span className="px-2.5 text-xs font-bold font-mono text-slate-900">
                               {item.quantity}
                             </span>
                             <button
@@ -663,7 +663,7 @@ export default function CheckoutPage() {
                               className="p-1 hover:bg-slate-200 text-slate-600 rounded-r"
                               title="পরিমাণ বাড়ান"
                             >
-                              <Plus className="w-3 h-3" />
+                              <Plus className="w-3.5 h-3.5" />
                             </button>
                           </div>
 
@@ -673,18 +673,18 @@ export default function CheckoutPage() {
                             className="p-1 text-slate-400 hover:text-red-500 transition-colors"
                             title="মুছে ফেলুন"
                           >
-                            <Trash2 className="w-3.5 h-3.5" />
+                            <Trash2 className="w-4 h-4" />
                           </button>
                         </div>
                       </div>
 
                       {/* Item Total Price */}
                       <div className="text-right shrink-0">
-                        <span className="font-extrabold text-xs text-slate-900 font-mono block">
+                        <span className="font-black text-sm text-slate-900 font-mono block">
                           ৳{itemLineTotal.toLocaleString()}
                         </span>
                         {item.mrpPrice > unitPrice && (
-                          <span className="text-[10px] text-slate-400 line-through font-mono">
+                          <span className="text-xs text-slate-400 line-through font-mono">
                             ৳{(item.mrpPrice * item.quantity).toLocaleString()}
                           </span>
                         )}
@@ -697,7 +697,7 @@ export default function CheckoutPage() {
               {/* Price Calculation Summary Box */}
               <div className="p-4 rounded-xl bg-slate-50 border border-slate-200/80 space-y-2 text-xs">
                 <div className="flex items-center justify-between text-slate-600">
-                  <span>মোট পণ্যের মূল্য (MRP Subtotal):</span>
+                  <span>মোট মূল্য (MRP Subtotal):</span>
                   <span className="font-bold text-slate-900 font-mono">
                     ৳{baselineSubtotal.toLocaleString()}
                   </span>
@@ -780,7 +780,7 @@ export default function CheckoutPage() {
               {/* WhatsApp Instant Order Fallback Option */}
               <div className="pt-2 border-t border-slate-100">
                 <a
-                  href={`https://wa.me/8801711234567?text=${encodeURIComponent(waMessage)}`}
+                  href={`https://wa.me/8801716019731?text=${encodeURIComponent(waMessage)}`}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="w-full py-2.5 px-3 rounded-xl border border-emerald-300 hover:bg-emerald-50 text-emerald-800 text-xs font-bold flex items-center justify-center gap-2 transition-colors"

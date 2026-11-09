@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import { X, Stethoscope, Save, ShieldAlert, Sparkles, AlertCircle } from 'lucide-react';
 import { AdminProduct, ClinicalDataPayload } from '@/types/admin-product';
-import { getApiUrl } from '@/lib/api-client';
+import { authorizedFetch } from '@/lib/api-client';
 
 interface ClinicalDataModalProps {
   product: AdminProduct | null;
@@ -67,10 +67,8 @@ export default function ClinicalDataModal({
         searchKeywords: keywords,
       };
 
-      const res = await fetch(getApiUrl(`/api/admin/products/${product.id}/clinical`), {
+      const res = await authorizedFetch(`/api/admin/products/${product.id}/clinical`, {
         method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
-        credentials: 'include',
         body: JSON.stringify(payload),
       });
 

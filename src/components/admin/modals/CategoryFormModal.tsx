@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { X, Tags, Loader2, AlertCircle, Check, ArrowRight } from 'lucide-react';
-import { getApiUrl } from '@/lib/api-client';
+import { authorizedFetch } from '@/lib/api-client';
 
 export interface AdminCategory {
   id: string;
@@ -114,10 +114,8 @@ export default function CategoryFormModal({
         : '/api/admin/categories';
       const method = isEditing ? 'PUT' : 'POST';
 
-      const res = await fetch(getApiUrl(url), {
+      const res = await authorizedFetch(url, {
         method,
-        headers: { 'Content-Type': 'application/json' },
-        credentials: 'include',
         body: JSON.stringify(payload),
       });
 

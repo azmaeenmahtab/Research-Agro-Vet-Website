@@ -17,10 +17,10 @@ export async function getAdminCategories(req: Request, res: Response) {
     const where: any = {};
     if (search) {
       where.OR = [
-        { nameEn: { contains: search, mode: 'insensitive' } },
+        { nameEn: { contains: search } },
         { nameBn: { contains: search } },
-        { slug: { contains: search, mode: 'insensitive' } },
-        { description: { contains: search, mode: 'insensitive' } },
+        { slug: { contains: search } },
+        { description: { contains: search } },
       ];
     }
 

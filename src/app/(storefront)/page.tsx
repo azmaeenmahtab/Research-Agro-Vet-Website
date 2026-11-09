@@ -25,7 +25,7 @@ async function FeaturedProductsLoader() {
   return <FeaturedProducts initialProducts={products} universalDiscount={universalDiscount} />;
 }
 
-export default function HomePage() {
+export default async function HomePage() {
   return (
     <div>
       <Suspense fallback={<div className="h-8 bg-slate-50 border-b border-slate-200" />}>
@@ -34,9 +34,7 @@ export default function HomePage() {
       <HeroSection />
       <SpeciesGrid />
       <TherapeuticPills />
-      <Suspense fallback={<FeaturedProducts initialProducts={[]} />}>
-        <FeaturedProductsLoader />
-      </Suspense>
+      <FeaturedProductsLoader />
     </div>
   );
 }
