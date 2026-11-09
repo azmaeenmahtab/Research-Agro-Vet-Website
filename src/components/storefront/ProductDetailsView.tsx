@@ -344,19 +344,19 @@ export default function ProductDetailsView({
             )}
 
             {/* Dynamic Price Box */}
-            <div className="bg-slate-50 border border-slate-200/90 p-4 rounded-xl grid grid-cols-2 gap-4 mt-3">
-              <div>
-                <div className="flex items-baseline gap-2.5">
-                  <span className="text-3xl font-black text-[#047857] font-mono tracking-tight">
+            <div className="bg-slate-50 border border-slate-200/90 px-3.5 py-2.5 sm:p-4 rounded-xl flex items-center justify-between gap-3 mt-3">
+              <div className="min-w-0">
+                <div className="flex items-baseline gap-2 sm:gap-2.5 flex-wrap">
+                  <span className="text-2xl sm:text-3xl font-black text-[#047857] font-mono tracking-tight">
                     ৳{toBengaliNumber(sellingPrice)}
                   </span>
                   {mrp > sellingPrice && (
-                    <span className="text-sm text-slate-400 line-through font-mono">
+                    <span className="text-xs sm:text-sm text-slate-400 line-through font-mono">
                       ৳{toBengaliNumber(mrp)}
                     </span>
                   )}
                   {hasDiscount ? (
-                    <span className="px-2.5 py-0.5 rounded-full bg-red-100 text-red-800 border border-red-200 text-sm font-extrabold flex items-center gap-1">
+                    <span className="px-2 sm:px-2.5 py-0.5 rounded-full bg-red-100 text-red-800 border border-red-200 text-xs sm:text-sm font-extrabold flex items-center gap-1">
                       <span>{toBengaliNumber(discountPct)}% ছাড়</span>
                     </span>
                   ) : (
@@ -372,22 +372,17 @@ export default function ProductDetailsView({
                 )} */}
               </div>
 
-              <div className="text-right sm:border-l sm:border-slate-200 sm:pl-4">
-                {/* Mobile screen: compact "Home Delivery" */}
-                <div className="sm:hidden text-right leading-tight">
-                  <span className="text-xs font-bold text-slate-800 flex items-center justify-end gap-1">
-                    <Truck className="w-3.5 h-3.5 text-emerald-700" />
-                    Home
-                  </span>
-                  <span className="text-xs font-bold text-slate-800 block">
-                    Delivery
-                  </span>
+              <div className="shrink-0 text-right sm:border-l sm:border-slate-200 sm:pl-4">
+                {/* Mobile screen: slim single-line "Home Delivery" */}
+                <div className="sm:hidden flex items-center justify-end gap-1 text-xs font-bold text-slate-800 whitespace-nowrap">
+                  <Truck className="w-3.5 h-3.5 text-emerald-700 shrink-0" />
+                  <span>Home Delivery</span>
                 </div>
 
                 {/* Desktop & tablet screen: full delivery note */}
                 <div className="hidden sm:block">
                   <span className="text-xs text-slate-500 font-medium block">সারাদেশে ডেলিভারি</span>
-                  <span className="text-xs font-bold text-slate-800 flex items-center justify-end gap-1 mt-0.5">
+                  <span className="text-xs font-bold text-slate-800 flex items-center justify-end gap-1 mt-0.5 whitespace-nowrap">
                     <Truck className="w-3.5 h-3.5 text-emerald-700" />
                     ২৪-৪৮ ঘণ্টায় হোম ডেলিভারি
                   </span>
