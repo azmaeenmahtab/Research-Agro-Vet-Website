@@ -352,7 +352,7 @@ export default function ProductDetailsView({
                   </span>
                   {mrp > sellingPrice && (
                     <span className="text-sm text-slate-400 line-through font-mono">
-                      MRP: ৳{toBengaliNumber(mrp)}
+                      ৳{toBengaliNumber(mrp)}
                     </span>
                   )}
                   {hasDiscount ? (

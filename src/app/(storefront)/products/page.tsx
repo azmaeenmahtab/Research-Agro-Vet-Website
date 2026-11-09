@@ -17,8 +17,14 @@ interface ProductsPageProps {
 }
 
 export const metadata = {
-  title: 'সকল ভেটেরিনারি ফিড প্রিমিক্স পণ্য তালিকা | Research Agro Vet',
+  title: 'সকল ভেটেরিনারি ফিড প্রিমিক্স পণ্য তালিকা',
   description: 'গবাদিপশু, পোল্ট্রি ও মাছের জন্য ডিএলএস অনুমোদিত উন্নত ভেটেরিনারি ফিড প্রিমিক্স ক্যাটালগ।',
+  openGraph: {
+    title: 'সকল ভেটেরিনারি ফিড প্রিমিক্স পণ্য তালিকা | Research Agro Vet',
+    description: 'গবাদিপশু, পোল্ট্রি ও মাছের জন্য ডিএলএস অনুমোদিত উন্নত ভেটেরিনারি ফিড প্রিমিক্স ক্যাটালগ।',
+    siteName: 'Research Agro Vet',
+    images: [{ url: '/images/og-image.png', width: 1200, height: 630, alt: 'Research Agro Vet Catalog' }],
+  },
 };
 
 const SPECIES_NAMES: Record<string, string> = {

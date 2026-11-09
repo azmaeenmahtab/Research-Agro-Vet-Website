@@ -1,4 +1,5 @@
 import { Suspense } from 'react';
+import type { Metadata } from 'next';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { getProductBySlug, getProducts } from '@/services/product.service';
@@ -12,29 +13,72 @@ interface ProductDetailPageProps {
   }>;
 }
 
-export async function generateMetadata({ params }: ProductDetailPageProps) {
+/**
+ * Transforms raw Cloudinary image URLs into standard 1200x630 (1.91:1) social share cards.
+ * Fits the full product bottle/packet cleanly inside the frame on a white background with zero cropping.
+ */
+function getProductOgImageUrl(imageUrl?: string | null): string {
+  if (!imageUrl) return '/images/og-image.png';
+
+  if (imageUrl.includes('res.cloudinary.com') && imageUrl.includes('/image/upload/')) {
+    return imageUrl.replace(
+      '/image/upload/',
+      '/image/upload/c_fit,h_570,w_1100/b_white,c_pad,h_630,w_1200,f_auto,q_auto/'
+    );
+  }
+
+  return imageUrl;
+}
+
+export async function generateMetadata({ params }: ProductDetailPageProps): Promise<Metadata> {
   const { slug } = await params;
   const product = await getProductBySlug(slug);
 
   if (!product) {
     return {
-      title: 'পণ্য পাওয়া যায়নি | Research Agro Vet',
+      title: 'পণ্য পাওয়া যায়নি',
     };
   }
 
-  const title = `${product.nameEn}${product.nameBn ? ` (${product.nameBn})` : ''} | Research Agro Vet`;
-  const description =
+  const title = product.nameBn
+    ? `${product.nameEn} (${product.nameBn})`
+    : product.nameEn;
+
+  // Keep description within ~135 characters for clean social cards without mid-sentence truncations
+  const rawDescription =
     product.shortDescription ||
-    product.indication?.slice(0, 150) ||
-    'ডিএলএস অনুমোদিত উন্নত ভেটেরিনারি ফিড প্রিমিক্স।';
+    product.indication?.replace(/\r?\n|\r/g, ' ') ||
+    'ডিএলএস অনুমোদিত উন্নত ভেটেরিনারি ফিড প্রিমিক্স ও পুষ্টি সম্পূরক।';
+  const description =
+    rawDescription.length > 135
+      ? `${rawDescription.slice(0, 132).trim()}...`
+      : rawDescription;
+
+  const ogImageUrl = getProductOgImageUrl(product.thumbnail);
 
   return {
     title,
     description,
     openGraph: {
-      title,
+      type: 'website',
+      siteName: 'Research Agro Vet',
+      locale: 'bn_BD',
+      title: `${title} | Research Agro Vet`,
       description,
-      images: [product.thumbnail || '/images/placeholder-medicine.webp'],
+      images: [
+        {
+          url: ogImageUrl,
+          width: 1200,
+          height: 630,
+          alt: product.nameEn,
+        },
+      ],
+    },
+    twitter: {
+      card: 'summary_large_image',
+      title: `${title} | Research Agro Vet`,
+      description,
+      images: [ogImageUrl],
     },
   };
 }
