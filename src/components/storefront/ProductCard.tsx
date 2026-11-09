@@ -115,31 +115,6 @@ export default function ProductCard({ product }: ProductCardProps) {
     setTimeout(() => setAddedAnimation(false), 1200);
   };
 
-  const handleInstantOrder = (e: React.MouseEvent) => {
-    e.preventDefault();
-    e.stopPropagation();
-    if (!currentVariant) return;
-
-    addItem({
-      variantId: currentVariant.id,
-      productId: product.id,
-      nameEn: product.nameEn,
-      nameBn: product.nameBn,
-      packSize: currentVariant.packSize,
-      sku: currentVariant.sku,
-      tradePrice: Number(currentVariant.tradePrice || currentVariant.sellingPrice),
-      mrpPrice: mrp,
-      sellingPrice: sellingPrice,
-      quantity: 1,
-      image: product.thumbnail || product.imageUrl,
-    });
-
-    const msg = encodeURIComponent(
-      `আসসালামু আলাইকুম, আমি সরাসরি ${product.nameEn} (${currentVariant.packSize}, মূল্য: ৳${sellingPrice}) অর্ডার করতে চাই।`
-    );
-    window.open(`https://wa.me/8801716019731?text=${msg}`, '_blank');
-  };
-
   const tagBadgeText =
     product.tagBadge ||
     (product.nameEn.toLowerCase().includes('zinc')
@@ -294,13 +269,12 @@ export default function ProductCard({ product }: ProductCardProps) {
             )}
           </button>
 
-          <button
-            type="button"
-            onClick={handleInstantOrder}
+          <Link
+            href={`/products/${product.slug || product.id}`}
             className="w-full py-2 bg-[#d97706] hover:bg-[#b45309] text-white text-xs font-bold rounded transition-colors flex items-center justify-center shadow-xs"
           >
             অর্ডার করুন
-          </button>
+          </Link>
         </div>
       </div>
     </article>

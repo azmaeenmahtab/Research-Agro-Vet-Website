@@ -7,6 +7,9 @@ import FeaturedProducts from '@/components/storefront/FeaturedProducts';
 import { getFeaturedProducts } from '@/services/product.service';
 import { getUniversalDiscountConfig, UniversalDiscountConfig } from '@/lib/pricing';
 
+export const dynamic = 'force-dynamic';
+export const revalidate = 0;
+
 async function FeaturedProductsLoader() {
   let products: any[] = [];
   let universalDiscount: UniversalDiscountConfig = { enabled: false, percent: 0, label: '' };
