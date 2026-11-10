@@ -70,14 +70,15 @@ export default function FeaturedProducts({
       : STITCH_FALLBACK_PRODUCTS;
 
   return (
-    <section className="w-full max-w-7xl mx-auto px-4 py-12" id="featured-catalog">
+    <section className="w-full max-w-7xl mx-auto px-4 py-6 sm:py-10" id="featured-catalog">
       {/* Section Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 mb-8">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 mb-5 sm:mb-8">
         <div>
           
-          <h2 className="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight">
+          <h2 className="text-xl sm:text-3xl font-extrabold text-slate-900 tracking-tight">
             জনপ্রিয় ভেটেরিনারি ফিড প্রিমিক্স পণ্যসমূহ
           </h2>
+          {/* //for mobile screen use shorter text here */}
         </div>
 
         <div className="flex items-center gap-2">
@@ -96,7 +97,7 @@ export default function FeaturedProducts({
       </div>
 
       {/* Product Grid */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
         {displayProducts.slice(0, 8).map((product) => (
           <ProductCard key={product.id} product={product} />
         ))}
