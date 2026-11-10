@@ -65,38 +65,35 @@ export default function FounderAchievements() {
         
         {/* Section Header */}
         <div className="text-center max-w-2xl mx-auto mb-10 sm:mb-14">
-          <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-50 text-emerald-800 border border-emerald-200/90 text-xs font-bold mb-3">
-            <ShieldCheck className="w-4 h-4 text-emerald-700" />
-            <span>অফিসিয়াল স্বীকৃতি ও উদ্ভাবন</span>
-          </div>
+        
           <h2 className="text-2xl sm:text-3xl lg:text-4xl font-extrabold text-slate-900 tracking-tight">
             গবেষক ও উদ্ভাবক পরিচিতি
           </h2>
-          <p className="text-xs sm:text-sm text-slate-600 mt-2">
+          {/* <p className="text-xs sm:text-sm text-slate-600 mt-2">
             রিসার্চ এগ্রোভেট-এর স্বত্বাধিকারী ও সরকারি পেটেন্টপ্রাপ্ত উদ্ভাবনসমূহ
-          </p>
+          </p> */}
         </div>
 
         {/* Top Split: Founder Profile & 3 Official Recognitions */}
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-8 items-start mb-10">
           
           {/* Founder Identity Card (Left) */}
-          <div className="lg:col-span-5 bg-white rounded-2xl border border-slate-200 shadow-sm p-6 sm:p-7 flex flex-col items-center text-center">
-            <div className="relative w-44 h-56 sm:w-48 sm:h-60 rounded-xl overflow-hidden border-2 border-emerald-600 shadow-md mb-4 bg-slate-100">
+          <div className="lg:col-span-5 flex py-10 flex-col items-center text-center">
+            <div className="relative w-44 h-56 sm:w-80 sm:h-96 rounded-xl overflow-hidden mb-4 shadow-sm bg-slate-100">
               <Image
-                src="/images/founder/dr-rezaul-karim.jpg"
+                src="/images/founder/dr-rezaul-karim-enhanced.png"
                 alt="ডাঃ মোঃ রেজাউল করিম — সফল গবেষক ও উদ্ভাবক"
                 fill
+                unoptimized
                 className="object-cover object-top"
-                sizes="(max-width: 640px) 176px, 192px"
                 priority
               />
             </div>
 
             <div className="space-y-1">
-              <span className="inline-block px-2.5 py-0.5 rounded-full bg-emerald-100 text-emerald-800 text-[11px] font-bold border border-emerald-200">
+              {/* <span className="inline-block px-2.5 py-0.5 rounded-full bg-emerald-100 text-emerald-800 text-[11px] font-bold border border-emerald-200">
                 সফল গবেষক ও উদ্ভাবক
-              </span>
+              </span> */}
               <h3 className="text-xl sm:text-2xl font-black text-slate-900 tracking-tight pt-1">
                 ডাঃ মোঃ রেজাউল করিম
               </h3>
@@ -109,7 +106,7 @@ export default function FounderAchievements() {
             </div>
 
             {/* Micro Specs */}
-            <div className="grid grid-cols-2 gap-2 w-full mt-5 pt-4 border-t border-slate-100 text-left">
+            {/* <div className="grid grid-cols-2 gap-2 w-full mt-5 pt-4 border-t border-slate-100 text-left">
               <div className="bg-slate-50 p-2.5 rounded-lg border border-slate-200/70">
                 <span className="text-[10px] text-slate-500 font-medium block">সরকারি স্বীকৃতি</span>
                 <span className="text-xs font-extrabold text-slate-800">২টি পেটেন্ট সনদ</span>
@@ -118,7 +115,7 @@ export default function FounderAchievements() {
                 <span className="text-[10px] text-slate-500 font-medium block">ক্লিনিক্যাল ট্রায়াল</span>
                 <span className="text-xs font-extrabold text-slate-800">BAU প্রত্যয়নপ্রাপ্ত</span>
               </div>
-            </div>
+            </div> */}
           </div>
 
           {/* 3 Core Official Documents Cards (Right) */}
@@ -306,3 +303,4 @@ export default function FounderAchievements() {
     </section>
   );
 }
+
