@@ -97,10 +97,10 @@ export default function FounderAchievements() {
         
         {/* Section Header */}
         <div className="text-center max-w-2xl mx-auto mb-10 sm:mb-12">
-          {/* <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-50 text-emerald-800 border border-emerald-200/90 text-xs font-bold mb-3">
+          <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-50 text-emerald-800 border border-emerald-200/90 text-xs font-bold mb-3">
             <ShieldCheck className="w-4 h-4 text-emerald-700" />
             <span>অফিসিয়াল স্বীকৃতি ও উদ্ভাবন</span>
-          </div> */}
+          </div>
           <h2 className="text-2xl sm:text-3xl lg:text-4xl font-extrabold text-slate-900 tracking-tight">
             গবেষক ও উদ্ভাবক পরিচিতি
           </h2>
@@ -121,7 +121,7 @@ export default function FounderAchievements() {
 
           <div className="space-y-1">
             <span className="inline-block px-3 py-0.5 rounded-full bg-emerald-100 text-emerald-900 text-xs font-bold border border-emerald-200">
-              গবেষক ও উদ্ভাবক
+              সফল গবেষক ও উদ্ভাবক
             </span>
             <h3 className="text-2xl sm:text-3xl font-black text-slate-900 tracking-tight pt-1">
               ডাঃ মোঃ রেজাউল করিম
@@ -164,8 +164,8 @@ export default function FounderAchievements() {
                     src={crest.image}
                     alt={crest.title}
                     fill
+                    unoptimized
                     className="object-cover group-hover:scale-105 transition-transform duration-300"
-                    sizes="140px"
                   />
                   <div className="absolute inset-0 bg-slate-950/0 group-hover:bg-slate-950/30 transition-colors flex items-center justify-center">
                     <span className="opacity-0 group-hover:opacity-100 bg-white/95 text-slate-800 text-[10px] font-bold px-2 py-0.5 rounded shadow flex items-center gap-1 transition-opacity">
@@ -225,8 +225,8 @@ export default function FounderAchievements() {
                       src={doc.image}
                       alt={doc.title}
                       fill
+                      unoptimized
                       className="object-cover group-hover:scale-105 transition-transform duration-300"
-                      sizes="(max-width: 640px) 100vw, 240px"
                     />
                     <div className="absolute inset-0 bg-slate-950/0 group-hover:bg-slate-950/30 transition-colors flex items-center justify-center">
                       <span className="opacity-0 group-hover:opacity-100 bg-white/95 text-slate-800 text-[10px] font-bold px-2 py-0.5 rounded shadow flex items-center gap-1 transition-opacity">
