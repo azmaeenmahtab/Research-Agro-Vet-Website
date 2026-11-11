@@ -5,6 +5,22 @@ import Link from 'next/link';
 import { ShoppingCart, Check } from 'lucide-react';
 import { useCartStore } from '@/store/useCartStore';
 
+function FlameIcon({ className = 'w-2.5 h-2.5' }: { className?: string }) {
+  return (
+    <svg className={className} viewBox="0 0 24 24" fill="currentColor">
+      <path d="M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.38-.5-2-1-3-1.072-2.143-.224-4.054 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 1 1-14 0c0-1.153.433-2.294 1-3a2.5 2.5 0 0 0 2.5 2.5z" />
+    </svg>
+  );
+}
+
+function SparklesIcon({ className = 'w-2.5 h-2.5' }: { className?: string }) {
+  return (
+    <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+      <path d="m12 3-1.9 5.8a2 2 0 0 1-1.3 1.3L3 12l5.8 1.9a2 2 0 0 1 1.3 1.3L12 21l1.9-5.8a2 2 0 0 1 1.3-1.3L21 12l-5.8-1.9a2 2 0 0 1-1.3-1.3L12 3Z" />
+    </svg>
+  );
+}
+
 // --- Shared types (importable by any page/component) ---
 
 export interface ProductVariantData {
@@ -27,6 +43,8 @@ export interface ProductCardData {
   nameEn: string;
   nameBn?: string | null;
   tagBadge?: string;
+  isFeatured?: boolean;
+  isBestSeller?: boolean;
   inStock?: boolean;
   thumbnail?: string;
   imageUrl?: string;
@@ -126,21 +144,35 @@ export default function ProductCard({ product }: ProductCardProps) {
       : 'রুচি ও হজম');
 
   return (
-    <article className="group flex flex-col justify-between bg-white rounded-xl border border-slate-200/90 hover:border-emerald-500/40 p-4 shadow-2xs hover:shadow-md transition-all duration-200">
+    <article className="group flex flex-col justify-between bg-white rounded-xl border border-slate-200/90 hover:border-emerald-500/40 p-2.5 sm:p-4 shadow-2xs hover:shadow-md transition-all duration-200">
       <div>
-        {/* Badges & Status */}
-        {/* <div className="flex items-center justify-between gap-2 mb-3">
-          <span className="px-2 py-0.5 rounded bg-[#ECFDF5] text-[#047857] text-[11px] font-bold border border-emerald-100">
-            {tagBadgeText}
-          </span>
-          
-        </div> */}
-
-        {/* Product Image */}
+        {/* Product Image with Featured / Bestseller Badge */}
         <Link
           href={`/products/${product.slug || product.id}`}
-          className="relative h-44 w-full bg-slate-50/80 rounded-lg p-2.5 flex items-center justify-center overflow-hidden mb-3 border border-slate-100 block group/img"
+          className="relative h-32 sm:h-44 w-full bg-slate-50/80 rounded-lg p-2 sm:p-2.5 flex items-center justify-center overflow-hidden mb-2 sm:mb-3 border border-slate-100 block group/img"
         >
+          {/* Over-the-image Badge: Bestseller / Featured (Top Left) */}
+          {product.isBestSeller ? (
+            <span className="absolute top-1.5 left-1.5 sm:top-2 sm:left-2 z-10 px-1.5 py-0.5 sm:px-2 sm:py-0.5 rounded text-[9px] sm:text-[10px] font-black uppercase tracking-wider bg-amber-500 text-white shadow-xs flex items-center gap-0.5 sm:gap-1">
+              <span>Bestseller</span>
+            </span>
+          ) : product.isFeatured ? (
+            <span className="absolute top-1.5 left-1.5 sm:top-2 sm:left-2 z-10 px-1.5 py-0.5 sm:px-2 sm:py-0.5 rounded text-[9px] sm:text-[10px] font-black uppercase tracking-wider bg-emerald-700 text-white shadow-xs flex items-center gap-0.5 sm:gap-1">
+              <span>Featured</span>
+            </span>
+          ) : null}
+
+          {/* Over-the-image Stock Badge: Mobile Only (Top Right) */}
+          <span
+            className={`sm:hidden absolute top-1.5 right-1.5 z-10 px-1.5 py-0.5 rounded text-[9px] font-bold shadow-2xs ${
+              product.inStock !== false
+                ? 'bg-[#DCFCE7] text-[#166534]'
+                : 'bg-red-100 text-red-700'
+            }`}
+          >
+            {product.inStock !== false ? 'ইন-স্টক' : 'স্টক শেষ'}
+          </span>
+
           {(product.thumbnail || product.imageUrl) && (
             <img
               src={(product.thumbnail || product.imageUrl)!}
@@ -153,44 +185,35 @@ export default function ProductCard({ product }: ProductCardProps) {
               loading="lazy"
             />
           )}
-
-          {/* Species Badges */}
-          {/* {product.speciesTags && product.speciesTags.length > 0 && (
-            <div className="absolute bottom-1.5 right-1.5 flex flex-wrap gap-1 z-10">
-              {product.speciesTags.slice(0, 2).map((species, i) => (
-                <span
-                  key={i}
-                  className="bg-white/95 backdrop-blur-xs px-1.5 py-0.5 rounded text-[10px] font-bold text-slate-700 shadow-2xs border border-slate-200/60"
-                >
-                  {formatSpecies(species)}
-                </span>
-              ))}
-            </div>
-          )} */}
         </Link>
 
         {/* Title Block */}
         <Link href={`/products/${product.slug || product.id}`} className="block group/title">
-        <div className='flex justify-between items-center'>
-<h3 className="font-bold text-base text-slate-900 leading-snug group-hover/title:text-emerald-800 transition-colors">
-            {product.nameEn}
-          </h3>
+          <div className="flex items-center justify-between gap-1">
+            <h3 className="font-bold text-xs sm:text-base text-slate-900 leading-snug group-hover/title:text-emerald-800 transition-colors line-clamp-1 sm:line-clamp-none">
+              {product.nameEn}
+            </h3>
 
-            <span className="px-2 py-0.5 rounded bg-[#DCFCE7] text-[#166534] text-[11px] font-bold">
-            {product.inStock !== false ? 'ইন-স্টক' : 'স্টক শেষ'}
-          </span>
-        </div>
-          
-        
+            {/* Desktop / Tablet Stock Badge: Kept in title row */}
+            <span
+              className={`hidden sm:inline-block px-2 py-0.5 rounded text-[11px] font-bold shrink-0 ${
+                product.inStock !== false
+                  ? 'bg-[#DCFCE7] text-[#166534]'
+                  : 'bg-red-100 text-red-700'
+              }`}
+            >
+              {product.inStock !== false ? 'ইন-স্টক' : 'স্টক শেষ'}
+            </span>
+          </div>
         </Link>
 
         {/* Pack Size Selector */}
-        <div className="mt-3">
-          <label className="block text-[11px] font-bold text-slate-600 mb-1">
-            {variants.length > 1 ? 'প্যাক সাইজ নির্বাচন:' : 'প্যাক সাইজ:'}
+        <div className="mt-2 sm:mt-3">
+          <label className="block text-[10px] sm:text-[11px] font-bold text-slate-600 mb-1">
+            {variants.length > 1 ? 'প্যাক সাইজ:' : 'প্যাক সাইজ:'}
           </label>
-          <div className="flex items-center justify-between gap-1.5 flex-wrap">
-            <div className="flex items-center gap-1.5 flex-wrap">
+          <div className="flex items-center justify-between gap-1 sm:gap-1.5 flex-wrap">
+            <div className="flex items-center gap-1 sm:gap-1.5 flex-wrap">
               {variants.map((variant, idx) => {
                 const isSelected = idx === selectedVariantIndex;
                 return (
@@ -198,7 +221,7 @@ export default function ProductCard({ product }: ProductCardProps) {
                     key={variant.id || idx}
                     type="button"
                     onClick={() => setSelectedVariantIndex(idx)}
-                    className={`px-2.5 py-1 text-xs font-bold rounded transition-all ${
+                    className={`px-1.5 py-0.5 sm:px-2.5 sm:py-1 text-[10px] sm:text-xs font-bold rounded transition-all cursor-pointer ${
                       isSelected
                         ? 'bg-[#047857] text-white shadow-xs'
                         : 'bg-slate-100 hover:bg-slate-200 text-slate-700'
@@ -212,7 +235,7 @@ export default function ProductCard({ product }: ProductCardProps) {
 
             {/* Packaging Note Badge */}
             {currentVariant?.packagingInfo && (
-              <span className="text-[11px] font-bold text-emerald-800 bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200/50">
+              <span className="text-[9px] sm:text-[11px] font-bold text-emerald-800 bg-emerald-50 px-1.5 py-0.5 rounded border border-emerald-200/50">
                 {currentVariant.packagingInfo}
               </span>
             )}
@@ -221,36 +244,36 @@ export default function ProductCard({ product }: ProductCardProps) {
       </div>
 
       {/* Pricing & CTAs */}
-      <div className="mt-4 pt-3 border-t border-slate-100 space-y-2.5">
+      <div className="mt-3 sm:mt-4 pt-2.5 sm:pt-3 border-t border-slate-100 space-y-2 sm:space-y-2.5">
         {/* Price Row */}
-        <div className="flex items-baseline justify-between">
-          <div className="flex items-baseline gap-2">
-            <span className="text-xl font-extrabold text-[#047857] font-mono tracking-tight">
+        <div className="flex items-baseline justify-between gap-1 flex-wrap">
+          <div className="flex items-baseline gap-1 sm:gap-2">
+            <span className="text-base sm:text-xl font-extrabold text-[#047857] font-mono tracking-tight">
               ৳{toBengaliNumber(sellingPrice)}
             </span>
             {mrp > sellingPrice && (
-              <span className="text-xs line-through text-slate-400 font-mono">
+              <span className="text-[10px] sm:text-xs line-through text-slate-400 font-mono">
                 ৳{toBengaliNumber(mrp)}
               </span>
             )}
           </div>
           {mrp > sellingPrice ? (
-            <span className="text-[14px] font-extrabold text-red-700 bg-red-100 border border-red-200 px-2 py-0.5 rounded-full flex items-center gap-0.5">
+            <span className="text-[10px] sm:text-[13px] font-extrabold text-red-700 bg-red-100 border border-red-200 px-1.5 py-0.5 rounded-full flex items-center gap-0.5">
               <span>{toBengaliNumber(discountPct)}% ছাড়</span>
             </span>
           ) : (
-            <span className="text-[10px] font-bold text-[#a05600] bg-[#ffdcc3] px-2 py-0.5 rounded">
+            <span className="text-[9px] sm:text-[10px] font-bold text-[#a05600] bg-[#ffdcc3] px-1.5 py-0.5 rounded">
               সেরা অফার
             </span>
           )}
         </div>
 
         {/* Action Buttons */}
-        <div className="grid grid-cols-2 gap-2">
+        <div className="grid grid-cols-2 gap-1.5 sm:gap-2">
           <button
             type="button"
             onClick={handleAddToCart}
-            className={`w-full py-2 rounded text-xs font-bold transition-all flex items-center justify-center gap-1.5 border shadow-2xs ${
+            className={`w-full py-1.5 sm:py-2 rounded text-[11px] sm:text-xs font-bold transition-all flex items-center justify-center gap-1 border shadow-2xs cursor-pointer ${
               addedAnimation
                 ? 'bg-emerald-700 text-white border-emerald-700'
                 : 'bg-slate-50 hover:bg-slate-100 text-slate-800 border-slate-200'
@@ -259,19 +282,21 @@ export default function ProductCard({ product }: ProductCardProps) {
             {addedAnimation ? (
               <>
                 <Check className="w-3.5 h-3.5 stroke-[2.5]" />
-                <span>যোগ হয়েছে!</span>
+                <span className="hidden sm:inline">যোগ হয়েছে!</span>
+                <span className="sm:hidden">যুক্ত!</span>
               </>
             ) : (
               <>
                 <ShoppingCart className="w-3.5 h-3.5 stroke-[2]" />
-                <span>কার্টে দিন</span>
+                <span className="hidden sm:inline">কার্টে দিন</span>
+                <span className="sm:hidden">কার্ট</span>
               </>
             )}
           </button>
 
           <Link
             href={`/products/${product.slug || product.id}`}
-            className="w-full py-2 bg-[#d97706] hover:bg-[#b45309] text-white text-xs font-bold rounded transition-colors flex items-center justify-center shadow-xs"
+            className="w-full py-1.5 sm:py-2 bg-[#d97706] hover:bg-[#b45309] text-white text-[11px] sm:text-xs font-bold rounded transition-colors flex items-center justify-center shadow-xs text-center"
           >
             অর্ডার করুন
           </Link>

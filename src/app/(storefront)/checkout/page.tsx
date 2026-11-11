@@ -38,6 +38,7 @@ export default function CheckoutPage() {
     getCartSubtotal,
     customerDraft,
     setCustomerDraft,
+    syncWithServer,
   } = useCartStore();
 
   const [mounted, setMounted] = useState(false);
@@ -65,14 +66,18 @@ export default function CheckoutPage() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
-  // Dynamic Universal Discount
+  // Dynamic Universal Discount (starts with false / 0% until verified from server)
   const [universalDiscount, setUniversalDiscount] = useState<{
     enabled: boolean;
     percent: number;
     label: string;
-  }>({ enabled: true, percent: 5, label: 'Website 5% Universal Discount' });
+  }>({ enabled: false, percent: 0, label: '' });
 
   useEffect(() => {
+    // 1. Sync real-time inventory and pricing for cart items immediately
+    syncWithServer();
+
+    // 2. Fetch live universal discount configuration
     fetch(getApiUrl('/api/discounts/universal'))
       .then((res) => res.json())
       .then((res) => {
@@ -81,7 +86,7 @@ export default function CheckoutPage() {
         }
       })
       .catch(() => {});
-  }, []);
+  }, [syncWithServer]);
 
   useEffect(() => {
     setMounted(true);
@@ -170,7 +175,10 @@ export default function CheckoutPage() {
     if (buyerMode === 'WHOLESALE') return;
     const mrp = Number(item.mrpPrice) || Number(item.sellingPrice) || 0;
     const dbSelling = Number(item.sellingPrice) || mrp;
-    const hasItemIndividualPromo = mrp > 0 && dbSelling < mrp;
+    // Check if item has individual promo (discountType === 'INDIVIDUAL' or DB selling price < mrp without universal discount)
+    const hasItemIndividualPromo =
+      item.discountType === 'INDIVIDUAL' ||
+      (mrp > 0 && dbSelling < mrp && item.discountType !== 'UNIVERSAL');
 
     if (hasItemIndividualPromo) {
       hasIndividualDiscount = true;
@@ -204,10 +212,19 @@ export default function CheckoutPage() {
   const shippingFee = items.length === 0 ? 0 : isDhaka ? 70 : 130;
   const grandTotal = Math.max(0, baselineSubtotal - discountAmount + shippingFee);
 
+  const hasUnpurchasableItem = items.some(
+    (i) => i.isPurchasable === false || i.inStock === false || i.isAvailable === false
+  );
+
   // Form submission handler
   const handlePlaceOrder = async (e?: React.FormEvent) => {
     if (e) e.preventDefault();
     setErrorMessage(null);
+
+    if (hasUnpurchasableItem) {
+      setErrorMessage('আপনার কার্টে স্টক শেষ বা অনুপলব্ধ পণ্য রয়েছে। অর্ডার সম্পন্ন করতে অনুগ্রহ করে সেই পণ্যটি কার্ট থেকে মুছে ফেলুন।');
+      return;
+    }
 
     // Validation
     const clean = customerPhone.replace(/[^0-9]/g, '');
@@ -603,7 +620,10 @@ export default function CheckoutPage() {
                 {items.map((item) => {
                   const mrp = Number(item.mrpPrice) || Number(item.sellingPrice) || 0;
                   const dbSelling = Number(item.sellingPrice) || mrp;
-                  const hasItemIndividualPromo = buyerMode !== 'WHOLESALE' && mrp > 0 && dbSelling < mrp;
+                  const hasItemIndividualPromo =
+                    buyerMode !== 'WHOLESALE' &&
+                    (item.discountType === 'INDIVIDUAL' ||
+                      (mrp > 0 && dbSelling < mrp && item.discountType !== 'UNIVERSAL'));
 
                   const unitPrice =
                     buyerMode === 'WHOLESALE'
@@ -614,6 +634,8 @@ export default function CheckoutPage() {
                       ? Math.round(mrp * (1 - universalRate))
                       : mrp;
 
+                  const isBlocked =
+                    item.isPurchasable === false || item.inStock === false || item.isAvailable === false;
                   const itemLineTotal = unitPrice * item.quantity;
 
                   return (
@@ -625,7 +647,7 @@ export default function CheckoutPage() {
                             src={item.image}
                             alt={item.nameEn}
                             fill
-                            className="object-contain p-1"
+                            className={`object-contain p-1 ${isBlocked ? 'opacity-40 grayscale' : ''}`}
                           />
                         ) : (
                           <div className="w-full h-full flex items-center justify-center text-slate-400">
@@ -642,6 +664,11 @@ export default function CheckoutPage() {
                         <p className="text-xs text-slate-500 font-medium mt-0.5">
                           প্যাক: {item.packSize} • ৳{unitPrice}
                         </p>
+                        {isBlocked && (
+                          <p className="text-[11px] font-bold text-rose-600 mt-0.5">
+                            {item.statusMessage || 'স্টক শেষ বা অনুপলব্ধ'}
+                          </p>
+                        )}
 
                         {/* Inline Quantity Changer */}
                         <div className="flex items-center gap-2 mt-2">
@@ -755,11 +782,17 @@ export default function CheckoutPage() {
 
               {/* High-Converting CTA Button */}
               <div className="space-y-2.5">
+                {hasUnpurchasableItem && (
+                  <div className="p-3 bg-rose-50 border border-rose-200 rounded-xl flex items-start gap-2 text-rose-800 text-xs font-medium">
+                    <AlertCircle className="w-4 h-4 text-rose-600 shrink-0 mt-0.5" />
+                    <span>কার্টের কিছু পণ্য বর্তমানে স্টক শেষ বা অনুপলব্ধ। অর্ডার সম্পন্ন করতে অনুগ্রহ করে সেই পণ্যটি কার্ট থেকে মুছে ফেলুন।</span>
+                  </div>
+                )}
                 <button
                   type="button"
                   onClick={handlePlaceOrder}
-                  disabled={isSubmitting}
-                  className="w-full py-3.5 px-4 rounded-xl bg-[#005d42] hover:bg-[#004e37] text-white text-sm font-bold flex items-center justify-center gap-2 shadow-md hover:shadow-lg transition-all active:scale-[0.99] disabled:opacity-60 cursor-pointer"
+                  disabled={isSubmitting || hasUnpurchasableItem}
+                  className="w-full py-3.5 px-4 rounded-xl bg-[#005d42] hover:bg-[#004e37] text-white text-sm font-bold flex items-center justify-center gap-2 shadow-md hover:shadow-lg transition-all active:scale-[0.99] disabled:opacity-60 cursor-pointer disabled:cursor-not-allowed"
                 >
                   {isSubmitting ? (
                     <>

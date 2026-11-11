@@ -47,9 +47,7 @@ export async function authorizedFetch(
   const headers = new Headers(options?.headers);
 
   // 1. Dynamically extract the token from Better Auth client storage
-  const token =
-    (authClient as any)?.getActions?.()?.getBearerToken?.() ||
-    getStoredBearerToken();
+  const token = getStoredBearerToken();
 
   // 2. Inject Authorization: Bearer <token> header
   if (token && !headers.has('Authorization')) {

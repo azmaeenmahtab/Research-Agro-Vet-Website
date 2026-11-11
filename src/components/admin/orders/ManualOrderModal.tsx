@@ -484,9 +484,8 @@ export default function ManualOrderModal({
     }
     setIsSearching(true);
     try {
-      const res = await fetch(
-        getApiUrl(`/api/admin/products?q=${encodeURIComponent(q.trim())}`),
-        { credentials: 'include' }
+      const res = await authorizedFetch(
+        `/api/admin/products?q=${encodeURIComponent(q.trim())}`
       );
       const data = await res.json();
       const list: ProductSearchResult[] = data.products ?? data ?? [];

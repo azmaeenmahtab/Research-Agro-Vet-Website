@@ -96,7 +96,7 @@ const DOCUMENTS: AchievementItem[] = [
     date: '১২ জুন ২০১৩',
     image: '/images/founder/bau-certification-1.jpg',
     group: 'DOCUMENT',
-    badge: 'BAU ক্লিনিক্যাল প্রত্যয়ন',
+    badge: 'BAU প্রত্যয়ন',
   },
   {
     id: 'bau-2',
@@ -108,7 +108,7 @@ const DOCUMENTS: AchievementItem[] = [
     date: '১২ জুন ২০১৩',
     image: '/images/founder/bau-certification-2.jpg',
     group: 'DOCUMENT',
-    badge: 'BAU মেডিসিন প্রত্যয়ন',
+    badge: 'BAU প্রত্যয়ন',
   },
 ];
 
@@ -236,17 +236,7 @@ export default function FounderAchievements() {
                 </div> */}
               </div>
 
-              {/* Quick credentials strip */}
-              {/* <div className="w-full mt-6 pt-5 border-t border-slate-100 grid grid-cols-2 gap-2.5 text-center">
-                <div className="bg-slate-50 rounded-xl p-2.5 border border-slate-100">
-                  <p className="text-[11px] font-bold text-slate-500">সরকারি স্বীকৃতি</p>
-                  <p className="text-xs font-black text-slate-800">২টি পেটেন্ট সনদ</p>
-                </div>
-                <div className="bg-slate-50 rounded-xl p-2.5 border border-slate-100">
-                  <p className="text-[11px] font-bold text-slate-500">BAU প্রত্যয়ন</p>
-                  <p className="text-xs font-black text-slate-800">ক্লিনিক্যাল রিসার্চ</p>
-                </div>
-              </div> */}
+              
             </div>
           </div>
 
@@ -256,23 +246,23 @@ export default function FounderAchievements() {
             onMouseEnter={() => setIsHovered(true)}
             onMouseLeave={() => setIsHovered(false)}
           >
-            {/* Top Bar: Clean Badge & Auto-cycle status */}
-            <div className="flex items-center justify-between gap-2 pb-4 border-b border-slate-100">
-              <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-slate-100 text-slate-800 text-xs font-bold border border-slate-200">
-                <Medal className="w-3.5 h-3.5 text-slate-700" />
-                স্বীকৃতি ও শুভেচ্ছা স্মারক
-              </span>
+            {/* Top Bar: Crest Badge & Live Auto-cycle indicator */}
+            <div className="flex items-center justify-between gap-2 pb-3 sm:pb-4 border-b border-slate-100">
+              <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-50 text-emerald-900 text-xs font-black border border-emerald-200">
+                <Medal className="w-3.5 h-3.5 text-emerald-700" />
+                <span>{activeCrest.badge}</span>
+              </div>
               
             </div>
 
-            {/* Crest Content: Large Photo + Spacious Citation & Animated Typewriter */}
-            <div className="pb-0 pt-5 sm:py-8 flex-1 flex items-center">
-              <div className="w-full flex flex-col md:flex-row gap-6 lg:gap-7 items-center md:items-start">
+            {/* Crest Content: Large Photo + Citation & Animated Typewriter */}
+            <div className="py-3 sm:py-5 flex-1 flex items-center">
+              <div className="w-full flex flex-col md:flex-row gap-5 lg:gap-6 items-center md:items-start">
                 
-                {/* Bigger Crest Image with AnimatePresence for smooth swap */}
+                {/* Crest Image with AnimatePresence for smooth swap */}
                 <div
                   onClick={() => setSelectedItem(activeCrest)}
-                  className="group relative aspect-[3/4] w-52 sm:w-60 md:w-64 shrink-0 rounded-2xl overflow-hidden bg-slate-100 shadow-md border border-slate-200/90 cursor-pointer ring-4 ring-slate-50"
+                  className="group relative aspect-[3/4] w-48 sm:w-56 md:w-60 shrink-0 rounded-2xl overflow-hidden bg-slate-100 shadow-md border border-slate-200/90 cursor-pointer ring-4 ring-slate-50"
                   title="বড় করে দেখতে ক্লিক করুন"
                 >
                   <AnimatePresence mode="wait">
@@ -305,28 +295,26 @@ export default function FounderAchievements() {
                 </div>
 
                 {/* Crest Citation & Animated Typewriter Name */}
-                <div className="flex-1 min-w-0 text-center md:text-left space-y-4 flex flex-col justify-between self-stretch">
-                  <div className="space-y-1">
-                    <h5 className="text-md sm:text-xl font-black text-slate-900 tracking-tight">
+                <div className="flex-1 min-w-0 text-center md:text-left space-y-3.5 flex flex-col justify-between self-stretch">
+                  <div className="hidden sm:block space-y-1">
+                    <h4 className="text-base sm:text-xl font-black text-slate-900 tracking-tight leading-snug">
                       {activeCrest.title}
-                    </h5>
-                    <p className="text-xs sm:text-sm font-semibold text-slate-500">
-                      {activeCrest.issuer}
-                    </p>
+                    </h4>
+                    
                   </div>
 
                   {/* Verbatim Inscribed Citation from the Crest */}
-                  <div className="bg-slate-50 p-4 sm:p-5 rounded-2xl border border-slate-150 text-xs sm:text-sm text-slate-700 leading-relaxed italic shadow-2xs">
+                  <div className="hidden sm:block bg-slate-50/90 p-3.5 sm:p-4 rounded-2xl border border-slate-200/70 text-xs sm:text-[13px] text-slate-700 leading-relaxed italic shadow-2xs">
                     &ldquo;{activeCrest.quote}&rdquo;
                   </div>
 
                   {/* Giver Name: Type Down & Removing Animation */}
-                  <div className="pt-3 border-t border-slate-100 space-y-1">
+                  <div className="pt-0 sm:pt-2 border-t-0 sm:border-t sm:border-slate-100 space-y-1">
                     <span className="text-[11px] font-bold text-slate-400 uppercase tracking-wider block">
-                      সম্মাননা প্রদানকারী:
+                      সৌজন্যে ও সম্মাননা প্রদানকারী:
                     </span>
-                    <div className="flex items-center justify-center md:justify-start min-h-[32px]">
-                      <span className="text-lg sm:text-xl font-black text-slate-900 tracking-tight">
+                    <div className="flex items-center justify-center md:justify-start min-h-[30px]">
+                      <span className="text-base sm:text-xl font-black text-slate-900 tracking-tight">
                         {displayedName}
                       </span>
                       <span className="inline-block w-0.5 h-5 bg-emerald-600 ml-1.5 animate-pulse" />
@@ -340,36 +328,7 @@ export default function FounderAchievements() {
               </div>
             </div>
 
-            {/* Bottom Bar: Switcher Dots & Zoom Button */}
-            {/* <div className="flex items-center justify-between pt-4 border-t border-slate-100">
-              <div className="flex items-center gap-2">
-                {CRESTS.map((_, idx) => (
-                  <button
-                    key={idx}
-                    type="button"
-                    onClick={() => handleSelectCrest(idx)}
-                    className={`h-2 rounded-full transition-all cursor-pointer ${
-                      activeCrestIndex === idx
-                        ? 'w-6 bg-slate-900'
-                        : 'w-2 bg-slate-300 hover:bg-slate-400'
-                    }`}
-                    title={idx === 0 ? 'পাবনা জেলা দপ্তর' : 'বেড়া উপজেলা দপ্তর'}
-                  />
-                ))}
-                <span className="text-xs text-slate-400 pl-1">
-                  {activeCrestIndex === 0 ? 'জেলা দপ্তর স্মারক' : 'উপজেলা দপ্তর স্মারক'}
-                </span>
-              </div>
-
-              <button
-                type="button"
-                onClick={() => setSelectedItem(activeCrest)}
-                className="inline-flex items-center gap-1.5 text-xs font-bold text-slate-700 hover:text-slate-900 bg-slate-100 hover:bg-slate-200 px-3 py-1.5 rounded-lg border border-slate-200 transition-colors cursor-pointer"
-              >
-                <ZoomIn className="w-3.5 h-3.5" />
-                স্মারক বড় করে দেখুন
-              </button>
-            </div> */}
+            
 
           </div>
         </div>
@@ -388,16 +347,16 @@ export default function FounderAchievements() {
             </div>
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-5">
+          <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-5">
             {DOCUMENTS.map((doc) => (
               <div
                 key={doc.id}
                 onClick={() => setSelectedItem(doc)}
-                className="group bg-white rounded-2xl border border-slate-200/90 hover:border-emerald-500 p-4 shadow-2xs hover:shadow-md transition-all flex flex-col justify-between cursor-pointer"
+                className="group bg-white rounded-2xl border border-slate-200/90 hover:border-emerald-500 p-3 sm:p-4 shadow-2xs hover:shadow-md transition-all flex flex-col justify-between cursor-pointer"
               >
                 <div>
                   {/* Document Thumbnail */}
-                  <div className="relative aspect-[3/4] w-full rounded-xl overflow-hidden bg-slate-100 mb-3 border border-slate-200/80 shadow-2xs">
+                  <div className="relative aspect-[3/4] w-full rounded-xl overflow-hidden bg-slate-100 mb-2 sm:mb-3 border border-slate-200/80 shadow-2xs">
                     <Image
                       src={doc.image}
                       alt={doc.title}
@@ -413,7 +372,7 @@ export default function FounderAchievements() {
                     </div>
                   </div>
 
-                  <span className="inline-block px-3 py-2 rounded-md bg-emerald-50 text-emerald-800 border border-emerald-100 text-sm font-extrabold mb-1">
+                  <span className="inline-block px-2 sm:px-3 py-1 sm:py-2 rounded-md bg-emerald-50 text-emerald-800 border border-emerald-100 text-xs sm:text-sm font-extrabold mb-1">
                     {doc.badge}
                   </span>
                   {/* <h5 className="text-xs sm:text-sm font-extrabold text-slate-900 line-clamp-2 leading-snug">

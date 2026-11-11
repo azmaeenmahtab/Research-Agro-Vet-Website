@@ -34,7 +34,7 @@ export async function generateMetadata({ params }: ProductDetailPageProps): Prom
   const { slug } = await params;
   const product = await getProductBySlug(slug);
 
-  if (!product) {
+  if (!product || product.status !== 'ACTIVE') {
     return {
       title: 'পণ্য পাওয়া যায়নি',
     };
@@ -90,7 +90,7 @@ async function ProductDetailContent({ params }: ProductDetailPageProps) {
     getUniversalDiscountConfig(),
   ]);
 
-  if (!rawProduct) {
+  if (!rawProduct || rawProduct.status !== 'ACTIVE') {
     notFound();
   }
 
@@ -117,16 +117,34 @@ async function ProductDetailContent({ params }: ProductDetailPageProps) {
     });
   }
 
-  // Fetch related products (e.g. from the same species or general active)
+  // Fetch related products (up to 14 products, prioritized by species with general active fallback)
   let relatedProducts: ProductCardData[] = [];
   try {
-    const relatedResult = await getProducts({
-      species: product.speciesTags?.[0],
-      limit: 5,
-    });
+    const targetLimit = 14;
+    let pool: any[] = [];
 
-    const filtered = (relatedResult.products || []).filter((p: any) => p.id !== product.id);
-    relatedProducts = filtered.slice(0, 4).map((p: any) => ({
+    // 1. Fetch from same species first if tagged
+    if (product.speciesTags?.[0]) {
+      const speciesResult = await getProducts({
+        species: product.speciesTags[0],
+        limit: 20,
+      });
+      pool = (speciesResult.products || []).filter((p: any) => p.id !== product.id);
+    }
+
+    // 2. If pool has fewer than 14 products, fetch additional active products to ensure full 14
+    if (pool.length < targetLimit) {
+      const generalResult = await getProducts({
+        limit: 25,
+      });
+      const additional = (generalResult.products || []).filter(
+        (p: any) => p.id !== product.id && !pool.some((existing) => existing.id === p.id)
+      );
+      pool = [...pool, ...additional];
+    }
+
+    const filtered = pool.slice(0, targetLimit);
+    relatedProducts = filtered.map((p: any) => ({
       id: p.id,
       slug: p.slug,
       nameEn: p.nameEn,

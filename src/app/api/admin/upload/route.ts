@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { v2 as cloudinary } from 'cloudinary';
+import { verifyAdminSession, unauthorizedResponse } from '@/lib/auth-server';
 
 cloudinary.config({
   cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
@@ -9,9 +10,15 @@ cloudinary.config({
 
 export async function POST(request: NextRequest) {
   try {
+    const session = await verifyAdminSession(request);
+    if (!session) {
+      return unauthorizedResponse();
+    }
+
     const formData = await request.formData();
     const files = formData.getAll('files') as File[];
     const singleFile = formData.get('file') as File | null;
+    const targetFolder = (formData.get('folder') as string)?.trim() || 'research-agro-vet/products';
 
     const allFiles: File[] = [];
     if (files && files.length > 0) {
@@ -28,6 +35,7 @@ export async function POST(request: NextRequest) {
     }
 
     const uploadedUrls: string[] = [];
+    const uploadedDetails: any[] = [];
 
     for (const file of allFiles) {
       const bytes = await file.arrayBuffer();
@@ -36,7 +44,7 @@ export async function POST(request: NextRequest) {
       const uploadResult = await new Promise<any>((resolve, reject) => {
         const uploadStream = cloudinary.uploader.upload_stream(
           {
-            folder: 'research-agro-vet/products',
+            folder: targetFolder,
             resource_type: 'image',
           },
           (error, result) => {
@@ -49,6 +57,14 @@ export async function POST(request: NextRequest) {
 
       if (uploadResult?.secure_url) {
         uploadedUrls.push(uploadResult.secure_url);
+        uploadedDetails.push({
+          url: uploadResult.secure_url,
+          publicId: uploadResult.public_id,
+          width: uploadResult.width,
+          height: uploadResult.height,
+          format: uploadResult.format,
+          bytes: uploadResult.bytes,
+        });
       }
     }
 
@@ -63,6 +79,7 @@ export async function POST(request: NextRequest) {
       success: true,
       url: uploadedUrls[0],
       urls: uploadedUrls,
+      details: uploadedDetails,
     });
   } catch (error: any) {
     console.error('Cloudinary upload error:', error);
@@ -72,4 +89,3 @@ export async function POST(request: NextRequest) {
     );
   }
 }
-

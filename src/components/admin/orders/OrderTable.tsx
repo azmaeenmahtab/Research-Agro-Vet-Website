@@ -439,36 +439,7 @@ export default function OrderTable({
         </div>
       </div>
 
-      {/* Operational Advisory Bento Cards (From Stitch Design) */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-3.5">
-        <div className="p-4 bg-white rounded-2xl border border-slate-200 shadow-2xs flex items-start gap-3">
-          <div className="w-9 h-9 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center shrink-0 border border-blue-100">
-            <Snowflake className="w-5 h-5" />
-          </div>
-          <div>
-            <h4 className="font-bold text-slate-900 text-xs">
-              Cold-Chain Pack Protection
-            </h4>
-            <p className="text-[11px] text-slate-500 mt-0.5 leading-relaxed">
-              Ensure temperature-sensitive vaccines and biological drugs are dispatched in insulated thermal boxes with frozen ice-gel packs.
-            </p>
-          </div>
-        </div>
-
-        <div className="p-4 bg-white rounded-2xl border border-slate-200 shadow-2xs flex items-start gap-3">
-          <div className="w-9 h-9 rounded-xl bg-amber-50 text-amber-700 flex items-center justify-center shrink-0 border border-amber-100">
-            <BadgePercent className="w-5 h-5" />
-          </div>
-          <div>
-            <h4 className="font-bold text-slate-900 text-xs">
-              Tele-Discount Protocol
-            </h4>
-            <p className="text-[11px] text-slate-500 mt-0.5 leading-relaxed">
-              Special rebates or custom phone discounts granted to farmers are automatically logged and tracked in the customer ledger.
-            </p>
-          </div>
-        </div>
-      </div>
+      
     </div>
   );
 }

@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { ProductFormFactor, ProductStatus } from '@prisma/client';
 import { generateStandardSku } from '@/lib/sku-generator';
+import { verifyAdminSession, unauthorizedResponse } from '@/lib/auth-server';
 
 function slugify(text: string): string {
   return text
@@ -163,6 +164,11 @@ export async function GET(request: NextRequest) {
 
 export async function POST(request: NextRequest) {
   try {
+    const session = await verifyAdminSession(request);
+    if (!session) {
+      return unauthorizedResponse();
+    }
+
     const body = await request.json();
 
     const {

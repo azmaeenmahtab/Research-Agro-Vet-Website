@@ -74,14 +74,14 @@ const FORM_FACTORS: ProductFormFactor[] = [
 ];
 
 const FORM_FACTOR_LABELS: Record<ProductFormFactor, string> = {
-  POWDER: 'Powder (পাউডার)',
-  LIQUID: 'Liquid / Syrup (লিকুইড / সিরাপ)',
-  BOLUS: 'Bolus / Tablet (বোলাস / ট্যাবলেট)',
-  SACHET: 'Sachet (স্যাচেট)',
-  SOLUTION: 'Solution (সল্যুশন)',
-  OINTMENT: 'Ointment / Cream (মলম)',
-  INJECTION: 'Injection / Vial (ইনজেকশন)',
-  OTHER: 'Other (অন্যান্য)',
+  POWDER: 'Powder',
+  LIQUID: 'Liquid / Syrup',
+  BOLUS: 'Bolus / Tablet',
+  SACHET: 'Sachet',
+  SOLUTION: 'Solution',
+  OINTMENT: 'Ointment / Cream',
+  INJECTION: 'Injection / Vial',
+  OTHER: 'Other',
 };
 
 const SPECIES_OPTIONS = [

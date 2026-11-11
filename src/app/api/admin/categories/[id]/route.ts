@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
+import { verifyAdminSession, unauthorizedResponse } from '@/lib/auth-server';
 
 function slugify(text: string): string {
   return text
@@ -48,6 +49,11 @@ export async function PUT(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const session = await verifyAdminSession(request);
+    if (!session) {
+      return unauthorizedResponse();
+    }
+
     const { id } = await params;
     const body = await request.json();
 
@@ -128,6 +134,11 @@ export async function DELETE(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const session = await verifyAdminSession(request);
+    if (!session) {
+      return unauthorizedResponse();
+    }
+
     const { id } = await params;
     const existing = await prisma.category.findUnique({
       where: { id },

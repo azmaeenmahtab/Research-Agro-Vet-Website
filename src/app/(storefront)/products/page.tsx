@@ -72,6 +72,8 @@ async function ProductsCatalog({ searchParams }: ProductsPageProps) {
     nameEn: p.nameEn,
     nameBn: p.nameBn || null,
     tagBadge: p.dlsLicenseNo ? 'DLS অনুমোদিত' : undefined,
+    isFeatured: Boolean(p.isFeatured),
+    isBestSeller: Boolean(p.isBestSeller),
     inStock: p.status === 'ACTIVE',
     thumbnail: p.thumbnail,
     imageUrl: p.thumbnail,
@@ -147,7 +149,7 @@ async function ProductsCatalog({ searchParams }: ProductsPageProps) {
       </div>
 
       {/* Main Catalog & Isolated Grid Section */}
-      <main className="max-w-7xl mx-auto px-4 py-6 sm:py-8">
+      <main className="max-w-7xl mx-auto px-4 py-4 sm:py-8">
         <ProductCatalogContainer
           key={`${species || ''}-${category || ''}-${search || ''}-${page}`}
           initialProducts={initialProducts}

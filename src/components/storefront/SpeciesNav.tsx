@@ -103,14 +103,14 @@ export default function SpeciesNav() {
 
   return (
     <div
-      className={`bg-white/95 backdrop-blur-xs border-b border-slate-200 sticky top-[68px] z-30 py-2 shadow-2xs transition-all duration-300 ease-in-out ${
+      className={`bg-white/95 backdrop-blur-xs border-b border-slate-200 sticky top-[65px] sm:top-[68px] z-30 py-2 shadow-2xs transition-all duration-300 ease-in-out ${
         isVisible
           ? 'translate-y-0 opacity-100 pointer-events-auto'
           : '-translate-y-full opacity-0 pointer-events-none'
       }`}
     >
-      <div className="max-w-7xl mx-auto px-4">
-        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-2 sm:gap-2.5">
+      <div className="max-w-7xl mx-auto px-2 sm:px-4">
+        <div className="grid grid-cols-3 sm:grid-cols-3 lg:grid-cols-6 gap-1.5 sm:gap-2.5">
           {speciesList.map((item) => {
             const isWholesaleBtn = item.tag === 'WHOLESALE';
             const active = isActive(item);
@@ -120,7 +120,7 @@ export default function SpeciesNav() {
                 key={item.label}
                 href={item.href}
                 title={item.labelBn}
-                className={`group flex items-center justify-center gap-2 px-2.5 py-1.5 sm:px-3 sm:py-2 rounded-xl border-[1.5px] border-dashed transition-all duration-200 cursor-pointer ${
+                className={`group flex items-center justify-center gap-1 sm:gap-2 px-1.5 py-1.5 sm:px-3 sm:py-2 rounded-lg sm:rounded-xl border-[1.5px] border-dashed transition-all duration-200 cursor-pointer ${
                   isWholesaleBtn
                     ? active
                       ? 'bg-amber-100 border-amber-600 ring-2 ring-amber-500/30 shadow-xs'
@@ -135,8 +135,8 @@ export default function SpeciesNav() {
                   <div
                     className={`relative flex items-center justify-center shrink-0 ${
                       item.tag === 'CATTLE_BUFFALO'
-                        ? 'h-4 sm:h-4.5 w-5.5 sm:w-6'
-                        : 'w-5 h-5 sm:w-5.5 sm:h-5.5'
+                        ? 'h-3.5 sm:h-4.5 w-4.5 sm:w-6'
+                        : 'w-3.5 h-3.5 sm:w-5 sm:h-5'
                     }`}
                   >
                     <Image
@@ -154,7 +154,7 @@ export default function SpeciesNav() {
                 )}
 
                 <span
-                  className={`font-bold text-xs sm:text-sm tracking-tight transition-colors whitespace-nowrap ${
+                  className={`font-bold text-[11px] sm:text-xs lg:text-sm tracking-tight transition-colors truncate ${
                     isWholesaleBtn
                       ? 'text-amber-900 group-hover:text-amber-950'
                       : active

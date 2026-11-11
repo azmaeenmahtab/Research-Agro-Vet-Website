@@ -34,6 +34,8 @@ export default function FeaturedProducts({
           nameEn: p.nameEn,
           nameBn: p.nameBn || null,
           tagBadge: p.dlsLicenseNo ? 'DLS অনুমোদিত' : undefined,
+          isFeatured: Boolean(p.isFeatured),
+          isBestSeller: Boolean(p.isBestSeller),
           inStock: p.status === 'ACTIVE',
           thumbnail:
             p.thumbnail &&
@@ -97,7 +99,7 @@ export default function FeaturedProducts({
       </div>
 
       {/* Product Grid */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
+      <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-6">
         {displayProducts.slice(0, 8).map((product) => (
           <ProductCard key={product.id} product={product} />
         ))}

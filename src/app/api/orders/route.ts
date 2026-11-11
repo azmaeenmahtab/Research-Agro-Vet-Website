@@ -87,7 +87,7 @@ export async function POST(request: NextRequest) {
     const isWholesale = buyerMode === 'WHOLESALE';
 
     // 3. Compute Itemized Totals & Subtotal
-    // 3. Query SiteSettings for Universal Discount Policy
+    // Query SiteSettings for Universal Discount Policy
     const siteSettings = await prisma.siteSettings.findUnique({
       where: { id: 'default' },
       select: { enableGeneralDiscount: true, generalRetailDiscountPercent: true },
@@ -120,9 +120,53 @@ export async function POST(request: NextRequest) {
 
     for (const item of items) {
       const variant = dbVariants.find((v) => v.id === item.variantId);
-      if (!variant) continue;
+      if (!variant) {
+        return NextResponse.json(
+          {
+            success: false,
+            message: 'কার্টের একটি বা একাধিক পণ্য পাওয়া যায়নি। অনুগ্রহ করে কার্ট রিফ্রেশ করুন।',
+          },
+          { status: 400 }
+        );
+      }
+
+      const displayName = variant.product.nameBn || variant.product.nameEn;
+      const variantLabel = `${displayName} (${variant.packSize})`;
+
+      // 1. Status Check: Must be ACTIVE
+      if (variant.product.status !== 'ACTIVE') {
+        return NextResponse.json(
+          {
+            success: false,
+            message: `"${displayName}" পণ্যটি বর্তমানে বিক্রয়ের জন্য উপলব্ধ নেই (আর্কাইভ বা নিষ্ক্রিয় করা হয়েছে)। অনুগ্রহ করে কার্ট থেকে পণ্যটি বাদ দিন।`,
+          },
+          { status: 400 }
+        );
+      }
 
       const qty = Math.max(1, Number(item.quantity) || 1);
+
+      // 2. Stock Check: Must be in stock and have sufficient quantity
+      if (!variant.inStock || variant.stockQuantity <= 0) {
+        return NextResponse.json(
+          {
+            success: false,
+            message: `"${variantLabel}" পণ্যটি বর্তমানে স্টক শেষ (আউট অব স্টক)।`,
+          },
+          { status: 400 }
+        );
+      }
+
+      if (variant.stockQuantity < qty) {
+        return NextResponse.json(
+          {
+            success: false,
+            message: `"${variantLabel}" এর পর্যাপ্ত স্টক নেই (মজুদ আছে: ${variant.stockQuantity} টি, আপনার কার্টে আছে: ${qty} টি)। অনুগ্রহ করে পরিমাণ কমিয়ে আবার চেষ্টা করুন।`,
+          },
+          { status: 400 }
+        );
+      }
+
       const unitMrp = Number(variant.mrpPrice);
       const unitTp = Number(variant.tradePrice);
       const rawSelling = Number(variant.sellingPrice || variant.mrpPrice);
@@ -309,6 +353,21 @@ export async function POST(request: NextRequest) {
           customerPhone: true,
         },
       });
+
+      // Atomically decrement variant stock & update inStock flag
+      for (const item of orderItemData) {
+        const dbVar = dbVariants.find((v) => v.id === item.variantId);
+        const currentQty = dbVar?.stockQuantity ?? item.quantity;
+        const remainingQty = Math.max(0, currentQty - item.quantity);
+
+        await tx.productVariant.update({
+          where: { id: item.variantId },
+          data: {
+            stockQuantity: { decrement: item.quantity },
+            inStock: remainingQty > 0,
+          },
+        });
+      }
 
       return createdOrder;
     });

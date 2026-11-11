@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { ProductFormFactor, ProductStatus } from '@prisma/client';
 import { generateStandardSku } from '@/lib/sku-generator';
+import { verifyAdminSession, unauthorizedResponse } from '@/lib/auth-server';
 
 function slugify(text: string): string {
   return text
@@ -45,6 +46,11 @@ export async function PUT(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const session = await verifyAdminSession(request);
+    if (!session) {
+      return unauthorizedResponse();
+    }
+
     const { id } = await params;
     const body = await request.json();
 
@@ -267,10 +273,15 @@ export async function PUT(
 }
 
 export async function DELETE(
-  _request: NextRequest,
+  request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const session = await verifyAdminSession(request);
+    if (!session) {
+      return unauthorizedResponse();
+    }
+
     const { id } = await params;
 
     // Check if product exists

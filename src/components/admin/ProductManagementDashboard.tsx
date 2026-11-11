@@ -181,9 +181,8 @@ export default function ProductManagementDashboard() {
     setIsDeleting(true);
 
     try {
-      const res = await fetch(getApiUrl(`/api/admin/products/${productToDelete.id}`), {
+      const res = await authorizedFetch(`/api/admin/products/${productToDelete.id}`, {
         method: 'DELETE',
-        credentials: 'include',
       });
       const data = await res.json();
       if (!res.ok || !data.success) {

@@ -15,6 +15,8 @@ import {
   X,
   LayoutDashboard,
   CheckCircle2,
+  ImageIcon,
+  Star,
 } from 'lucide-react';
 
 interface AdminSidebarProps {
@@ -56,6 +58,23 @@ export default function AdminSidebar({ isOpen, onClose }: AdminSidebarProps) {
       ],
     },
     {
+      title: 'Storefront CMS',
+      links: [
+        {
+          label: 'Hero Banners',
+          href: '/admin/hero-banners',
+          icon: ImageIcon,
+          badge: null,
+        },
+        {
+          label: 'Customer Reviews',
+          href: '/admin/reviews',
+          icon: Star,
+          badge: null,
+        },
+      ],
+    },
+    {
       title: 'Configuration',
       links: [
         {
@@ -81,7 +100,8 @@ export default function AdminSidebar({ isOpen, onClose }: AdminSidebarProps) {
             <Image
               src="/images/logo.png"
               alt="Research Agro Vet Logo"
-            fill
+              fill
+              sizes="80px"
               className="object-contain"
             />
           </div>

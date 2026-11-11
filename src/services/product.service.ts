@@ -261,7 +261,7 @@ export async function getProducts(params: ProductFilterParams = {}) {
   return { products, total, page, totalPages: Math.ceil(total / limit) };
 }
 
-export async function getProductBySlug(slugOrId: string) {
+export async function getProductBySlug(slugOrId: string, onlyActive = true) {
   const include = {
     variants: { orderBy: { sellingPrice: 'asc' as const } },
     category: true,
@@ -272,14 +272,24 @@ export async function getProductBySlug(slugOrId: string) {
     },
   };
 
-  const bySlug = await prisma.product.findUnique({
-    where: { slug: slugOrId },
+  const whereSlug: any = {
+    slug: slugOrId,
+    ...(onlyActive ? { status: 'ACTIVE' as const } : {}),
+  };
+
+  const bySlug = await prisma.product.findFirst({
+    where: whereSlug,
     include,
   });
   if (bySlug) return bySlug;
 
-  return prisma.product.findUnique({
-    where: { id: slugOrId },
+  const whereId: any = {
+    id: slugOrId,
+    ...(onlyActive ? { status: 'ACTIVE' as const } : {}),
+  };
+
+  return prisma.product.findFirst({
+    where: whereId,
     include,
   });
 }

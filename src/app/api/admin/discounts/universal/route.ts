@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
+import { verifyAdminSession, unauthorizedResponse } from '@/lib/auth-server';
 
 
 export async function GET() {
@@ -46,6 +47,11 @@ export async function GET() {
 
 export async function PUT(request: NextRequest) {
   try {
+    const session = await verifyAdminSession(request);
+    if (!session) {
+      return unauthorizedResponse();
+    }
+
     const body = await request.json();
     const { enabled, percent } = body;
 

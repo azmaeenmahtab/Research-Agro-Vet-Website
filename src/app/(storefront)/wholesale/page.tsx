@@ -1,6 +1,7 @@
 import React from 'react';
 import Link from 'next/link';
 import { Handshake, MessageCircle, Phone, ArrowLeft, Building2, Package, Percent, ShieldCheck, Truck } from 'lucide-react';
+import { WhatsAppIcon } from '@/components/storefront/HeroSection';
 
 export const metadata = {
   title: 'পাইকারি ও ডিলারশিপ অর্ডার | Research Agro Vet',
@@ -21,16 +22,16 @@ export default function WholesalePage() {
         </nav>
 
         {/* The Wholesale Card */}
-        <div className="bg-white rounded-3xl border border-slate-200/90 shadow-sm p-6 sm:p-10 space-y-8">
+        <div className="bg-white rounded-3xl border border-slate-200/90 shadow-sm p-4 sm:p-10 sm:space-y-8 space-y-5">
           {/* Card Header */}
-          <div className="text-center space-y-3 pb-6 border-b border-slate-100">
+          <div className="text-center space-y-3  pb-3 sm:pb-6 border-b border-slate-100">
             <div className="w-16 h-16 rounded-2xl bg-amber-100 border border-amber-300 text-amber-900 flex items-center justify-center mx-auto shadow-2xs">
               <Handshake className="w-8 h-8 text-amber-800" />
             </div>
 
-            <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-amber-50 border border-amber-200 text-amber-900 text-xs font-bold">
+            {/* <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-amber-50 border border-amber-200 text-amber-900 text-xs font-bold">
               <span>B2B • পাইকারি ও ডিলার পয়েন্ট</span>
-            </div>
+            </div> */}
 
             <h1 className="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight">
               পাইকারি ও ডিলারশিপ অর্ডার
@@ -121,7 +122,7 @@ export default function WholesalePage() {
               rel="noopener noreferrer"
               className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-6 py-3 rounded-xl bg-[#005d42] hover:bg-[#004e37] text-white font-bold text-xs sm:text-sm shadow-sm transition-all"
             >
-              <MessageCircle className="w-4 h-4 fill-white/20" />
+              <WhatsAppIcon className="w-4 h-4 fill-current shrink-0" />
               <span>WhatsApp-এ পাইকারি অর্ডার করুন</span>
             </a>
 
@@ -130,7 +131,7 @@ export default function WholesalePage() {
               className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-6 py-3 rounded-xl bg-white hover:bg-slate-100 text-slate-800 font-bold text-xs sm:text-sm border border-slate-300 shadow-2xs transition-all"
             >
               <Phone className="w-4 h-4 text-emerald-700" />
-              <span>Manufacturer Hotline: ০১৭১৬-০১৯৭৩১</span>
+              <span>Hotline: ০১৭১৬-০১৯৭৩১</span>
             </a>
 
             <Link
@@ -138,7 +139,7 @@ export default function WholesalePage() {
               className="w-full sm:w-auto inline-flex items-center justify-center gap-1.5 px-5 py-3 rounded-xl text-slate-600 hover:text-emerald-700 font-bold text-xs sm:text-sm transition-colors"
             >
               <ArrowLeft className="w-4 h-4" />
-              <span>সকল পণ্য ক্যাটালগ</span>
+              <span>সকল পণ্য</span>
             </Link>
           </div>
         </div>

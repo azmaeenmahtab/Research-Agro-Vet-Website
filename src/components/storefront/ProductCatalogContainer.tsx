@@ -23,6 +23,8 @@ function formatRawProduct(p: any, universalDiscount?: UniversalDiscountConfig | 
     nameEn: p.nameEn,
     nameBn: p.nameBn || null,
     tagBadge: p.dlsLicenseNo ? 'DLS অনুমোদিত' : undefined,
+    isFeatured: Boolean(p.isFeatured),
+    isBestSeller: Boolean(p.isBestSeller),
     inStock: p.status === 'ACTIVE',
     thumbnail: p.thumbnail,
     imageUrl: p.thumbnail,
@@ -244,7 +246,7 @@ export default function ProductCatalogContainer({
   const endItem = Math.min(currentPage * pageSize, totalCount);
 
   return (
-    <div className="grid grid-cols-1 lg:grid-cols-12 gap-5 items-start">
+    <div className="grid grid-cols-1 lg:grid-cols-12 sm:gap-5 gap-0 items-start">
       {/* Left Column: Filter Sidebar (col-span-4, sticky) */}
       <aside className="lg:col-span-3 w-full lg:sticky lg:top-[85px] self-start z-20">
         <ProductFilters
@@ -369,7 +371,7 @@ export default function ProductCatalogContainer({
         {/* Products Grid (Only this section updates on filter/page change) */}
         <div className={`relative transition-opacity duration-200 ${isLoading || isPending ? 'opacity-50 pointer-events-none' : 'opacity-100'}`}>
           {products.length > 0 ? (
-            <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-5">
+            <div className="grid grid-cols-2 sm:grid-cols-2 xl:grid-cols-3 gap-3 sm:gap-5">
               {products.map((product) => (
                 <ProductCard key={product.id} product={product} />
               ))}

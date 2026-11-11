@@ -10,12 +10,20 @@ const TOKEN_STORAGE_KEY = 'better-auth_token';
 export function getStoredBearerToken(): string | null {
   if (typeof window === 'undefined') return null;
 
+  // Helper to extract clean token if it's signed (e.g. s:token.signature or token.signature)
+  const cleanTokenString = (raw: string): string => {
+    let val = raw.trim();
+    if (val.startsWith('s:')) val = val.slice(2);
+    if (val.includes('.')) val = val.split('.')[0];
+    return val;
+  };
+
   // 1. Check local storage for token captured via `set-auth-token` header
   try {
     const localToken =
       localStorage.getItem(TOKEN_STORAGE_KEY) ||
       localStorage.getItem('better-auth.session_token');
-    if (localToken) return localToken;
+    if (localToken) return cleanTokenString(localToken);
   } catch (e) {
     // localStorage might be unavailable in restricted contexts
   }
@@ -26,7 +34,7 @@ export function getStoredBearerToken(): string | null {
       /(?:^|;\s*)(?:__Secure-)?better-auth\.session_token=([^;]+)/
     );
     if (match && match[1]) {
-      return decodeURIComponent(match[1]);
+      return cleanTokenString(decodeURIComponent(match[1]));
     }
   } catch (e) {
     // ignore

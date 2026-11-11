@@ -1,9 +1,15 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { Prisma, BuyerTier } from '@prisma/client';
+import { verifyAdminSession, unauthorizedResponse } from '@/lib/auth-server';
 
 export async function POST(request: NextRequest) {
   try {
+    const session = await verifyAdminSession(request);
+    if (!session) {
+      return unauthorizedResponse();
+    }
+
     const body = await request.json();
     const {
       customerName,

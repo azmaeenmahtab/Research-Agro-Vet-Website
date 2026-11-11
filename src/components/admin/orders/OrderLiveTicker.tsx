@@ -61,7 +61,7 @@ export default function OrderLiveTicker({
 
         {/* Right: Sound Alert & Auto-Refresh Controls */}
         <div className="flex items-center gap-3 text-xs">
-          <button
+          {/* <button
             type="button"
             onClick={() => setSoundEnabled(!soundEnabled)}
             className="flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-emerald-900/60 hover:bg-emerald-900 text-emerald-100 hover:text-white transition-colors border border-emerald-700/50"
@@ -77,7 +77,7 @@ export default function OrderLiveTicker({
                 <span>Sound Alert: <strong className="text-slate-300">OFF</strong></span>
               </>
             )}
-          </button>
+          </button> */}
 
           <span className="text-emerald-300/40 hidden md:inline">|</span>
 
@@ -95,10 +95,7 @@ export default function OrderLiveTicker({
             <span>Auto-Refresh: <strong>{countdown}s</strong></span>
           </button>
 
-          <span className="hidden lg:inline-flex items-center gap-1 px-2.5 py-1 bg-amber-500/20 text-amber-200 border border-amber-400/30 rounded-lg font-semibold text-[11px]">
-            <Zap className="w-3 h-3 text-amber-300" />
-            <span>Tele-Verification Active</span>
-          </span>
+          
         </div>
       </div>
     </div>

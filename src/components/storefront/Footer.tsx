@@ -4,7 +4,7 @@ import { Phone, Mail, MapPin, ShieldCheck } from 'lucide-react';
 export default function Footer() {
   return (
     <footer className="bg-slate-900 text-slate-300 text-xs mt-auto">
-      <div className="max-w-7xl mx-auto px-4 py-10 grid grid-cols-1 md:grid-cols-4 gap-8">
+      <div className="max-w-7xl mx-auto px-4 py-6 sm:py-10 grid grid-cols-1 md:grid-cols-4 sm:gap-8 gap-4">
         {/* Brand & Regulatory */}
         <div className="space-y-3">
           <div className="flex items-center gap-2">

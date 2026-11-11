@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getOrderById, updateAdminOrder } from '@/services/order.service';
+import { verifyAdminSession, unauthorizedResponse } from '@/lib/auth-server';
 
 interface RouteContext {
   params: Promise<{ id: string }>;
@@ -29,6 +30,11 @@ export async function GET(request: NextRequest, context: RouteContext) {
 
 export async function PUT(request: NextRequest, context: RouteContext) {
   try {
+    const session = await verifyAdminSession(request);
+    if (!session) {
+      return unauthorizedResponse();
+    }
+
     const { id } = await context.params;
     const body = await request.json();
 
